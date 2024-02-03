@@ -1,4 +1,5 @@
 var { admin } = require('./initFirebase');
+var { getGameData } = require('./game');
 
 
 async function getWishlists(req) {
