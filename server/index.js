@@ -1,63 +1,11 @@
-var SteamStrategy =  require("passport-steam");
-var passport = require("passport");
+var { passport, login, logout } = require("./auth.js");
 var express = require("express");
 var Session = require("express-session");
-
-// Import the functions you need from the SDKs you need
-var firebase_auth = require("firebase/auth");
 var { admin } = require("./initFirebase.js");
-const auth = firebase_auth.getAuth();
 const { v4: uuidv4 } = require('uuid');
-
 require('dotenv').config()
-
 var qs = require('querystring');
-
 const { searchForGame } = require('./typesense.js');
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
-const base_url = `${process.env.BASE_URL}`
-
-// this gets called whenever a user logs in (for the first time only i think)
-// stores only the information from the user that we find relevant (in this case id, name, and avatar)
-passport.serializeUser(function(user, done) {
-  // console.log(user);
-  done(null, {
-    id: user.id,
-    name: user.displayName,
-    avatar: user.photos[1].value
-  });
-});
-
-// this gets called whenever a user loads a page
-// basically just returns the user object we created in serializeUser
-passport.deserializeUser(function(obj, done) {
-  done(null, obj)
-});
-
-passport.use(new SteamStrategy({
-  returnURL: base_url + '/steam/login',
-  realm: base_url + '/',
-  apiKey: `${process.env.PASSPORT_API_KEY}`
-},
-function(identifier, profile, done) {
-  // asynchronous verification, for effect...
-  process.nextTick(function () {
-
-    // To keep the example simple, the user's Steam profile is returned to
-    // represent the logged-in user.  In a typical application, you would want
-    // to associate the Steam account with a user record in your database,
-    // and return that user instead.
-    profile.identifier = identifier;
-    return done(null, profile);
-  });
-}
-));
 
 const app = express()
 
@@ -87,33 +35,7 @@ app.get('/', async function(req, res){
 });
 
 // login path redirects to index after authenticating with Steam
-app.get('/steam/login', passport.authenticate('steam', {failureRedirect: '/'}), function(req, res){
-  var oid = req.query["openid.claimed_id"];
-  var array = oid.split("/id/");
-  var result = array[1];
-  admin.auth().createCustomToken(result)
-  .then(function(customToken) {
-    // console.log("created custom token?");
-    doc = admin.firestore().collection('users').doc(result).get().then((docSnapshot) => {
-      if (!docSnapshot.exists) {
-        console.log("User does not exist, creating new user");
-        admin.firestore().collection('users').doc(result).set({
-          wishlists: []
-        });
-      }
-    });
-
-    // Send token back to client
-    firebase_auth.signInWithCustomToken(auth, customToken)
-    .catch(function(error) {
-      if (error){
-        alert(error);
-      }
-    })
-    .then(console.log("Signed in as " + req.user?.displayName + " with custom token on firebase"))
-  })
-  .then(res.redirect('/'))
-});
+app.get('/steam/login', passport.authenticate('steam', {failureRedirect: '/'}), login);
 
 async function getWishLists(req) {
   // console.log(req);
@@ -308,16 +230,7 @@ app.get('/game/add/:wishlist_id/:game_id', async function(req, res){
 // })
 
 // logout path redirects to index
-app.get('/logout', function(req, res){
-  console.log("Logging out of " + req.user?.name)
-  req.logout(function(err) {
-    if (err) {
-      console.log(err);
-      return next(err);
-    }
-    res.redirect('/');
-  });
-});
+app.get('/logout', logout);
 
 
 app.listen(3001);

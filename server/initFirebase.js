@@ -23,3 +23,4 @@ const firebaseAdmin = admin.initializeApp({
 });
 
 exports.admin = firebaseAdmin;
+exports.app = firebaseApp;
