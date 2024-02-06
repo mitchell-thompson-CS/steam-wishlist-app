@@ -24,7 +24,7 @@ async function searchGamePage(req, res){
     res.send(gameList.hits);
     // console.log('sent game list');
   } else {
-    res.redirect('/');
+    res.sendStatus(404);
   }
 }
 
@@ -55,10 +55,11 @@ function getGamePage(req, res){
       }
 
       // console.log(gameData)
-      res.render('game', { gameData: gameData });
+      // res.render('game', { gameData: gameData });
+      res.send(gameData);
       // https://store.steampowered.com/appreviews/105600?json=1
     } else {
-      res.redirect('/');
+      res.sendStatus(404);
     }
   });
 }

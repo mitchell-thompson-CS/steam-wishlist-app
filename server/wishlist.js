@@ -68,7 +68,7 @@ function createWishlist(req, res) {
                         wishlists: admin.firestore.FieldValue.arrayUnion(admin.firestore().collection('wishlists').doc(new_id))
                     }).then(() => {
                         // console.log("wishlist added to user");
-                        res.redirect('/');
+                        res.sendStatus(200);
                     });
                 });
             }
@@ -83,17 +83,18 @@ async function getWishlistPage(req, res) {
                 var data = wishsnapshot.data();
                 data['id'] = req.params.id;
                 if (data.editors[req.user.id] || data.owner.id == req.user.id) {
-                    res.render('wishlist', { user: req.user, wishlist: data });
+                    // res.render('wishlist', { user: req.user, wishlist: data });
+                    res.send(data);
                 } else {
-                    res.redirect('/');
+                    res.sendStatus(401);
                 }
             } else {
                 console.log(req.user.name + " tried to access a wishlist that doesn't exist");
-                res.redirect('/');
+                res.sendStatus(404);
             }
         })
     } else {
-        res.redirect('/');
+        res.sendStatus(404);
     }
 }
 
@@ -110,19 +111,20 @@ async function addGameToWishlist(req, res) {
                         admin.firestore().collection('wishlists').doc(req.params.wishlist_id).update({
                             [`games.${req.params.game_id}`]: gameData[req.params.game_id]['data']['name']
                         }).then(() => {
-                            res.redirect('/wishlist/' + req.params.wishlist_id)
+                            // res.redirect('/wishlist/' + req.params.wishlist_id)
+                            res.sendStatus(200);
                         });
                     })
                 } else {
-                    res.redirect('/');
+                    res.sendStatus(401);
                 }
             } else {
                 console.log(req.user.name + " tried to add a game to a wishlist that doesn't exist");
-                res.redirect('/');
+                res.sendStatus(404);
             }
         })
     } else {
-        res.redirect('/');
+        res.sendStatus(404);
     }
 }
 exports.getWishlistPage = getWishlistPage;

@@ -26,7 +26,7 @@ passport.deserializeUser(function (obj, done) {
 });
 
 passport.use(new SteamStrategy({
-    returnURL: base_url + '/steam/login',
+    returnURL: base_url + '/auth/steam/return',
     realm: base_url + '/',
     apiKey: `${process.env.PASSPORT_API_KEY}`
 },
@@ -44,7 +44,14 @@ passport.use(new SteamStrategy({
     }
 ));
 
+async function savePrevPageToSession(req, res, next) {
+    req.session.prevPage = req.query.redir;
+    await req.session.save();
+    next();
+}
+
 function login(req, res){
+  console.log(req.session.prevPage);
   var oid = req.query["openid.claimed_id"];
   var array = oid.split("/id/");
   var result = array[1];
@@ -60,16 +67,24 @@ function login(req, res){
       }
     });
 
+    // console.log("Signing in with custom token");
     // Send token back to client
     firebase_auth.signInWithCustomToken(auth, customToken)
     .catch(function(error) {
       if (error){
-        alert(error);
+        console.log(error)
+        res.sendStatus(500);
       }
     })
-    .then(console.log("Signed in as " + req.user?.displayName + " with custom token on firebase"))
+    .then(() => {
+        console.log("Signed in as " + req.user?.displayName + " with custom token on firebase");
+        if(!res.headersSent){
+          // console.log(req);
+          // console.log(res);
+          res.sendStatus(200);
+        }
+    })
   })
-  .then(res.redirect('/'))
 }
 
 function logout(req, res){
@@ -77,12 +92,14 @@ function logout(req, res){
   req.logout(function(err) {
     if (err) {
       console.log(err);
-      return next(err);
+      res.sendStatus(500);
+      // return next(err);
     }
-    res.redirect('/');
+    res.sendStatus(200);
   });
 }
 
 exports.passport = passport;
 exports.login = login;
 exports.logout = logout;
+exports.savePrevPageToSession = savePrevPageToSession;
