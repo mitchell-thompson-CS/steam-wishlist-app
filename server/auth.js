@@ -46,12 +46,12 @@ passport.use(new SteamStrategy({
 
 async function savePrevPageToSession(req, res, next) {
     req.session.prevPage = req.query.redir;
-    await req.session.save();
-    next();
+    await req.session.save(() => {
+      next();
+    });
 }
 
 function login(req, res){
-  console.log(req.session.prevPage);
   var oid = req.query["openid.claimed_id"];
   var array = oid.split("/id/");
   var result = array[1];
@@ -77,11 +77,15 @@ function login(req, res){
       }
     })
     .then(() => {
+        // console.log(req.user)
         console.log("Signed in as " + req.user?.displayName + " with custom token on firebase");
         if(!res.headersSent){
           // console.log(req);
           // console.log(res);
-          res.sendStatus(200);
+          // res.sendStatus(200);
+          // console.log(req.session.prevPage);
+          res.redirect(req.session.prevPage);
+          // res.send(req.session.prevPage);
         }
     })
   })

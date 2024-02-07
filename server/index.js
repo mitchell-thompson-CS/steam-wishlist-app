@@ -21,8 +21,8 @@ app.set("view engine", "ejs")
 app.use(Session({
     secret: 'your secret',
     name: 'session_id',
-    resave: true,
-    saveUninitialized: false
+    resave: false,
+    saveUninitialized: true
   }));
 
 // maintains login state from session
@@ -36,9 +36,9 @@ app.get('/', async function(req, res){
   res.sendStatus(200);
 });
 
-app.get('/steam/login', savePrevPageToSession, passport.authenticate('steam'));
+app.get('/steam/login', savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}));
 
-app.get('/auth/steam/return', login);
+app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}), login);
 
 app.post('/wishlist/create', createWishlist);
 
