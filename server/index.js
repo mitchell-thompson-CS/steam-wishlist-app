@@ -1,12 +1,12 @@
 var { passport, login, logout, savePrevPageToSession } = require("./auth.js");
 var express = require("express");
 var Session = require("express-session");
-// var cors = require("cors");
+var cors = require("cors");
 var { admin } = require("./initFirebase.js");
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config()
 var qs = require('querystring');
-var { getWishlistPage, createWishlist, addGameToWishlist, getWishlists } = require("./wishlist.js");
+var { getWishlistPage, createWishlist, addGameToWishlist, getWishlists, getWishlistsPage} = require("./wishlist.js");
 const { getGamePage, searchGamePage } = require("./game.js");
 
 const app = express()
@@ -15,7 +15,7 @@ const app = express()
 app.set('views', __dirname + '/views');
 app.set("view engine", "ejs")
 
-// app.use(cors());
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 // session config
 app.use(Session({
@@ -39,6 +39,8 @@ app.get('/', async function(req, res){
 app.get('/steam/login', savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}));
 
 app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}), login);
+
+app.get('/wishlist', getWishlistsPage);
 
 app.post('/wishlist/create', createWishlist);
 

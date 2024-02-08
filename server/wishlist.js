@@ -33,6 +33,11 @@ async function getWishlists(req) {
     }
 }
 
+async function getWishlistsPage(req, res) {
+    let wishlists = await getWishlists(req);
+    res.send(JSON.stringify(wishlists));
+}
+
 function createWishlist(req, res) {
     // console.log(req);
     var body = '';
@@ -131,3 +136,4 @@ exports.getWishlistPage = getWishlistPage;
 exports.getWishlists = getWishlists;
 exports.createWishlist = createWishlist;
 exports.addGameToWishlist = addGameToWishlist;
+exports.getWishlistsPage = getWishlistsPage;
