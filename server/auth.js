@@ -6,7 +6,7 @@ var { admin } = require("./initFirebase");
 
 const auth = firebase_auth.getAuth();
 
-const base_url = `${process.env.BASE_URL}`
+const base_url = `${process.env.API_BASE_URL}`
 
 // this gets called whenever a user logs in (for the first time only i think)
 // stores only the information from the user that we find relevant (in this case id, name, and avatar)
