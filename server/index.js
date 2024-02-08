@@ -1,10 +1,10 @@
+require('dotenv').config({path: __dirname + '/../.env'})
 var { passport, login, logout, savePrevPageToSession } = require("./auth.js");
 var express = require("express");
 var Session = require("express-session");
 var cors = require("cors");
 var { admin } = require("./initFirebase.js");
 const { v4: uuidv4 } = require('uuid');
-require('dotenv').config()
 var qs = require('querystring');
 var { getWishlistPage, createWishlist, addGameToWishlist, getWishlists, getWishlistsPage} = require("./wishlist.js");
 const { getGamePage, searchGamePage } = require("./game.js");

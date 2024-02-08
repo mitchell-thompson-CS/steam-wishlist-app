@@ -1,6 +1,5 @@
 const Typesense = require('typesense');
 const http = require('http');
-require('dotenv').config();
 var typesenseClient = new Typesense.Client({
     'nodes': [{
         'host': 'localhost', // For Typesense Cloud use xxx.a1.typesense.net

@@ -3,9 +3,6 @@ var firebase_app = require("firebase/app");
 
 var serviceAccount = require("./private/steam-wishlist-app-firebase-adminsdk-ere8r-e012cbbea1.json");
 
-
-require("dotenv").config();
-
 const firebaseConfig = {
   apiKey: `${process.env.FIREBASE_API_KEY}`,
   authDomain: `${process.env.FIREBASE_AUTH_DOMAIN}`,
