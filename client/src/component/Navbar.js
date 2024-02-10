@@ -21,28 +21,37 @@ const Navbar = () => {
 
     return (
         <nav>
-                <ul>
+                <ul className="left">
 
                     <li>
                         <a href="http://localhost:3000"><img id="logo" src="http://localhost:3000/logo.svg"/></a>
                     </li>
-                    <li>
+                    {/* <li>
                         <a href="http://localhost:3000/">HOME</a>
+                    </li> */}
+                    <li id="searchArea">
+                        <form>
+                            <input type="text" id="search" name="search" placeholder="Search.."/>
+                        </form>
                     </li>
                     <li>
                         <a href="http://localhost:3000/wishlists">WISHLISTS</a>
                     </li>
-                    <li id="moveright">
+                </ul>
+                <ul className="right">
+                    <li>
                         {user.name ?
-                            <div className="signin">
-                                <img id="avatar" src={user.avatar}/>
-                                <a href="http://localhost:3001/logout?redir=http://localhost:3000">{user.name}</a> 
-                            </div> :
+                            <a href="http://localhost:3001/logout?redir=http://localhost:3000" className="signin">{user.name}</a> :
                             <a href="http://localhost:3001/steam/login?redir=http://localhost:3000" className="signin">LOGIN</a>
                         }
                     </li>
-                    <div className="clear"></div>
+                    <li>
+                        {user.avatar ?
+                         <img id="avatar" src={user.avatar} alt="avatar"/> :
+                         <div></div>}
+                    </li>
                 </ul>
+                <div className="clear"></div>
         </nav>
     );
 }
