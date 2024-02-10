@@ -30,6 +30,8 @@ async function getWishlists(req) {
                 }
             }
         });
+    } else {
+        res.sendStatus(404);
     }
 }
 

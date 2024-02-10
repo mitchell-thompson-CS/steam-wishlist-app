@@ -1,5 +1,5 @@
 require('dotenv').config({path: __dirname + '/../.env'})
-var { passport, login, logout, savePrevPageToSession } = require("./auth.js");
+var { passport, login, logout, savePrevPageToSession, getUser } = require("./auth.js");
 var express = require("express");
 var Session = require("express-session");
 var cors = require("cors");
@@ -39,6 +39,8 @@ app.get('/', async function(req, res){
 app.get('/steam/login', savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}));
 
 app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}), login);
+
+app.get('/user', getUser);
 
 app.get('/wishlist', getWishlistsPage);
 

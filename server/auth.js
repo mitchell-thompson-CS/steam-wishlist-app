@@ -99,11 +99,20 @@ function logout(req, res){
       res.sendStatus(500);
       // return next(err);
     }
-    res.sendStatus(200);
+    res.redirect(req.query.redir);
   });
+}
+
+function getUser(req, res){
+  if(req.user){
+    res.send(req.user);
+  } else {
+    res.sendStatus(404);
+  }
 }
 
 exports.passport = passport;
 exports.login = login;
 exports.logout = logout;
 exports.savePrevPageToSession = savePrevPageToSession;
+exports.getUser = getUser;
