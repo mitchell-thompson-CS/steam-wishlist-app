@@ -17,15 +17,11 @@ async function getGameData(appid) {
 }
 
 async function searchGamePage(req, res){
-  if (req.user) {
-    let query = req.params.query;
-    // console.log("Searching for " + query);
-    let gameList = await searchForGame(query, 5);
-    res.send(gameList.hits);
-    // console.log('sent game list');
-  } else {
-    res.sendStatus(404);
-  }
+  let query = req.params.query;
+  // console.log("Searching for " + query);
+  let gameList = await searchForGame(query, 5);
+  res.send(gameList.hits);
+  // console.log('sent game list');
 }
 
 function getGamePage(req, res){

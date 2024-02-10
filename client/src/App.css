@@ -1,39 +1,95 @@
-.App {
-  text-align: center;
+:root {
+  --nav-height: 60px;
 }
 
 .App-header {
   background-color: #1b2838;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  /* align-items: center;
-  justify-content: center; */
-  font-size: calc(10px + 2vmin);
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* font-size: calc(10px + 2vmin); */
   color: white;
 }
 
-.navbar {
-  background-color: #171D25;
-  height: 60px;
+nav {
+  width: 100%;
+  height: 75px;
+  display: block;
+  position: absolute;
+  background-color: #171d25;
 }
 
-.navbar a {
-  display: block; /* Display links as block elements */
-  color: white; /* Text color */
-  text-align: center; /* Center-align text */
-  padding: 14px 20px; /* Padding around text */
-  text-decoration: none; /* Remove underline */
+nav ul {
+  position: relative;
+  list-style: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* top: 12.5%; */
 }
 
-.navbar a:not(.signin) {
-  float: left;
+nav ul li {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  top: 33.3333%;
+  /* height: 33.3%; */
+  padding: 0 20px;
+  /* line-height: 33.3%; */
+  height: 25px;
 }
 
-.navbar a:hover {
-  color: #c6c6c6; /* Text color on hover */
+/* nav ul li div {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  top: 25%;
+  padding: 0 20px;
+  align-items: center;
+} */
+
+nav ul li a {
+  display: inline-block;
+  color: white;
+  text-decoration: none;
+  font-size: 25px;
+  height: 100%;
+  line-height: 100%;
+  /* top: 25%; */
 }
 
-.navbar .signin {
-  float: right;
+nav ul li a:hover {
+  color: #c6c6c6;
+}
+
+#moveright {
+  margin-left: 20vw;
+  /* height: 19px; */
+  /* height: 25px; */
+}
+
+.signin {
+  /* float: right; */
+}
+
+nav ul li .signin{
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  width: 200px;
+  top: 0;
+}
+
+nav ul li .signin img {
+  position: relative;
+  height: 100%;
+}
+
+nav ul li .signin a {
+  /* position: relative; */
+}
+
+
+.clear {
+  clear: both;
 }
