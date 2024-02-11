@@ -1,7 +1,9 @@
 var { admin } = require('./initFirebase');
 var { getGameData } = require('./game');
+let { FirebaseError, UserError, handleError } = require('./errors');
 
-
+// this function gets a users wishlists in an array and returns it
+// returns null if the user is not logged in
 async function getWishlists(req) {
     // console.log(req);
     if (req.user) {
@@ -28,16 +30,24 @@ async function getWishlists(req) {
                 } else {
                     return [];
                 }
+            } else {
+                // console.log("Unable to get a user's wishlists");
+                throw new FirebaseError("Unable to get a user's wishlists");
             }
         });
     } else {
-        res.sendStatus(404);
+        throw new UserError("User is not logged in");
     }
 }
 
 async function getWishlistsPage(req, res) {
-    let wishlists = await getWishlists(req);
-    res.send(JSON.stringify(wishlists));
+    try {
+        let wishlists = await getWishlists(req);
+        res.send(JSON.stringify(wishlists));
+    } catch (error) {
+        handleError(error, res);
+    }
+    
 }
 
 function createWishlist(req, res) {
@@ -93,7 +103,7 @@ async function getWishlistPage(req, res) {
                     // res.render('wishlist', { user: req.user, wishlist: data });
                     res.send(data);
                 } else {
-                    res.sendStatus(401);
+                    res.sendStatus(403);
                 }
             } else {
                 console.log(req.user.name + " tried to access a wishlist that doesn't exist");
@@ -101,7 +111,7 @@ async function getWishlistPage(req, res) {
             }
         })
     } else {
-        res.sendStatus(404);
+        res.sendStatus(401);
     }
 }
 
@@ -123,7 +133,7 @@ async function addGameToWishlist(req, res) {
                         });
                     })
                 } else {
-                    res.sendStatus(401);
+                    res.sendStatus(403);
                 }
             } else {
                 console.log(req.user.name + " tried to add a game to a wishlist that doesn't exist");
@@ -131,7 +141,7 @@ async function addGameToWishlist(req, res) {
             }
         })
     } else {
-        res.sendStatus(404);
+        res.sendStatus(401);
     }
 }
 exports.getWishlistPage = getWishlistPage;
