@@ -36,20 +36,24 @@ app.get('/', async function(req, res){
   res.sendStatus(200);
 });
 
+// auth paths
 app.get('/api/auth/steam', savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}));
 
 app.get('/api/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}), login);
 
 app.post('/api/auth/logout', logout);
 
+// user path
 app.get('/api/user', getUser);
 
+// wishlist paths
 app.get('/api/wishlist', getWishlistsPage);
 
 app.post('/api/wishlist/create', createWishlist);
 
 app.get('/api/wishlist/:id', getWishlistPage);
 
+// game paths
 app.get('/api/game/search/:query', searchGamePage);
 
 app.get('/api/game/:game_id', getGamePage);

@@ -53,8 +53,8 @@ const Navbar = () => {
                 <ul className="right">
                     <li>
                         {user.name ?
-                            <a href="#" className="signin" onClick={logout}>{user.name}</a> :
-                            <a href="/api/auth/steam?redir=http://localhost:3000" className="signin">LOGIN</a>
+                            <a href="javascript:void(0)" className="signin" onClick={logout}>{user.name}</a> :
+                            <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)} className="signin">LOGIN</a>
                         }
                     </li>
                     <li>
