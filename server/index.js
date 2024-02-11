@@ -56,4 +56,6 @@ app.get('/api/game/:game_id', getGamePage);
 
 app.get('/api/game/add/:wishlist_id/:game_id', addGameToWishlist);
 
+// TODO: we need to add delete api paths for stuff that we create as well
+
 app.listen(3001);
