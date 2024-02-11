@@ -31,7 +31,7 @@ const Navbar = () => {
                     </li> */}
                     <li id="searchArea">
                         <form>
-                            <input type="text" id="search" name="search" placeholder="Search.."/>
+                            <input type="text" id="search" name="search" placeholder="Search..."/>
                         </form>
                     </li>
                     <li>
