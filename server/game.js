@@ -1,5 +1,6 @@
 const { searchForGame } = require('./typesense.js');
 
+// TODO: restructure game data method with a SteamError or something similar
 async function getGameData(appid) {
   let currency = 'USD';
   return await fetch('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid)
@@ -16,6 +17,7 @@ async function getGameData(appid) {
   })
 }
 
+// TODO: do we need to handle errors from searchForGame?
 async function searchGamePage(req, res){
   let query = req.params.query;
   // console.log("Searching for " + query);
@@ -24,6 +26,7 @@ async function searchGamePage(req, res){
   // console.log('sent game list');
 }
 
+// TODO: handle error from the note on getGameData
 function getGamePage(req, res){
   console.log('searching for game id ' + req.params.game_id)
   getGameData(req.params.game_id).then((data) => {

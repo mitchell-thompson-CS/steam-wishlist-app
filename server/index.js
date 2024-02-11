@@ -36,24 +36,24 @@ app.get('/', async function(req, res){
   res.sendStatus(200);
 });
 
-app.get('/steam/login', savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}));
+app.get('/api/auth/steam', savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}));
 
-app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}), login);
+app.get('/api/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true}), login);
 
-app.get('/user', getUser);
+app.post('/api/auth/logout', logout);
 
-app.get('/wishlist', getWishlistsPage);
+app.get('/api/user', getUser);
 
-app.post('/wishlist/create', createWishlist);
+app.get('/api/wishlist', getWishlistsPage);
 
-app.get('/wishlist/:id', getWishlistPage);
+app.post('/api/wishlist/create', createWishlist);
 
-app.get('/game/search/:query', searchGamePage);
+app.get('/api/wishlist/:id', getWishlistPage);
 
-app.get('/game/:game_id', getGamePage);
+app.get('/api/game/search/:query', searchGamePage);
 
-app.get('/game/add/:wishlist_id/:game_id', addGameToWishlist);
+app.get('/api/game/:game_id', getGamePage);
 
-app.get('/logout', logout);
+app.get('/api/game/add/:wishlist_id/:game_id', addGameToWishlist);
 
 app.listen(3001);

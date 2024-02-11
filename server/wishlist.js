@@ -43,7 +43,7 @@ async function getWishlists(req) {
 async function getWishlistsPage(req, res) {
     try {
         let wishlists = await getWishlists(req);
-        res.send(JSON.stringify(wishlists));
+        res.send(JSON.parse(JSON.stringify(wishlists)));
     } catch (error) {
         handleError(error, res);
     }
