@@ -41,7 +41,19 @@ nav ul li a {
   text-decoration: none;
 }
 
-nav ul li a:hover {
+nav ul li button {
+  position: relative;
+  color: white;
+  text-decoration: none;
+  background-color: #171d25;
+  border: none;
+  cursor: pointer;
+  line-height: 51px;
+  font-size: 29px;
+  padding: 0;
+}
+
+nav ul li a:hover, nav ul li button:hover {
   color: #c6c6c6;
 }
 

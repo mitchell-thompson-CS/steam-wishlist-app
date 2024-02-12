@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Navbar = () => {
 
@@ -36,7 +36,7 @@ const Navbar = () => {
                 <ul className="left">
 
                     <li>
-                        <a href="/"><img id="logo" src="/logo.svg"/></a>
+                        <a href="/"><img id="logo" src="/logo.svg" alt="logo"/></a>
                     </li>
                     {/* <li>
                         <a href="http://localhost:3000/">HOME</a>
@@ -53,7 +53,7 @@ const Navbar = () => {
                 <ul className="right">
                     <li>
                         {user.name ?
-                            <a href="javascript:void(0)" className="signin" onClick={logout}>{user.name}</a> :
+                            <button className="signin" onClick={logout}>{user.name}</button> :
                             <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)} className="signin">LOGIN</a>
                         }
                     </li>
