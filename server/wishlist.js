@@ -79,6 +79,7 @@ function createWishlist(req, res) {
                     if (wishsnapshot.exists) {
                         console.log("wishlist already exists");
                     } else {
+                        // TODO: why do we use req.session.passport.user.id instead of req.user.id?
                         admin.firestore().collection('wishlists').doc(new_id).set({
                             editors: {},
                             name: post['wishlist_name'],
