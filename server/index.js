@@ -47,18 +47,18 @@ app.post('/api/auth/logout', logout);
 app.get('/api/user', getUser);
 
 // wishlist paths
-app.get('/api/wishlist', getWishlistsPage);
-
-app.post('/api/wishlist/create', createWishlist);
+app.get('/api/wishlists', getWishlistsPage);
 
 app.get('/api/wishlist/:id', getWishlistPage);
+
+app.post('/api/wishlist/create', createWishlist);
 
 // game paths
 app.get('/api/game/search/:query', searchGamePage);
 
 app.get('/api/game/:game_id', getGamePage);
 
-app.get('/api/game/add/:wishlist_id/:game_id', addGameToWishlist);
+app.post('/api/game/add', addGameToWishlist);
 
 // TODO: we need to add delete api paths for stuff that we create as well
 

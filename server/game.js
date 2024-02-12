@@ -9,10 +9,13 @@ async function getGameData(appid) {
     return await fetch('https://store.steampowered.com/appreviews/' + appid + '?json=1')
     .then(response => response.json())
     .then(reviewData => {
-      if (reviewData['success'] && data[appid]['success']) {
-        data[appid]['data']['reviews'] = reviewData['query_summary'];
+      // need to maKe sure that we actually got data (and its proper data) from both requests
+      if (data && data[appid] && reviewData){
+        if (reviewData['success'] && data[appid]['success']) {
+          data[appid]['data']['reviews'] = reviewData['query_summary'];
+        }
+        return data;
       }
-      return data;
     })
   })
 }

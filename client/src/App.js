@@ -14,14 +14,13 @@ function App() {
   return (
     <Provider store={store}>
       <div className="App">
-        <header className="App-header">
+        <header>
           <Navbar />
         </header>
-
         <Routes>
-            <Route path="/wishlists" element={<Wishlist />} />
-            {/* <Route path ="/login" element={<Login />} /> */}
-          </Routes>
+          <Route path="/wishlists" element={<Wishlist />} />
+          {/* <Route path ="/login" element={<Login />} /> */}
+        </Routes>
       </div>
     </Provider>
   );

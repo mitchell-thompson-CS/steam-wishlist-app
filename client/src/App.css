@@ -1,14 +1,17 @@
-:root {
-  --nav-height: 60px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-header {
+.App {
   background-color: #1b2838;
   min-height: 100vh;
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* font-size: calc(10px + 2vmin); */
   color: white;
+}
+
+header {
+  height: 75px;
 }
 
 nav {
