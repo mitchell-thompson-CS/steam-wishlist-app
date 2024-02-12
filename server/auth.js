@@ -62,7 +62,8 @@ function login(req, res) {
         if (!docSnapshot.exists) {
           console.log("User does not exist, creating new user");
           admin.firestore().collection('users').doc(result).set({
-            wishlists: []
+            wishlists: {},
+            shared_wishlists: {}
           });
         }
       });

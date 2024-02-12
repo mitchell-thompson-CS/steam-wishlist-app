@@ -6,7 +6,7 @@ var cors = require("cors");
 var { admin } = require("./initFirebase.js");
 const { v4: uuidv4 } = require('uuid');
 var qs = require('querystring');
-var { getWishlistPage, createWishlist, addGameToWishlist, getWishlists, getWishlistsPage} = require("./wishlist.js");
+var { getWishlistPage, createWishlist, addGameToWishlist, getWishlistsPage, deleteWishlist, removeGameFromWishlist} = require("./wishlist.js");
 const { getGamePage, searchGamePage } = require("./game.js");
 
 const app = express()
@@ -53,12 +53,16 @@ app.get('/api/wishlist/:id', getWishlistPage);
 
 app.post('/api/wishlist/create', createWishlist);
 
+app.delete('/api/wishlist/delete', deleteWishlist);
+
 // game paths
 app.get('/api/game/search/:query', searchGamePage);
 
 app.get('/api/game/:game_id', getGamePage);
 
 app.post('/api/game/add', addGameToWishlist);
+
+app.delete('/api/game/remove', removeGameFromWishlist);
 
 // TODO: we need to add delete api paths for stuff that we create as well
 

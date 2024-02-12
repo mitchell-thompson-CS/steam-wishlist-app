@@ -75,20 +75,23 @@ function createWishlist(req, res) {
             // console.log('id: ' + new_id);
             // console.log('user: ' + req.session.passport.user.id);
             if (wishlist_name) {
+                // TODO: can we do this by setting a doc up here like below?
+                // let doc = admin.firestore().collection('wishlists').doc(new_id);
                 let wishdoc = admin.firestore().collection('wishlists').doc(new_id).get().then((wishsnapshot) => {
                     if (wishsnapshot.exists) {
                         console.log("wishlist already exists");
                     } else {
-                        // TODO: why do we use req.session.passport.user.id instead of req.user.id?
                         admin.firestore().collection('wishlists').doc(new_id).set({
                             editors: {},
                             name: post['wishlist_name'],
                             games: {},
-                            owner: admin.firestore().collection('users').doc(req.session.passport.user.id)
+                            owner: admin.firestore().collection('users').doc(req.user.id)
                         }).then(() => {
                             // console.log("wishlist created in collection");
-                            admin.firestore().collection('users').doc(req.session.passport.user.id).update({
-                                wishlists: admin.firestore.FieldValue.arrayUnion(admin.firestore().collection('wishlists').doc(new_id))
+                            // admin.firestore().collection('users').doc(req.session.passport.user.id).update({
+                            //     wishlists: admin.firestore.FieldValue.arrayUnion(admin.firestore().collection('wishlists').doc(new_id))
+                            admin.firestore().collection('users').doc(req.user.id).update({
+                                [`wishlists.${new_id}`]: admin.firestore().collection('wishlists').doc(new_id)
                             }).then(() => {
                                 // console.log("wishlist added to user");
                                 res.sendStatus(200);
@@ -101,6 +104,76 @@ function createWishlist(req, res) {
             }
         });
     } else {
+        res.sendStatus(401);
+    }
+}
+
+function deleteWishlist(req, res) {
+    if (req.user) {
+        var body = '';
+        req.on('data', function (data) {
+            body += data;
+
+            if (body.length > 1e6)
+                req.socket.destroy();
+        });
+
+        req.on('end', function () {
+            let post = JSON.parse(body);
+            var wishlist_id = post['wishlist_id'];
+            // TODO: add sanitization to the ids like this one that are inputted by user
+            if (wishlist_id) {
+                var wishlist = admin.firestore().collection('wishlists').doc(wishlist_id).get().then((wishsnapshot) => {
+                    if (wishsnapshot.exists) {
+                        let data = wishsnapshot.data();
+                        if (data.owner.id == req.user.id) {
+                            admin.firestore().collection('users').doc(req.user.id).get().then((userSnapshot) => {
+                                if (userSnapshot.exists) {
+                                    let user_data = userSnapshot.data();
+                                    if (user_data.wishlists[wishlist_id]) {
+                                        admin.firestore().collection('users').doc(req.user.id).update({
+                                            [`wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
+                                        }).then(() => {
+                                            for (let editor in data.editors) {
+                                                admin.firestore().collection('users').doc(editor).get().then((editorSnapshot) => {
+                                                    if(editorSnapshot.exists){
+                                                        admin.firestore().collection('users').doc(editor).update({
+                                                            [`shared_wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
+                                                        });
+                                                    }
+                                                })
+                                            }
+
+                                            admin.firestore().collection('wishlists').doc(wishlist_id).delete()
+                                            .then(() => {
+                                                res.sendStatus(200);
+                                            });
+                                        });
+                                    } else {
+                                        // user doesn't have this wishlist
+                                        res.sendStatus(404);
+                                    }
+                                } else {
+                                    // user doesn't exist
+                                    res.sendStatus(404);
+                                }
+                            })
+                        } else {
+                            // user is not the owner
+                            res.sendStatus(403);
+                        }
+                    } else {
+                        // wishlist doesn't exist
+                        res.sendStatus(404);
+                    }
+                })
+            } else {
+                // no wishlist id
+                res.sendStatus(400);
+            }
+        })
+    } else {
+        // user isn't logged in
         res.sendStatus(401);
     }
 }
@@ -174,8 +247,16 @@ function addGameToWishlist(req, res) {
         res.sendStatus(401);
     }
 }
+
+function removeGameFromWishlist(req, res) {
+
+}
+
+
 exports.getWishlistPage = getWishlistPage;
 exports.getWishlists = getWishlists;
 exports.createWishlist = createWishlist;
 exports.addGameToWishlist = addGameToWishlist;
 exports.getWishlistsPage = getWishlistsPage;
+exports.deleteWishlist = deleteWishlist;
+exports.removeGameFromWishlist = removeGameFromWishlist;
