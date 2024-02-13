@@ -7,36 +7,27 @@ var { getGameData } = require('./game');
 let { FirebaseError, UserError, handleError } = require('./errors');
 const { v4: uuidv4 } = require('uuid');
 
-// this function gets a users wishlists in an array and returns it
-// returns null if the user is not logged in
+// this function gets a users owned and shared wishlists in a map and returns it
+// throws errors if user isn't logged in or if there's a problem getting the wishlists
 async function getWishlists(req) {
-    // console.log(req);
     if (req.user) {
         return await admin.firestore().collection('users').doc(req.user.id).get().then(async (docSnapshot) => {
             if (docSnapshot.exists) {
-                // req.session.wishlists = docSnapshot.data().wishlists;
-                // req.session.save();
-                var db_wishlists = docSnapshot.data().wishlists;
-                // console.log(db_wishlists)
-                if (db_wishlists.length > 0) {
-                    return await admin.firestore().getAll(...db_wishlists).then((wishlists) => {
-                        // req.session.wishlists = wishlists;
-                        // req.session.save();
-                        final_wishlists = [];
-                        for (var wishlist of wishlists) {
-                            // console.log(wishlist.id)
-                            var wishlist_data = wishlist.data();
-                            wishlist_data['id'] = wishlist.id;
-                            final_wishlists.push(wishlist_data);
+                let db_wishlists = docSnapshot.data().wishlists;
+                let db_shared_wishlists = docSnapshot.data().shared_wishlists;
+                let combined_wishlists = [...Object.values(db_wishlists), ...Object.values(db_shared_wishlists)];
+                if (combined_wishlists.length > 0) {
+                    return await admin.firestore().getAll(...combined_wishlists).then((wishlists) => {
+                        final_wishlists = {};
+                        for (let wishlist of wishlists) {
+                            final_wishlists[wishlist.id] = wishlist.data();
                         }
-                        // console.log(final_wishlists)
                         return final_wishlists;
                     })
                 } else {
-                    return [];
+                    return {};
                 }
             } else {
-                // console.log("Unable to get a user's wishlists");
                 throw new FirebaseError("Unable to get a user's wishlists");
             }
         });
@@ -72,8 +63,6 @@ function createWishlist(req, res) {
             console.log('creating a new wishlist: ' + wishlist_name);
             var new_id = uuidv4();
 
-            // console.log('id: ' + new_id);
-            // console.log('user: ' + req.session.passport.user.id);
             if (wishlist_name) {
                 // TODO: can we do this by setting a doc up here like below?
                 // let doc = admin.firestore().collection('wishlists').doc(new_id);
@@ -81,20 +70,18 @@ function createWishlist(req, res) {
                     if (wishsnapshot.exists) {
                         console.log("wishlist already exists");
                     } else {
+                        // wishlist doesn't exist, so we can go ahead and create it
                         admin.firestore().collection('wishlists').doc(new_id).set({
                             editors: {},
                             name: post['wishlist_name'],
                             games: {},
                             owner: admin.firestore().collection('users').doc(req.user.id)
                         }).then(() => {
-                            // console.log("wishlist created in collection");
-                            // admin.firestore().collection('users').doc(req.session.passport.user.id).update({
-                            //     wishlists: admin.firestore.FieldValue.arrayUnion(admin.firestore().collection('wishlists').doc(new_id))
                             try {
                                 admin.firestore().collection('users').doc(req.user.id).update({
                                     [`wishlists.${new_id}`]: admin.firestore().collection('wishlists').doc(new_id)
                                 }).then(() => {
-                                    // console.log("wishlist added to user");
+                                    // wishlist added to user
                                     res.sendStatus(200);
                                 });
                             } catch (error) {
@@ -112,10 +99,12 @@ function createWishlist(req, res) {
                     }
                 })
             } else {
+                // wishlist name is empty
                 res.sendStatus(400);
             }
         });
     } else {
+        // user isn't logged in
         res.sendStatus(401);
     }
 }
@@ -138,6 +127,7 @@ function deleteWishlist(req, res) {
                 var wishlist = admin.firestore().collection('wishlists').doc(wishlist_id).get().then(async (wishsnapshot) => {
                     if (wishsnapshot.exists) {
                         let data = wishsnapshot.data();
+                        // need to check permissions of user then can delete
                         if (data.owner.id == req.user.id) {
                             try {
                                 await admin.firestore().collection('users').doc(req.user.id).update({
