@@ -6,7 +6,7 @@ var cors = require("cors");
 var { admin } = require("./initFirebase.js");
 const { v4: uuidv4 } = require('uuid');
 var qs = require('querystring');
-var { getWishlistPage, createWishlist, addGameToWishlist, getWishlistsPage, deleteWishlist, removeGameFromWishlist} = require("./wishlist.js");
+var { getWishlistPage, createWishlist, addGameToWishlist, getWishlistsPage, deleteWishlist, removeGameFromWishlist, addEditorToWishlist} = require("./wishlist.js");
 const { getGamePage, searchGamePage } = require("./game.js");
 
 const app = express()
@@ -52,6 +52,8 @@ app.get('/api/wishlists', getWishlistsPage);
 app.get('/api/wishlist/:id', getWishlistPage);
 
 app.post('/api/wishlist/create', createWishlist);
+
+app.post('/api/wishlist/add-editor', addEditorToWishlist);
 
 app.delete('/api/wishlist/delete', deleteWishlist);
 

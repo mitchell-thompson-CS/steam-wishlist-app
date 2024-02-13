@@ -323,6 +323,80 @@ function removeGameFromWishlist(req, res) {
     }
 }
 
+function addEditorToWishlist(req, res) {
+    if (req.user) {
+        var body = '';
+        req.on('data', function (data) {
+            body += data;
+
+            if (body.length > 1e6)
+                req.socket.destroy();
+        });
+
+        req.on('end', function () {
+            var post = JSON.parse(body);
+            var wishlist_id = post['wishlist_id'];
+            var editor_id = post['editor_id'];
+            if (wishlist_id && editor_id) {
+                let wishdoc = admin.firestore().collection('wishlists').doc(wishlist_id).get().then(async (wishsnapshot) => {
+                    if (wishsnapshot.exists) {
+                        var data = wishsnapshot.data();
+                        if (data.owner.id == req.user.id && !data.editors[editor_id]) {
+                            try {
+                                await admin.firestore().collection('users').doc(editor_id).update({
+                                    [`shared_wishlists.${wishlist_id}`]: admin.firestore().collection('wishlists').doc(wishlist_id)
+                                }).then(async () => {
+                                    try {
+                                        await admin.firestore().collection('wishlists').doc(wishlist_id).update({
+                                            [`editors.${editor_id}`]: admin.firestore().collection('users').doc(editor_id)
+                                        }).then(() => {
+                                            res.sendStatus(200);
+                                        });
+                                    } catch (error) {
+                                        // issue with adding shared wishlist to editor
+                                        // TODO: this issue could either be a firebase issue or that the editor doesn't exist, we should handle both
+                                        handleError(error, res);
+
+                                        // have to attempt to remove the editor from the wishlist again
+                                        try {
+                                            admin.firestore().collection('users').doc(editor_id).update({
+                                                [`shared_wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
+                                            });
+                                        } catch (error2) {
+                                            // issue with removing editor from the wishlist
+                                            console.log("error removing editor from wishlist after failing to add wishlist to editor:\n" + error2);
+                                        }
+                                    }
+                                });
+                            } catch (error) {
+                                handleError(error, res);
+                            }
+                        } else {
+                            if (data.owner.id != req.user.id) {
+                                // user is not the owner
+                                res.sendStatus(403);
+                            } else {
+                                // editor already exists
+                                res.sendStatus(200);
+                            }
+                        }
+                    } else {
+                        // wishlist doesn't exist
+                        res.sendStatus(404);
+                    }
+                })
+            } else {
+                // no wishlist id or editor id
+                res.sendStatus(400);
+            }
+        });
+    } else {
+        // user isn't logged in
+        res.sendStatus(401);
+    }
+
+}
+
 
 exports.getWishlistPage = getWishlistPage;
 exports.getWishlists = getWishlists;
@@ -331,3 +405,4 @@ exports.addGameToWishlist = addGameToWishlist;
 exports.getWishlistsPage = getWishlistsPage;
 exports.deleteWishlist = deleteWishlist;
 exports.removeGameFromWishlist = removeGameFromWishlist;
+exports.addEditorToWishlist = addEditorToWishlist;

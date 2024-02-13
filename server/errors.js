@@ -2,14 +2,29 @@
 function handleError(err, res) {
   switch (err.name) {
     case 'FirebaseError':
-      res.status(500).send(err.message);
+      res.sendStatus(500);
       break;
     case 'UserError':
-        res.status(401).send(err.message);
+        res.sendStatus(401);
         break;
     default:
+
+      // not an error we created, so lets check firebase errors next
+      switch (err.code) {
+        case 5:
+          // NOT_FOUND error
+          res.sendStatus(400);
+          break;
+        default:
+          res.sendStatus(500);
+          break;
+      }
+
       console.log(err);
-      res.status(500).send('An error occurred');
+
+      if (!res.headersSent) {
+        res.status(500);
+      }
       break;
   }
 }
