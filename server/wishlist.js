@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 
 // this function gets a users owned and shared wishlists in a map and returns it
 // throws errors if user isn't logged in or if there's a problem getting the wishlists
+// @params request object
 async function getWishlists(req) {
     if (req.user) {
         return await admin.firestore().collection('users').doc(req.user.id).get().then(async (docSnapshot) => {
@@ -36,6 +37,9 @@ async function getWishlists(req) {
     }
 }
 
+// gets a users wishlists and sends them to the client
+// sends the wishlists to the client as a JSON object
+// @params request and response objects
 async function getWishlistsPage(req, res) {
     try {
         let wishlists = await getWishlists(req);
@@ -46,8 +50,11 @@ async function getWishlistsPage(req, res) {
 
 }
 
+// creates a wishlist in the firestore database
+// sends a 200 status code if successful
+// @params request object with a wishlist_name in the body
+// @params response object
 function createWishlist(req, res) {
-    // console.log(req);
     if (req.user) {
         var body = '';
         req.on('data', function (data) {
@@ -109,6 +116,10 @@ function createWishlist(req, res) {
     }
 }
 
+// deletes a wishlist from the firestore database
+// sends a 200 status code if successful
+// @params request object with a wishlist_id in the body
+// @params response object
 function deleteWishlist(req, res) {
     if (req.user) {
         var body = '';
@@ -130,6 +141,7 @@ function deleteWishlist(req, res) {
                         // need to check permissions of user then can delete
                         if (data.owner.id == req.user.id) {
                             try {
+                                // delete from user first, then will delete from editors
                                 await admin.firestore().collection('users').doc(req.user.id).update({
                                     [`wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
                                 }).then(async () => {
@@ -148,6 +160,8 @@ function deleteWishlist(req, res) {
                                 // problem with user
                             }
 
+                            // we will delete the wishlist regardless of if there was an error with the users
+                            // if there was an error getting the users, they likely don't exist so wishlist shouldn't exist
                             try {
                                 await admin.firestore().collection('wishlists').doc(wishlist_id).delete()
                                     .then(() => {
@@ -177,6 +191,9 @@ function deleteWishlist(req, res) {
     }
 }
 
+// gets a wishlist from the firestore database and sends it to the client
+// @params request object that has a parameter with id
+// @params response object
 async function getWishlistPage(req, res) {
     if (req.user) {
         var wishlist = await admin.firestore().collection('wishlists').doc(req.params.id).get().then((wishsnapshot) => {
@@ -199,6 +216,10 @@ async function getWishlistPage(req, res) {
     }
 }
 
+// adds a game to a wishlist in the firestore database
+// sends a 200 status code if successful
+// @params request object with a game_id and wishlist_id in the body
+// @params response object
 function addGameToWishlist(req, res) {
     if (req.user) {
         var body = '';
@@ -227,26 +248,35 @@ function addGameToWishlist(req, res) {
                                         res.sendStatus(200);
                                     });
                                 } else {
+                                    // game doesn't exist
                                     res.sendStatus(400);
                                 }
                             })
                         } else {
+                            // user is not the owner or editor
                             res.sendStatus(403);
                         }
                     } else {
+                        // wishlist doesn't exist
                         console.log(req.user.name + " tried to add a game to a wishlist that doesn't exist");
                         res.sendStatus(404);
                     }
                 })
             } else {
+                // no game id or wishlist id
                 res.sendStatus(400);
             }
         });
     } else {
+        // user isn't logged in
         res.sendStatus(401);
     }
 }
 
+// removes a game from a wishlist in the firestore database
+// sends a 200 status code if successful
+// @params request object with a game_id and wishlist_id in the body
+// @params response object
 function removeGameFromWishlist(req, res) {
     if (req.user) {
         var body = '';

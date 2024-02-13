@@ -23,10 +23,8 @@ async function getGameData(appid) {
 // TODO: do we need to handle errors from searchForGame?
 async function searchGamePage(req, res){
   let query = req.params.query;
-  // console.log("Searching for " + query);
   let gameList = await searchForGame(query, 5);
   res.send(gameList.hits);
-  // console.log('sent game list');
 }
 
 // TODO: handle error from the note on getGameData
