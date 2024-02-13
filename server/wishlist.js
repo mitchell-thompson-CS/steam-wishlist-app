@@ -90,12 +90,24 @@ function createWishlist(req, res) {
                             // console.log("wishlist created in collection");
                             // admin.firestore().collection('users').doc(req.session.passport.user.id).update({
                             //     wishlists: admin.firestore.FieldValue.arrayUnion(admin.firestore().collection('wishlists').doc(new_id))
-                            admin.firestore().collection('users').doc(req.user.id).update({
-                                [`wishlists.${new_id}`]: admin.firestore().collection('wishlists').doc(new_id)
-                            }).then(() => {
-                                // console.log("wishlist added to user");
-                                res.sendStatus(200);
-                            });
+                            try {
+                                admin.firestore().collection('users').doc(req.user.id).update({
+                                    [`wishlists.${new_id}`]: admin.firestore().collection('wishlists').doc(new_id)
+                                }).then(() => {
+                                    // console.log("wishlist added to user");
+                                    res.sendStatus(200);
+                                });
+                            } catch (error) {
+                                // problem with user not existing now, so we need to delete the wishlist
+                                try {
+                                    admin.firestore().collection('wishlists').doc(new_id).delete();
+                                } catch (error2) {
+                                    // problem deleting the wishlist
+                                    console.log("error deleting wishlist: " + error2);
+                                }
+
+                                handleError(error, res);
+                            }
                         });
                     }
                 })
@@ -123,41 +135,38 @@ function deleteWishlist(req, res) {
             var wishlist_id = post['wishlist_id'];
             // TODO: add sanitization to the ids like this one that are inputted by user
             if (wishlist_id) {
-                var wishlist = admin.firestore().collection('wishlists').doc(wishlist_id).get().then((wishsnapshot) => {
+                var wishlist = admin.firestore().collection('wishlists').doc(wishlist_id).get().then(async (wishsnapshot) => {
                     if (wishsnapshot.exists) {
                         let data = wishsnapshot.data();
                         if (data.owner.id == req.user.id) {
-                            admin.firestore().collection('users').doc(req.user.id).get().then((userSnapshot) => {
-                                if (userSnapshot.exists) {
-                                    let user_data = userSnapshot.data();
-                                    if (user_data.wishlists[wishlist_id]) {
-                                        admin.firestore().collection('users').doc(req.user.id).update({
-                                            [`wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
-                                        }).then(() => {
-                                            for (let editor in data.editors) {
-                                                admin.firestore().collection('users').doc(editor).get().then((editorSnapshot) => {
-                                                    if(editorSnapshot.exists){
-                                                        admin.firestore().collection('users').doc(editor).update({
-                                                            [`shared_wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
-                                                        });
-                                                    }
-                                                })
-                                            }
-
-                                            admin.firestore().collection('wishlists').doc(wishlist_id).delete()
-                                            .then(() => {
-                                                res.sendStatus(200);
+                            try {
+                                await admin.firestore().collection('users').doc(req.user.id).update({
+                                    [`wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
+                                }).then(async () => {
+                                    for (let editor in data.editors) {
+                                        try {
+                                            await admin.firestore().collection('users').doc(editor).update({
+                                                [`shared_wishlists.${wishlist_id}`]: admin.firestore.FieldValue.delete()
                                             });
-                                        });
-                                    } else {
-                                        // user doesn't have this wishlist
-                                        res.sendStatus(404);
+                                        } catch (error2) {
+                                            // editor doesn't exist
+                                            console.log("error deleting shared wishlist from " + editor + ": " + error2);
+                                        }
                                     }
-                                } else {
-                                    // user doesn't exist
-                                    res.sendStatus(404);
-                                }
-                            })
+                                });
+                            } catch (error) {
+                                // problem with user
+                            }
+
+                            try {
+                                await admin.firestore().collection('wishlists').doc(wishlist_id).delete()
+                                    .then(() => {
+                                        res.sendStatus(200);
+                                    });
+                            } catch (error) {
+                                // couldn't delete wishlist
+                                handleError(error, res);
+                            }
                         } else {
                             // user is not the owner
                             res.sendStatus(403);
@@ -221,7 +230,7 @@ function addGameToWishlist(req, res) {
 
                         if (data.editors[req.user.id] || data.owner.id == req.user.id) {
                             getGameData(game_id).then((gameData) => {
-                                if(gameData){
+                                if (gameData) {
                                     admin.firestore().collection('wishlists').doc(wishlist_id).update({
                                         [`games.${game_id}`]: gameData[game_id]['data']['name']
                                     }).then(() => {
@@ -249,7 +258,49 @@ function addGameToWishlist(req, res) {
 }
 
 function removeGameFromWishlist(req, res) {
+    if (req.user) {
+        var body = '';
+        req.on('data', function (data) {
+            body += data;
 
+            if (body.length > 1e6)
+                req.socket.destroy();
+        });
+
+        req.on('end', function () {
+            var post = JSON.parse(body);
+            var game_id = post['game_id'];
+            var wishlist_id = post['wishlist_id'];
+            // TODO: add sanitization to the ids like this one that are inputted by user
+            if (game_id && wishlist_id) {
+                let wishdoc = admin.firestore().collection('wishlists').doc(wishlist_id).get().then((wishsnapshot) => {
+                    if (wishsnapshot.exists) {
+                        var data = wishsnapshot.data();
+
+                        if (data.editors[req.user.id] || data.owner.id == req.user.id) {
+                            admin.firestore().collection('wishlists').doc(wishlist_id).update({
+                                [`games.${game_id}`]: admin.firestore.FieldValue.delete()
+                            }).then(() => {
+                                res.sendStatus(200);
+                            });
+                        } else {
+                            // user is not the owner or editor
+                            res.sendStatus(403);
+                        }
+                    } else {
+                        // wishlist doesn't exist
+                        res.sendStatus(404);
+                    }
+                });
+            } else {
+                // no game id or wishlist id
+                res.sendStatus(400);
+            }
+        })
+    } else {
+        // user isn't logged in
+        res.sendStatus(401);
+    }
 }
 
 

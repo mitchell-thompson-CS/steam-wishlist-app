@@ -8,6 +8,7 @@ function handleError(err, res) {
         res.status(401).send(err.message);
         break;
     default:
+      console.log(err);
       res.status(500).send('An error occurred');
       break;
   }
