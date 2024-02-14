@@ -77,7 +77,7 @@ class Logging {
    */
   static log(function_name, message, level=LogLevels.INFO) {
     if (write_to_console) {
-      console.log(message);
+      console.log("(" + function_name + ") " + message);
     }
   }
 }

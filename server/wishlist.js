@@ -76,7 +76,7 @@ function createWishlist(req, res) {
     req.on('end', function () {
         let post = JSON.parse(body);
         var wishlist_name = post['wishlist_name'];
-        console.log('creating a new wishlist: ' + wishlist_name);
+        logging.log(function_name, "Attempting to create wishlist " + wishlist_name + " by " + req.user.id);
         var new_id = uuidv4();
 
         if (!wishlist_name) {
@@ -112,7 +112,9 @@ function createWishlist(req, res) {
                         admin.firestore().collection('wishlists').doc(new_id).delete();
                     } catch (error2) {
                         // problem deleting the wishlist
-                        console.log("error deleting wishlist: " + error2);
+                        logging.log(function_name,
+                            "Unable to delete wishlist " + new_id + " after failing to add to user " + req.user.id,
+                            LogLevels.WARN);
                     }
                     logging.handleError(error, res);
                 }
@@ -179,7 +181,7 @@ function deleteWishlist(req, res) {
                             });
                         } catch (error2) {
                             // editor doesn't exist
-                            console.log("error deleting shared wishlist from " + editor + ": " + error2);
+                            logging.log(function_name, "Unable to delete wishlist " + wishlist_id + " from editor " + editor, LogLevels.WARN);
                         }
                     }
                 });
@@ -216,7 +218,6 @@ async function getWishlistPage(req, res) {
     }
     var wishlist = await admin.firestore().collection('wishlists').doc(req.params.id).get().then((wishsnapshot) => {
         if (!wishsnapshot.exists) {
-            console.log(req.user.name + " tried to access a wishlist that doesn't exist");
             logging.handleResponse(res, 404, null, function_name,
                 "Wishlist " + req.params.id + " doesn't exist by " + req.user.id);
             return;
@@ -229,7 +230,7 @@ async function getWishlistPage(req, res) {
             return;
         }
         // res.render('wishlist', { user: req.user, wishlist: data });
-        logging.handleResponse(res, 200, data, function_name, 
+        logging.handleResponse(res, 200, data, function_name,
             "Sent wishlist " + req.params.id + " to user " + req.user.id);
     })
 }
@@ -242,7 +243,7 @@ function addGameToWishlist(req, res) {
     let function_name = addGameToWishlist.name;
     if (!req.user) {
         // user isn't logged in
-        logging.handleResponse(res, 401, null, function_name, 
+        logging.handleResponse(res, 401, null, function_name,
             "User isn't logged in");
         return;
     }
@@ -260,14 +261,14 @@ function addGameToWishlist(req, res) {
         var wishlist_id = post['wishlist_id'];
         if (!game_id || !wishlist_id) {
             // no game id or wishlist id
-            logging.handleResponse(res, 400, null, function_name, 
+            logging.handleResponse(res, 400, null, function_name,
                 "No game id or wishlist id given by user " + req.user.id);
             return;
         }
         let wishdoc = admin.firestore().collection('wishlists').doc(wishlist_id).get().then((wishsnapshot) => {
             if (!wishsnapshot.exists) {
                 // wishlist doesn't exist
-                logging.handleResponse(res, 404, null, function_name, 
+                logging.handleResponse(res, 404, null, function_name,
                     "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
                 return;
             }
@@ -275,21 +276,21 @@ function addGameToWishlist(req, res) {
 
             if (!data.editors[req.user.id] && data.owner.id != req.user.id) {
                 // user is not the owner or editor
-                logging.handleResponse(res, 403, null, function_name, 
+                logging.handleResponse(res, 403, null, function_name,
                     "User " + req.user.id + " is not the owner or editor of wishlist " + wishlist_id);
                 return;
             }
             getGameData(game_id).then((gameData) => {
                 if (!gameData) {
                     // game doesn't exist
-                    logging.handleResponse(res, 400, null, function_name, 
+                    logging.handleResponse(res, 400, null, function_name,
                         "Game " + game_id + " doesn't exist");
                     return;
                 }
                 admin.firestore().collection('wishlists').doc(wishlist_id).update({
                     [`games.${game_id}`]: gameData[game_id]['data']['name']
                 }).then(() => {
-                    logging.handleResponse(res, 200, null, function_name, 
+                    logging.handleResponse(res, 200, null, function_name,
                         "Game " + game_id + " added to wishlist " + wishlist_id + " by user " + req.user.id);
                     return;
                 });
@@ -306,7 +307,7 @@ function removeGameFromWishlist(req, res) {
     let function_name = removeGameFromWishlist.name;
     if (!req.user) {
         // user isn't logged in
-        logging.handleResponse(res, 401, null, function_name, 
+        logging.handleResponse(res, 401, null, function_name,
             "User isn't logged in");
         return;
     }
@@ -325,14 +326,14 @@ function removeGameFromWishlist(req, res) {
         // TODO: add sanitization to the ids like this one that are inputted by user
         if (!game_id || !wishlist_id) {
             // no game id or wishlist id
-            logging.handleResponse(res, 400, null, function_name, 
+            logging.handleResponse(res, 400, null, function_name,
                 "No game id or wishlist id given by user " + req.user.id);
             return;
         }
         let wishdoc = admin.firestore().collection('wishlists').doc(wishlist_id).get().then((wishsnapshot) => {
             if (!wishsnapshot.exists) {
                 // wishlist doesn't exist
-                logging.handleResponse(res, 404, null, function_name, 
+                logging.handleResponse(res, 404, null, function_name,
                     "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
                 return;
             }
@@ -340,14 +341,14 @@ function removeGameFromWishlist(req, res) {
 
             if (!data.editors[req.user.id] && !data.owner.id == req.user.id) {
                 // user is not the owner or editor
-                logging.handleResponse(res, 403, null, function_name, 
+                logging.handleResponse(res, 403, null, function_name,
                     "User " + req.user.id + " is not the owner or editor of wishlist " + wishlist_id);
                 return;
             }
             admin.firestore().collection('wishlists').doc(wishlist_id).update({
                 [`games.${game_id}`]: admin.firestore.FieldValue.delete()
             }).then(() => {
-                logging.handleResponse(res, 200, null, function_name, 
+                logging.handleResponse(res, 200, null, function_name,
                     "Game " + game_id + " removed from wishlist " + wishlist_id + " by user " + req.user.id);
                 return;
             });
@@ -363,7 +364,7 @@ function addEditorToWishlist(req, res) {
     let function_name = addEditorToWishlist.name;
     if (!req.user) {
         // user isn't logged in
-        logging.handleResponse(res, 401, null, function_name, 
+        logging.handleResponse(res, 401, null, function_name,
             "User isn't logged in");
         return;
     }
@@ -381,14 +382,14 @@ function addEditorToWishlist(req, res) {
         var editor_id = post['editor_id'];
         if (!wishlist_id || !editor_id) {
             // no wishlist id or editor id
-            logging.handleResponse(res, 400, null, function_name, 
+            logging.handleResponse(res, 400, null, function_name,
                 "No wishlist id or editor id by user " + req.user.id);
             return;
         }
         admin.firestore().collection('wishlists').doc(wishlist_id).get().then(async (wishsnapshot) => {
             if (!wishsnapshot.exists) {
                 // wishlist doesn't exist
-                logging.handleResponse(res, 404, null, function_name, 
+                logging.handleResponse(res, 404, null, function_name,
                     "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
                 return;
             }
@@ -396,12 +397,12 @@ function addEditorToWishlist(req, res) {
             if (data.owner.id != req.user.id || data.editors[editor_id]) {
                 if (data.owner.id != req.user.id) {
                     // user is not the owner
-                    logging.handleResponse(res, 403, null, function_name, 
+                    logging.handleResponse(res, 403, null, function_name,
                         "User " + req.user.id + " is not the owner of wishlist " + wishlist_id);
                     return;
                 } else {
                     // editor already exists
-                    logging.handleResponse(res, 200, null, function_name, 
+                    logging.handleResponse(res, 200, null, function_name,
                         "Editor " + editor_id + " already exists in wishlist " + wishlist_id + " by user " + req.user.id);
                     return;
                 }
@@ -414,7 +415,7 @@ function addEditorToWishlist(req, res) {
                         await admin.firestore().collection('wishlists').doc(wishlist_id).update({
                             [`editors.${editor_id}`]: admin.firestore().collection('users').doc(editor_id)
                         }).then(() => {
-                            logging.handleResponse(res, 200, null, function_name, 
+                            logging.handleResponse(res, 200, null, function_name,
                                 "Editor " + editor_id + " added to wishlist " + wishlist_id + " by user " + req.user.id);
                             return;
                         });
@@ -429,7 +430,7 @@ function addEditorToWishlist(req, res) {
                             });
                         } catch (error2) {
                             // issue with removing editor from the wishlist
-                            console.log("error removing editor from wishlist after failing to add wishlist to editor:\n" + error2);
+                            logging.log(function_name, "Unable to remove editor " + editor_id + " from wishlist " + wishlist_id, LogLevels.WARN);
                         }
                     }
                 });
@@ -449,7 +450,7 @@ function deleteEditorFromWishlist(req, res) {
     let function_name = deleteEditorFromWishlist.name;
     if (!req.user) {
         // user isn't logged in
-        logging.handleResponse(res, 401, null, function_name, 
+        logging.handleResponse(res, 401, null, function_name,
             "User isn't logged in");
         return;
     }
@@ -467,7 +468,7 @@ function deleteEditorFromWishlist(req, res) {
         var editor_id = post['editor_id'];
         if (!wishlist_id || !editor_id) {
             // no wishlist id or editor id
-            logging.handleResponse(res, 400, null, function_name, 
+            logging.handleResponse(res, 400, null, function_name,
                 "No wishlist id or editor id by user " + req.user.id);
             return;
         }
@@ -475,7 +476,7 @@ function deleteEditorFromWishlist(req, res) {
             if (!wishsnapshot.exists) {
                 // wishlist doesn't exist
                 logging.handleResponse(res, 404, null, function_name,
-                    "Wishlist " + wishlist_id +" doesn't exist by user " + req.user.id);
+                    "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
                 return;
             }
             var data = wishsnapshot.data();
