@@ -60,10 +60,8 @@ class Logging {
     } else {
       res.sendStatus(code);
     }
-  
-    if (write_to_console || level === LogLevels.ERROR) {
-      console.log("(" + function_name + ") " + message);
-    }
+    
+    this.log(function_name, message, level);
   }
 
   /** logs a message
