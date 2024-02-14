@@ -72,6 +72,22 @@ async function addEditorToWishlist() {
 
 }
 
+async function deleteEditorFromWishlist() {
+    try {
+        let res = await axios.delete('/api/wishlist/delete-editor', {
+            data: {
+                wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
+                editor_id: "76561198012386061"
+            }
+        });
+        console.log(res);
+    } catch (error) {
+        console.log("error")
+        console.error(error);
+    }
+
+}
+
 const Wishlist = () => {
     const state = useSelector((state) => state);
     console.log(state);
@@ -86,6 +102,7 @@ const Wishlist = () => {
             <button onClick={deleteWishlistPost}>Delete Wishlist Post</button>
             <button onClick={removeGameFromWishlist}>Remove Game from Wishlist</button>
             <button onClick={addEditorToWishlist}>Add Editor to Wishlist</button>
+            <button onClick={deleteEditorFromWishlist}>Delete Editor from Wishlist</button>
         </div>
     );
 };
