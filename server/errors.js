@@ -11,7 +11,13 @@ class Logging {
 
   }
 
+  /** handles an error and sends the appropriate status code to the client
+   * @param {Error} err - the error to handle
+   * @param {Response} res - the response object, used to send the status code to the client
+   */
   static handleError(err, res) {
+    let function_name = "handleError";
+
     switch (err.name) {
       case 'FirebaseError':
         res.sendStatus(500);
@@ -32,13 +38,13 @@ class Logging {
             break;
         }
   
-        console.log(err);
-  
         if (!res.headersSent) {
           res.sendStatus(500);
         }
         break;
     }
+
+    this.log(function_name, err, LogLevels.ERROR);
   }
   
   /** sends a response to the client with the code and data (data can be null)
@@ -61,6 +67,17 @@ class Logging {
   
     if (write_to_console) {
       console.log("(" + function_name + ") " + message);
+    }
+  }
+
+  /** logs a message
+   * @param {string} function_name - the name of the function that called this
+   * @param {any} message - the message to log
+   * @param {number} level - the level of the message
+   */
+  static log(function_name, message, level=LogLevels.INFO) {
+    if (write_to_console) {
+      console.log(message);
     }
   }
 }
