@@ -1,4 +1,4 @@
-const write_to_console = true;
+let write_to_console = process.argv.includes("--verbose") ? true : false || process.argv.includes("-v") ? true : false;
 
 const LogLevels = Object.freeze({
   INFO: 0,
@@ -7,10 +7,6 @@ const LogLevels = Object.freeze({
 });
 
 class Logging {
-  constructor() {
-
-  }
-
   /** handles an error and sends the appropriate status code to the client
    * @param {Error} err - the error to handle
    * @param {Response} res - the response object, used to send the status code to the client
@@ -65,7 +61,7 @@ class Logging {
       res.sendStatus(code);
     }
   
-    if (write_to_console) {
+    if (write_to_console || level === LogLevels.ERROR) {
       console.log("(" + function_name + ") " + message);
     }
   }
@@ -76,7 +72,7 @@ class Logging {
    * @param {number} level - the level of the message
    */
   static log(function_name, message, level=LogLevels.INFO) {
-    if (write_to_console) {
+    if (write_to_console || level === LogLevels.ERROR) {
       console.log("(" + function_name + ") " + message);
     }
   }
