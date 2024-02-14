@@ -35,7 +35,7 @@ class Logging {
         console.log(err);
   
         if (!res.headersSent) {
-          res.status(500);
+          res.sendStatus(500);
         }
         break;
     }
