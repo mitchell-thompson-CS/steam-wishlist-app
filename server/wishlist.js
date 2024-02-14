@@ -38,16 +38,15 @@ async function getWishlists(req) {
     });
 }
 
-// gets a users wishlists and sends them to the client
-// sends the wishlists to the client as a JSON object
-// @params request and response objects
+/** Gets a users wishlists and sends the wishlists to the client as a JSON object
+ * @params request object
+ * @params response object
+ */
 async function getWishlistsPage(req, res) {
     let function_name = getWishlistPage.name;
     try {
         let wishlists = await getWishlists(req);
-        // res.send(JSON.parse(JSON.stringify(wishlists)));
-        // TODO: do we need to parse and stringify?
-        logging.handleResponse(res, 200, JSON.parse(JSON.stringify(wishlists)), function_name,
+        logging.handleResponse(res, 200, wishlists, function_name,
             "Sent wishlists to client for user " + req.user.id);
     } catch (error) {
         logging.handleError(error, res);
@@ -55,10 +54,10 @@ async function getWishlistsPage(req, res) {
 
 }
 
-// creates a wishlist in the firestore database
-// sends a 200 status code if successful
-// @params request object with a wishlist_name in the body
-// @params response object
+/** Creates a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a wishlist_name in the body
+ * @params response object
+ */
 function createWishlist(req, res) {
     let function_name = createWishlist.name;
     if (!req.user) {
@@ -86,8 +85,6 @@ function createWishlist(req, res) {
                 "Wishlist name is empty in request by " + req.user.id);
             return;
         }
-        // TODO: can we do this by setting a doc up here like below?
-        // let doc = admin.firestore().collection('wishlists').doc(new_id);
         let wishdoc = admin.firestore().collection('wishlists').doc(new_id).get().then((wishsnapshot) => {
             if (wishsnapshot.exists) {
                 logging.handleResponse(res, 500, null, function_name,
@@ -125,10 +122,10 @@ function createWishlist(req, res) {
 }
 
 
-// deletes a wishlist from the firestore database
-// sends a 200 status code if successful
-// @params request object with a wishlist_id in the body
-// @params response object
+/** Deletes a wishlist from the firestore database and sends a 200 status code if successful
+ * @params request object with a wishlist_id in the body
+ * @params response object
+ */
 function deleteWishlist(req, res) {
     let function_name = deleteWishlist.name;
     if (!req.user) {
@@ -206,9 +203,10 @@ function deleteWishlist(req, res) {
     })
 }
 
-// gets a wishlist from the firestore database and sends it to the client
-// @params request object that has a parameter with id
-// @params response object
+/** Gets a wishlist from the firestore database and sends it to the client
+ * @params request object that has a parameter with id
+ * @params response object
+ */
 async function getWishlistPage(req, res) {
     let function_name = getWishlistPage.name;
     if (!req.user) {
@@ -236,10 +234,10 @@ async function getWishlistPage(req, res) {
     })
 }
 
-// adds a game to a wishlist in the firestore database
-// sends a 200 status code if successful
-// @params request object with a game_id and wishlist_id in the body
-// @params response object
+/** Adds a game to a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a game_id and wishlist_id in the body
+ * @params response object
+ */
 function addGameToWishlist(req, res) {
     let function_name = addGameToWishlist.name;
     if (!req.user) {
@@ -300,10 +298,10 @@ function addGameToWishlist(req, res) {
     });
 }
 
-// removes a game from a wishlist in the firestore database
-// sends a 200 status code if successful
-// @params request object with a game_id and wishlist_id in the body
-// @params response object
+/** Removes a game from a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a game_id and wishlist_id in the body
+ * @params response object
+ */
 function removeGameFromWishlist(req, res) {
     let function_name = removeGameFromWishlist.name;
     if (!req.user) {
@@ -357,6 +355,10 @@ function removeGameFromWishlist(req, res) {
     })
 }
 
+/** Adds an editor to a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a editor_id and wishlist_id in the body
+ * @params response object
+ */
 function addEditorToWishlist(req, res) {
     let function_name = addEditorToWishlist.name;
     if (!req.user) {
@@ -439,6 +441,10 @@ function addEditorToWishlist(req, res) {
 
 }
 
+/** Deletes an editor from a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a editor_id and wishlist_id in the body
+ * @params response object
+ */
 function deleteEditorFromWishlist(req, res) {
     let function_name = deleteEditorFromWishlist.name;
     if (!req.user) {
