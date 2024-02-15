@@ -56,7 +56,7 @@ nav ul li button {
   padding: 0;
 }
 
-nav ul li a:hover, nav ul li button:hover {
+nav ul li a:hover, nav ul li button:hover{
   color: #c6c6c6;
 }
 
@@ -94,18 +94,18 @@ nav ul li a:hover, nav ul li button:hover {
   margin-bottom: 25px; */
 }
 
-#searchArea {
+#gameSearchArea {
   vertical-align: top;
 }
 
-#searchArea form{
+#gameSearchArea form{
   /* line-height: 51px; */
   height: 51px;
   display: flex;
   align-items: center;
 }
 
-#search {
+#gameSearch {
   position: relative;
   height: 29px;
   width: 250px;
@@ -116,7 +116,39 @@ nav ul li a:hover, nav ul li button:hover {
   padding-left: 10px;
   /* line-height: 25px; */
   vertical-align: middle;
-  
+  border-radius: 20px;
+}
+
+#gameSearchResults {
+  position: absolute;
+  top: 51px;
+  left: 0;
+  width: 750px;
+  background-color: #171d25;
+  color: white;
+  z-index: 1;
+  border: #282e35;
+  box-shadow: 0px 0px 10px 0px #282e35;
+  display: none;
+}
+
+#gameSearchResults li {
+  margin: 0;
+  width: 100%;
+  line-height: 51px;
+  text-align: center;
+  border-bottom: 1px solid #282e35;
+}
+
+#gameSearchResults a {
+  margin: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#gameSearchResults li:hover {
+  background-color: #282e35;
 }
 
 input[type=text] {
@@ -125,4 +157,39 @@ input[type=text] {
 
 .clear {
   clear: both;
+}
+
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  background-color: #282e35;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  float: left;
+}
+
+.wishlistItem {
+  width: 196px;
+  background-color: gray;
+  margin-top: 1px;
+  list-style: none;
+}
+
+.gridContainer {
+  padding: 50px;
+  display: grid;
+  gap: 50px;
+  grid-auto-flow: column;
+  grid-template-columns: 10;
+}
+
+.gridItem {
+  background-color: aqua;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 100px;
 }
