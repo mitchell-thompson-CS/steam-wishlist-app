@@ -1,6 +1,13 @@
+const { Logging } = require('./errors.js');
 const { searchForGame } = require('./typesense.js');
 
 // TODO: restructure game data method with a SteamError or something similar
+/** Gets data for a game from the Steam API and returns JSON object of it if it exists.
+ *  Returns null if the game does not exist.
+ * 
+ * @param {any} appid 
+ * @returns 
+ */
 async function getGameData(appid) {
   let currency = 'USD';
   return await fetch('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid)
@@ -21,19 +28,29 @@ async function getGameData(appid) {
 }
 
 // TODO: do we need to handle errors from searchForGame?
+/** Searches for a game and sends the top 5 results.
+ * 
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function searchGamePage(req, res){
   let query = req.params.query;
   let gameList = await searchForGame(query, 5);
-  res.send(gameList.hits);
+  Logging.handleResponse(res, 200, gameList.hits, "searchGamePage", "Searched for game " + query);
 }
 
 // TODO: handle error from the note on getGameData
+/** Gets the game data for a game and sends it to the client.
+ * 
+ * @param {Request} req
+ * @param {Response} res
+ */
 function getGamePage(req, res){
-  console.log('searching for game id ' + req.params.game_id)
   getGameData(req.params.game_id).then((data) => {
     if (data[req.params.game_id]['success']) {
       let entry = data[req.params.game_id]['data'];
-      // we want type, name, dlc, short_description, header_image, website, pc_requirements, mac_requirements, linux_requirements, developers, publishers, price_overview, platforms, categories, genres, release_date
+      // we want type, name, dlc, short_description, header_image, website, pc_requirements, mac_requirements, 
+      // linux_requirements, developers, publishers, price_overview, platforms, categories, genres, release_date
       let gameData = {
         'type': entry['type'],
         'name': entry['name'],
@@ -54,12 +71,11 @@ function getGamePage(req, res){
         'reviews': entry['reviews']
       }
 
-      // console.log(gameData)
-      // res.render('game', { gameData: gameData });
-      res.send(gameData);
-      // https://store.steampowered.com/appreviews/105600?json=1
+      // res.send(gameData);
+      Logging.handleResponse(res, 200, gameData, "getGamePage", "Got game data for " + req.params.game_id);
     } else {
-      res.sendStatus(404);
+      // failure to get data
+      Logging.handleResponse(res, 404, null, "getGamePage", "Game " + req.params.game_id + " does not exist", LogLevels.ERROR);
     }
   });
 }
