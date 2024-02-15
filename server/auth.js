@@ -3,6 +3,7 @@ var passport = require("passport");
 
 var firebase_auth = require("firebase/auth");
 var { admin } = require("./initFirebase");
+const { Logging, LogLevels } = require("./errors");
 
 const auth = firebase_auth.getAuth();
 
@@ -44,6 +45,12 @@ passport.use(new SteamStrategy({
   }
 ));
 
+/** Saves the previous page to the session so we can redirect back to it after logging in.
+ * 
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param {*} next 
+ */
 async function savePrevPageToSession(req, res, next) {
   req.session.prevPage = req.query.redir;
   await req.session.save(() => {
@@ -51,6 +58,11 @@ async function savePrevPageToSession(req, res, next) {
   });
 }
 
+/** Logs in the user and creates a custom token for them to use with firebase.
+ * 
+ * @param {Request} req
+ * @param {Response} res
+ */
 function login(req, res) {
   var oid = req.query["openid.claimed_id"];
   var array = oid.split("/id/");
@@ -60,7 +72,7 @@ function login(req, res) {
       // console.log("created custom token?");
       doc = admin.firestore().collection('users').doc(result).get().then((docSnapshot) => {
         if (!docSnapshot.exists) {
-          console.log("User does not exist, creating new user");
+          Logging.log("login", "User " + result + " does not exist, creating new user");
           admin.firestore().collection('users').doc(result).set({
             wishlists: {},
             shared_wishlists: {}
@@ -72,13 +84,11 @@ function login(req, res) {
       firebase_auth.signInWithCustomToken(auth, customToken)
         .catch(function (error) {
           if (error) {
-            console.log(error)
-            res.sendStatus(500);
+            Logging.handleError(error, res);
           }
         })
         .then(() => {
-          // console.log(req.user)
-          console.log("Signed in as " + req.user?.displayName + " with custom token on firebase");
+          Logging.log("login", req.user?.displayName + " (" + req.user?.id + ") Signed in with custom token on firebase");
           if (!res.headersSent) {
             res.redirect(req.session.prevPage);
           }
@@ -86,30 +96,33 @@ function login(req, res) {
     })
 }
 
-// logs out the user via a post request
-// sends a 200 status code if successful
+/** Logs out the user.
+ * 
+ * @param {Request} req
+ * @param {Response} res
+ */
 function logout(req, res) {
   if (req.user) {
-    console.log("Logging out of " + req.user?.name)
+    let name = req.user.name
+    let id = req.user.id
     req.logout(function (err) {
       if (err) {
-        console.log(err);
-        res.sendStatus(500);
+        Logging.handleError(err, res);
       }
       if (!res.headersSent) {
-        res.sendStatus(200);
+        Logging.handleResponse(res, 200, null, "logout", "Logged out " + name + " (" + id + ")");
       }
     });
   } else {
-    res.sendStatus(401);
+    Logging.handleResponse(res, 401, null, "logout", "No user to log out");
   }
 }
 
 function getUser(req, res) {
   if (req.user) {
-    res.send(req.user);
+    Logging.handleResponse(res, 200, req.user, "getUser", "Got user " + req.user.name + " (" + req.user.id + ")");
   } else {
-    res.sendStatus(401);
+    Logging.handleResponse(res, 401, null, "getUser", "No user to get");
   }
 }
 

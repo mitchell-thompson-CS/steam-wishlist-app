@@ -6,6 +6,12 @@ const LogLevels = Object.freeze({
   ERROR: 2
 });
 
+const LogLevelsStrings = Object.freeze({
+  0: "INFO",
+  1: "WARN",
+  2: "ERROR"
+});
+
 class Logging {
   /** handles an error and sends the appropriate status code to the client
    * @param {Error} err - the error to handle
@@ -55,13 +61,17 @@ class Logging {
    * @param {number} level - the level of the message
    */
   static handleResponse(res, code, data=null, function_name, message="", level=LogLevels.INFO) {
-    if (data) {
-      res.status(code).send(data);
+    if (res.headersSent) {
+      this.log(function_name, "Response already sent", LogLevels.ERROR);
     } else {
-      res.sendStatus(code);
+      if (data) {
+        res.status(code).send(data);
+      } else {
+        res.sendStatus(code);
+      }
+      
+      this.log(function_name, message, level);
     }
-    
-    this.log(function_name, message, level);
   }
 
   /** logs a message
@@ -70,8 +80,8 @@ class Logging {
    * @param {number} level - the level of the message
    */
   static log(function_name, message, level=LogLevels.INFO) {
-    if (write_to_console || level === LogLevels.ERROR) {
-      console.log("(" + function_name + ") " + message);
+    if (write_to_console || level !== LogLevels.INFO) {
+      console.log("(" + LogLevelsStrings[level] + ")(" + function_name + ") " + message);
     }
   }
 }
