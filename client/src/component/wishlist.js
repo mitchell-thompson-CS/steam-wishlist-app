@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
@@ -90,13 +90,48 @@ async function deleteEditorFromWishlist() {
 
 const Wishlist = () => {
     const state = useSelector((state) => state);
-    console.log(state);
+    // console.log(state);
     const dispatch = useDispatch();
+
+    const [wishlistItems, setWishlistItems] = useState([]);
+
+    useEffect(() => {
+        fetch('/api/wishlists', { mode: 'cors', credentials: 'include' })
+            .then(function (response) {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).then(function (data) {
+                if (data) {
+                    // console.log(data);
+                    setWishlistItems(data);
+                    // console.log(wishlistItems)
+                }
+            })
+    }, []);
+
     return (
         <div className="wishlist">
-            <h2>Wishlists: </h2>
+            <div className="sidebar">
+                <ul>
+                    <li id="wishlistSearchArea">
+                        <form>
+                            <input type="text" id="wishlistSearch" name="search" placeholder="Search..."/>
+                        </form>
+                    </li>
+                    {Object.entries(wishlistItems).map(([key, value]) => (
+                        <li key={key} className="wishlistItem">{value.name}</li>
+                    ))}
+                </ul>
+            </div>
             {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
             <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
+            <div className="gridContainer">
+                <button onClick={createWishlistPost} className="gridItem">Create Wishlist Post</button>
+                {Object.entries(wishlistItems).map(([key, value]) => (
+                    <a key={key} className="gridItem" href={"/wishlist/" + key}>{value.name}</a>
+                ))}
+            </div>
             <button onClick={createWishlistPost}>Create Wishlist Post</button>
             <button onClick={addGameToWishlist}>Add Game to Wishlist</button>
             <button onClick={deleteWishlistPost}>Delete Wishlist Post</button>
