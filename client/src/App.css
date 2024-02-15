@@ -147,9 +147,9 @@ nav ul li a:hover, nav ul li button:hover{
   height: 100%;
 }
 
-#gameSearchResults li:hover {
+/* #gameSearchResults a:hover {
   background-color: #282e35;
-}
+} */
 
 input[type=text] {
   margin: auto;
@@ -179,9 +179,8 @@ input[type=text] {
 .gridContainer {
   padding: 50px;
   display: grid;
+  grid-template-columns: repeat(8, 1fr);
   gap: 50px;
-  grid-auto-flow: column;
-  grid-template-columns: 10;
 }
 
 .gridItem {

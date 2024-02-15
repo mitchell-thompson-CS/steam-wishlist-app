@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const searchDelay = 500;
 
@@ -7,6 +7,9 @@ const Navbar = () => {
 
     const [user, setUser] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+
+    // var searchPosition = -1;
+    const searchPosition = useRef(-1);
 
     useEffect(() => {
         
@@ -41,6 +44,16 @@ const Navbar = () => {
                             a.innerHTML = "<li>" + cur_data.name + "</li>";
                             a.className = "searchResult";
                             a.id = "searchResult" + i;
+                            a.onmouseover = function(event) {
+                                for(let j = 0; j < searchResults.children.length; j++) {
+                                    searchResults.children[j].style.backgroundColor = null;
+                                }
+                                event.target.style.backgroundColor = "#282e35";
+                                searchPosition.current = i;
+                            };
+                            a.onmouseout = function(event) {
+                                event.target.style.backgroundColor = null;
+                            }
                             searchResults.appendChild(a);
                         }
 
@@ -72,35 +85,34 @@ const Navbar = () => {
         document.getElementById("gameSearchResults").style.display = "block";
     }
 
-    let searchPosition = -1;
     function handleSearchKeyDown(event) {
         let results = document.getElementsByClassName("searchResult");
 
-        // if (searchPosition !== -1) {
-        //     results[searchPosition].style.backgroundColor = null;
-        // }
+        if (searchPosition.current !== -1) {
+            results[searchPosition.current].dispatchEvent(new Event("mouseout"));
+        }
 
         if (event.key === "ArrowDown") {
-            if (searchPosition === -1 && results.length > 0){
-                searchPosition = 0;
+            if (searchPosition.current === -1 && results.length > 0){
+                searchPosition.current = 0;
             }
-            else if (searchPosition < results.length - 1) {
-                searchPosition++;
+            else if (searchPosition.current < results.length - 1) {
+                searchPosition.current = searchPosition.current + 1;
             }
         } else if (event.key === "ArrowUp") {
-            if (searchPosition === -1){
-                searchPosition = results.length - 1;
-            } else if (searchPosition > 0 && results.length > 0) {
-                searchPosition--;
+            if (searchPosition.current === -1){
+                searchPosition.current = results.length - 1;
+            } else if (searchPosition.current > 0 && results.length > 0) {
+                searchPosition.current = searchPosition.current - 1;
             }
         } else if (event.key === "Enter") {
-            if (searchPosition !== -1) {
-                results[searchPosition].click();
+            if (searchPosition.current !== -1) {
+                results[searchPosition.current].click();
             }
         }
 
-        if (searchPosition !== -1) {
-            results[searchPosition].dispatchEvent(new Event("mouseover"));
+        if (searchPosition.current !== -1) {
+            results[searchPosition.current].dispatchEvent(new Event("mouseover"));
         }
     }
 
