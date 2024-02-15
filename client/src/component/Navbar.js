@@ -86,6 +86,7 @@ const Navbar = () => {
     }
 
     function handleSearchKeyDown(event) {
+        // event.preventDefault();
         let results = document.getElementsByClassName("searchResult");
 
         if (searchPosition.current !== -1) {
@@ -93,6 +94,7 @@ const Navbar = () => {
         }
 
         if (event.key === "ArrowDown") {
+            event.preventDefault();
             if (searchPosition.current === -1 && results.length > 0){
                 searchPosition.current = 0;
             }
@@ -100,12 +102,14 @@ const Navbar = () => {
                 searchPosition.current = searchPosition.current + 1;
             }
         } else if (event.key === "ArrowUp") {
+            event.preventDefault();
             if (searchPosition.current === -1){
                 searchPosition.current = results.length - 1;
             } else if (searchPosition.current > 0 && results.length > 0) {
                 searchPosition.current = searchPosition.current - 1;
             }
         } else if (event.key === "Enter") {
+            event.preventDefault();
             if (searchPosition.current !== -1) {
                 results[searchPosition.current].click();
             }
