@@ -9,6 +9,7 @@ const Navbar = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
+        
         if (user.length === 0){
             fetch('/api/user', { mode: 'cors', credentials: 'include' })
                 .then(function (response) {
@@ -17,15 +18,13 @@ const Navbar = () => {
                     }
                 }).then(function (data) {
                     if (data) {
-                        // user.current = data;
                         setUser(data);
-                        // console.log(user);
                     }
                 });
         }
         
         const delayDebounce = setTimeout(() => {
-            if(searchTerm && searchTerm != ""){
+            if(searchTerm && searchTerm !== ""){
                 fetch('/api/game/search/' + searchTerm, { mode: 'cors', credentials: 'include' })
                 .then(function (response) {
                     if (response.status === 200) {
@@ -41,8 +40,10 @@ const Navbar = () => {
                             a.href = "/game/" + cur_data.appid;
                             a.innerHTML = "<li>" + cur_data.name + "</li>";
                             a.className = "searchResult";
+                            a.id = "searchResult" + i;
                             searchResults.appendChild(a);
                         }
+
                     }
                 });
             }
@@ -53,7 +54,6 @@ const Navbar = () => {
                 document.getElementById("gameSearchResults").style.display = "none";
             }
         }
-
         return () => clearTimeout(delayDebounce);
     }, [searchTerm, user]);
 
@@ -72,12 +72,37 @@ const Navbar = () => {
         document.getElementById("gameSearchResults").style.display = "block";
     }
 
-    // function unFocusSearch(event) {
-    //     let results = document.getElementById("gameSearchResults");
-    //     if (!event.target.contains(results)){
-    //         results.style.display = "none";
-    //     }
-    // }
+    let searchPosition = -1;
+    function handleSearchKeyDown(event) {
+        let results = document.getElementsByClassName("searchResult");
+
+        // if (searchPosition !== -1) {
+        //     results[searchPosition].style.backgroundColor = null;
+        // }
+
+        if (event.key === "ArrowDown") {
+            if (searchPosition === -1 && results.length > 0){
+                searchPosition = 0;
+            }
+            else if (searchPosition < results.length - 1) {
+                searchPosition++;
+            }
+        } else if (event.key === "ArrowUp") {
+            if (searchPosition === -1){
+                searchPosition = results.length - 1;
+            } else if (searchPosition > 0 && results.length > 0) {
+                searchPosition--;
+            }
+        } else if (event.key === "Enter") {
+            if (searchPosition !== -1) {
+                results[searchPosition].click();
+            }
+        }
+
+        if (searchPosition !== -1) {
+            results[searchPosition].dispatchEvent(new Event("mouseover"));
+        }
+    }
 
     return (
         <nav>
@@ -89,9 +114,12 @@ const Navbar = () => {
                     {/* <li>
                         <a href="http://localhost:3000/">HOME</a>
                     </li> */}
-                    <li id="searchArea" onFocus={focusSearch}>
+                    <li id="searchArea" onFocus={focusSearch} onKeyDown={handleSearchKeyDown}>
                         <form>
-                            <input type="text" id="gameSearch" name="search" placeholder="Search..." autoComplete="off" onChange={(e) => setSearchTerm(e.target.value)}/>
+                            <input type="text" id="gameSearch" name="search" placeholder="Search..." autoComplete="off" 
+                            onChange={(e) => {if(e.target.value !== searchTerm) {
+                                setSearchTerm(e.target.value)
+                            }}}/>
                         </form>
                         <ul id="gameSearchResults"></ul>
                     </li>
