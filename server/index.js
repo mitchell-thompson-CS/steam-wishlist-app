@@ -5,6 +5,7 @@ var Session = require("express-session");
 var cors = require("cors");
 var { admin } = require("./initFirebase.js");
 const { v4: uuidv4 } = require('uuid');
+const rateLimitMiddleware = require('./rateLimitMiddleware.js');
 var qs = require('querystring');
 var { getWishlistPage, createWishlist, addGameToWishlist, getWishlistsPage, deleteWishlist, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist} = require("./wishlist.js");
 const { getGamePage, searchGamePage } = require("./game.js");
@@ -15,7 +16,9 @@ const app = express()
 app.set('views', __dirname + '/views');
 app.set("view engine", "ejs")
 
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+// app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({credentials: true}));
+app.use(rateLimitMiddleware);
 
 // session config
 app.use(Session({
