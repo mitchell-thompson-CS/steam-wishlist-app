@@ -6,6 +6,7 @@ import store from './store';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar';
 import axios from 'axios';
+import { CookiesProvider } from 'react-cookie';
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';
@@ -13,15 +14,17 @@ function App() {
 
   return (
     <Provider store={store}>
-      <div className="App">
-        <header>
-          <Navbar />
-        </header>
-        <Routes>
-          <Route path="/wishlists" element={<Wishlist />} />
-          {/* <Route path ="/login" element={<Login />} /> */}
-        </Routes>
-      </div>
+      <CookiesProvider defaultSetOptions={{ path: '/' }} >
+        <div className="App">
+          <header>
+            <Navbar />
+          </header>
+          <Routes>
+            <Route path="/wishlists" element={<Wishlist />} />
+            {/* <Route path ="/login" element={<Login />} /> */}
+          </Routes>
+        </div>
+      </CookiesProvider>
     </Provider>
   );
 }

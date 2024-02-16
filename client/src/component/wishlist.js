@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
+import Popup from './Popup';
 
-async function createWishlistPost() {
+async function createWishlistPost(wishlistName) {
     try {
         let res = await axios.post('/api/wishlist/create', {
-            wishlist_name: "test wishlist 1"
+            wishlist_name: wishlistName
         });
         console.log(res);
     } catch (error) {
@@ -110,6 +111,9 @@ const Wishlist = () => {
             })
     }, []);
 
+    const [buttonPopup, setButtonPopup] = useState(false);
+    const [inputText, setInputText] = useState("");
+
     return (
         <div className="wishlist">
             <div className="sidebar">
@@ -127,7 +131,7 @@ const Wishlist = () => {
             {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
             <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
             <div className="gridContainer">
-                <button onClick={createWishlistPost} className="gridItem">Create Wishlist Post</button>
+                <button onClick={() => setButtonPopup(true)} className="gridItem">Create Wishlist Post</button>
                 {Object.entries(wishlistItems).map(([key, value]) => (
                     <a key={key} className="gridItem" href={"/wishlist/" + key}>{value.name}</a>
                 ))}
@@ -138,6 +142,11 @@ const Wishlist = () => {
             <button onClick={removeGameFromWishlist}>Remove Game from Wishlist</button>
             <button onClick={addEditorToWishlist}>Add Editor to Wishlist</button>
             <button onClick={deleteEditorFromWishlist}>Delete Editor from Wishlist</button>
+            <button onClick={() => setButtonPopup(true)}>Open Popup</button>
+            <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
+                <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)}/>
+                <button onClick={() => {setButtonPopup(false); createWishlistPost(inputText)}}>Create Wishlist Post</button>
+            </Popup>
         </div>
     );
 };

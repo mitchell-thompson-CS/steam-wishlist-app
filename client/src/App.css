@@ -171,9 +171,10 @@ input[type=text] {
 
 .wishlistItem {
   width: 196px;
-  background-color: gray;
+  background-color: #393f46;
   margin-top: 1px;
   list-style: none;
+  padding-left: 5px;
 }
 
 .gridContainer {
@@ -184,11 +185,23 @@ input[type=text] {
 }
 
 .gridItem {
-  background-color: aqua;
   width: 100px;
   height: 100px;
   text-align: center;
   display: inline-block;
   vertical-align: middle;
   line-height: 100px;
+  border: 1px gray;
+  border-radius: 10%;
+  color: white;
+  background-color: #282e35;
+  box-shadow: 10px white;
+  text-decoration: none;
+  overflow: hidden;
+  padding: 0px 5px;
+  transition: 0.2s;
+}
+
+.gridItem:hover {
+  background-color: #393f46;
 }

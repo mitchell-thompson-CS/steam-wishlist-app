@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
+import { useCookies } from 'react-cookie';
 
 const searchDelay = 500;
 
@@ -7,14 +8,15 @@ const Navbar = () => {
 
     const [user, setUser] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-
-    // var searchPosition = -1;
     const searchPosition = useRef(-1);
+    const [cookies, setCookie, removeCookie] = useCookies(['user']);
+    const[loggingIn, setLoggingIn] = useState(false);
 
     useEffect(() => {
-
-        if (user.length === 0) {
-            fetch('/api/user', { mode: 'cors', credentials: 'include' })
+        let cookieUser = cookies.user;
+        if (!cookieUser && !loggingIn) {
+            console.log("getting user")
+            fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache'})
                 .then(function (response) {
                     if (response.status === 200) {
                         return response.json();
@@ -22,8 +24,13 @@ const Navbar = () => {
                 }).then(function (data) {
                     if (data) {
                         setUser(data);
+                        setCookie('user', data);
+                    } else {
+                        setCookie('user', {});
                     }
                 });
+        } else {
+            setUser(cookieUser);
         }
 
         const delayDebounce = setTimeout(() => {
@@ -73,17 +80,26 @@ const Navbar = () => {
             }
         }
         return () => clearTimeout(delayDebounce);
-    }, [searchTerm, user]);
+    }, [searchTerm, user, cookies.user, setCookie, loggingIn]);
 
     async function logout() {
         try {
             let response = await axios.post('/api/auth/logout');
             if (response.status === 200) {
-                setUser([]);
+                setCookie('user', {});
             }
         } catch (error) {
+            if (error.response.status === 401) {
+                setCookie('user', {});
+            }
             console.error(error);
         }
+    }
+
+    async function login() {
+        setLoggingIn(true);
+        // removeCookie('user');
+        setCookie('user', false);
     }
 
     function focusSearch(event) {
@@ -154,7 +170,9 @@ const Navbar = () => {
                 <li>
                     {user.name ?
                         <button className="signin" onClick={logout}>{user.name}</button> :
-                        <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)} className="signin">LOGIN</a>
+                        <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)} 
+                        onClick={login}
+                        className="signin">LOGIN</a>
                     }
                 </li>
                 <li>
