@@ -2,10 +2,12 @@ var SteamStrategy = require("passport-steam");
 var passport = require("passport");
 
 var firebase_auth = require("firebase/auth");
-var { admin } = require("./initFirebase");
+var { admin, getDb } = require("./initFirebase");
 const { Logging, LogLevels } = require("./errors");
 
 const auth = firebase_auth.getAuth();
+
+// const db = getDb();
 
 const base_url = `${process.env.API_BASE_URL}`
 
@@ -64,16 +66,17 @@ async function savePrevPageToSession(req, res, next) {
  * @param {Response} res
  */
 function login(req, res) {
+  // TODO: should we change this to user req.user.id? this may be security issue rn???
   var oid = req.query["openid.claimed_id"];
   var array = oid.split("/id/");
   var result = array[1];
   admin.auth().createCustomToken(result)
     .then(function (customToken) {
       // console.log("created custom token?");
-      doc = admin.firestore().collection('users').doc(result).get().then((docSnapshot) => {
+      doc = getDb().collection('users').doc(result).get().then((docSnapshot) => {
         if (!docSnapshot.exists) {
           Logging.log("login", "User " + result + " does not exist, creating new user");
-          admin.firestore().collection('users').doc(result).set({
+          getDb().collection('users').doc(result).set({
             wishlists: {},
             shared_wishlists: {}
           });

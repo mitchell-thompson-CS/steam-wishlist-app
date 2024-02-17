@@ -19,5 +19,19 @@ const firebaseAdmin = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+let db;
+
+if (process.env.NODE_ENV !== "test") {
+  db = admin.firestore();
+}
+
 exports.admin = firebaseAdmin;
 exports.app = firebaseApp;
+
+exports.getDb = () => {
+  return db;
+}
+
+exports.setDb = (database) => {
+  db = database;
+}

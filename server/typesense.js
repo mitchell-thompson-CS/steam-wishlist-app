@@ -1,5 +1,7 @@
 const Typesense = require('typesense');
 const http = require('http');
+const axios = require('axios');
+const { Logging } = require('./errors');
 var typesenseClient = new Typesense.Client({
     'nodes': [{
         'host': 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
@@ -18,37 +20,59 @@ let gameSchema = {
     ]
 }
 
-typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === 'games') }).then(function (data) {
-    // console.log(data)
-    // TODO: maybe launch options here?
-    if (data) {
-        console.log("deleting and then readding")
-        typesenseClient.collections('games').delete().then(function (data) {
-            typesenseClient.collections().create(gameSchema).then(function (data) {
-                console.log("Created Typesense collection");
-                initializeTypesense();
-            });
-        });
-    } else {
-        typesenseClient.collections().create(gameSchema).then(function (data) {
+async function start_typesense() {
+//     await typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === 'games') }).then(function (data) {
+//         // console.log(data)
+//         // TODO: maybe launch options here?
+//         if (data) {
+//             console.log("deleting and then readding")
+//             typesenseClient.collections('games').delete().then(function (data) {
+//                 typesenseClient.collections().create(gameSchema).then(function (data) {
+//                     console.log("Created Typesense collection");
+//                     initializeTypesense();
+//                 });
+//             });
+//         } else {
+//             typesenseClient.collections().create(gameSchema).then(function (data) {
+//                 console.log("Created Typesense collection");
+//                 initializeTypesense();
+//             });
+//         }
+//     });
+    let data = await typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === 'games') });
+    let function_name = "start_typesense";
+    try {
+        if (data) {
+            console.log("deleting and then readding");
+            let del = await typesenseClient.collections('games').delete();
+            let create = await typesenseClient.collections().create(gameSchema);
             console.log("Created Typesense collection");
-            initializeTypesense();
-        });
+            await initializeTypesense();
+        } else {
+            let create = await typesenseClient.collections().create(gameSchema);
+            console.log("Created Typesense collection");
+            await initializeTypesense();
+        }
+    } catch (e) {
+        Logging.log(function_name, e, LogLevels.ERROR);
     }
-});
+}
 
-function initializeTypesense() {
+// await start_typesense();
+
+async function initializeTypesense() {
     let data = "";
     let urlToPrint = "http://api.steampowered.com/ISteamApps/GetAppList/v2/";
 
-    const request = http.get(urlToPrint, function (response) {
+    const request = http.get(urlToPrint, async function (response) {
 
         response
             .on("data", append => data += append)
             .on("error", e => console.log(e))
-            .on("end", () => { setupTypeSense(data) });
+            .on("end", async () => { await setupTypeSense(data) });
 
     });
+
 }
 
 // TODO: add weights to each app????? probably in a new collection that just stores {appid: weight}
@@ -84,3 +108,4 @@ async function searchForGame(gameName, numPerPage) {
 
 exports.searchForGame = searchForGame;
 exports.typesenseClient = typesenseClient;
+exports.start_typesense = start_typesense;

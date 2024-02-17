@@ -1,8 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useCookies } from 'react-cookie';
+import '../Navbar.css'
 
 const searchDelay = 500;
+
+// TODO: currently if user hits log in, then goes back, then forward, then successfully logs in
+// the user will not be updated. This is because the user is only updated when the page is loaded
 
 const Navbar = () => {
 
