@@ -178,5 +178,6 @@ exports.exportedForTesting = {
     setupTypeSenseCollection: setupTypeSenseCollection,
     checkTypesenseHealth: checkTypesenseHealth,
     gameSchema: gameSchema,
-    getSteamData: getSteamData
+    getSteamData: getSteamData,
+    setTypesenseClient: setTypesenseClient,
 }
