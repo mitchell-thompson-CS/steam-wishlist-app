@@ -12,43 +12,7 @@ const LogLevelsStrings = Object.freeze({
   2: "ERROR"
 });
 
-class Logging {
-  /** handles an error and sends the appropriate status code to the client
-   * @param {Error} err - the error to handle
-   * @param {Response} res - the response object, used to send the status code to the client
-   */
-  static handleError(err, res) {
-    let function_name = "handleError";
-
-    switch (err.name) {
-      case 'FirebaseError':
-        res.sendStatus(500);
-        break;
-      case 'UserError':
-          res.sendStatus(401);
-          break;
-      default:
-  
-        // not an error we created, so lets check firebase errors next
-        switch (err.code) {
-          case 5:
-            // NOT_FOUND error
-            res.sendStatus(400);
-            break;
-          default:
-            res.sendStatus(500);
-            break;
-        }
-  
-        if (!res.headersSent) {
-          res.sendStatus(500);
-        }
-        break;
-    }
-
-    this.log(function_name, err, LogLevels.ERROR);
-  }
-  
+class Logging {  
   /** sends a response to the client with the code and data (data can be null)
    * and logs the message if flags are set
    * 
