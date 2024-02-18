@@ -67,9 +67,15 @@ async function savePrevPageToSession(req, res, next) {
  */
 function login(req, res) {
   // TODO: should we change this to user req.user.id? this may be security issue rn???
-  var oid = req.query["openid.claimed_id"];
-  var array = oid.split("/id/");
-  var result = array[1];
+  // var oid = req.query["openid.claimed_id"];
+  // var array = oid.split("/id/");
+  // var result = array[1];
+  if (!req.user) {
+    Logging.handleResponse(res, 401, null, "login", "No user to log in");
+    return;
+  }
+  
+  let result = req.user.id;
   admin.auth().createCustomToken(result)
     .then(function (customToken) {
       // console.log("created custom token?");
