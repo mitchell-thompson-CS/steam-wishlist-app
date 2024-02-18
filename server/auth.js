@@ -66,10 +66,7 @@ async function savePrevPageToSession(req, res, next) {
  * @param {Response} res
  */
 function login(req, res) {
-  // TODO: should we change this to user req.user.id? this may be security issue rn???
-  // var oid = req.query["openid.claimed_id"];
-  // var array = oid.split("/id/");
-  // var result = array[1];
+  // TODO: test with disabling user accounts and see what happens? might be security issue there
   if (!req.user) {
     Logging.handleResponse(res, 401, null, "login", "No user to log in");
     return;
