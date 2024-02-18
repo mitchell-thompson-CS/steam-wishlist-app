@@ -1,9 +1,8 @@
 const Typesense = require('typesense');
-const http = require('http');
 const { Logging, LogLevels } = require('./logging');
 const { default: axios } = require('axios');
 
-const typesenseClient = new Typesense.Client({
+let typesenseClient = new Typesense.Client({
     'nodes': [{
         'host': 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
         'port': 8108,      // For Typesense Cloud use 443
@@ -21,22 +20,34 @@ const gameSchema = {
     ]
 }
 
+async function setTypesenseClient(client) {
+    typesenseClient = client;
+}
+
 /**
  * Makes sure that typesense is initialized properly for the server to use
+ * @param {boolean} reset - whether or not to reset the typesense collection
+ * @param {string} collectionName - the name of the collection to use
  */
-async function startTypesense() {
+async function startTypesense(reset = false, collectionName = "games") {
     let function_name = "start_typesense";
-    let data = await typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === 'games') });
+    gameSchema.name = collectionName;
+    let data = await typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === collectionName) });
     try {
-        if (data) {
-            await clearTypesenseCollection("games");
+        if (reset) {
+            // since we are resetting, need to delete the collection and then reinitialize it and put data in it
+            await clearTypesenseCollection(collectionName);
             await initializeTypesenseCollection(gameSchema);
-            await setupTypeSenseCollection("games", await getSteamData());
-        } else {
-            // await typesenseClient.collections().create(gameSchema);
-            Logging.log(function_name, "Created Typesense collection");
+            await setupTypeSenseCollection(collectionName, await getSteamData());
+        } 
+        else if (data) {
+            // update the collection with any new data from steam
+            await setupTypeSenseCollection(collectionName, await getSteamData());
+        }
+        else {
+            // need to create the collection, then can put steam data in it
             await initializeTypesenseCollection(gameSchema);
-            await setupTypeSenseCollection("games", await getSteamData());
+            await setupTypeSenseCollection(collectionName, await getSteamData());
         }
     } catch (e) {
         Logging.log(function_name, e, LogLevels.ERROR);
@@ -61,6 +72,7 @@ async function clearTypesenseCollection(collection) {
 /**
  * Initializes a Typesense collection with the given schema
  * @param {String} collection - the name of the collection to initialize
+ * @returns {any} - the result of the typesense collection creation
  */
 async function initializeTypesenseCollection(schema) {
     let function_name = "initializeTypesenseCollection";
@@ -76,6 +88,7 @@ async function initializeTypesenseCollection(schema) {
 
 /**
  * Returns the app list from steam
+ * @returns {any} - the app list from steam
  */
 async function getSteamData() {
     let data = "";
@@ -83,7 +96,7 @@ async function getSteamData() {
 
     try {
         return await axios.get(urlToPrint).then((response) => {
-            return JSON.parse(JSON.stringify(response.data)).applist.apps;
+            return response.data.applist.apps;
         });
     }
     catch (e) {
@@ -94,7 +107,7 @@ async function getSteamData() {
 // TODO: add weights to each app????? probably in a new collection that just stores {appid: weight}
 // might only add to that collection when something gets clicked on for the first time rather than on startup
 /**
- * Sets up the Typesense games collection with the app list from steam
+ * Sets up the Typesense games collection with the app list
  * @param {String} collection - the name of the collection to setup
  * @param {any} data - the app list to initialize with
  */
@@ -133,6 +146,7 @@ async function searchForGame(gameName, numPerPage) {
  */
 async function searchTypesenseCollection(collection, searchParameters) {
     let function_name = "searchTypesenseCollection";
+    Logging.log(function_name, "Searching for " + searchParameters.q + " in collection " + collection);
     return typesenseClient.collections(collection).documents().search(searchParameters).then(function (data) {
         return data;
     }).catch((e) => {
