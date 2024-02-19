@@ -34,7 +34,7 @@ async function getGameData(appid) {
  * @param {Response} res
  */
 async function searchGamePage(req, res) {
-    if (!req.params || !req.params.query) {
+    if (!req || !req.params || !req.params.query) {
         Logging.handleResponse(res, 400, null, "searchGamePage", "No query provided");
         return;
     }

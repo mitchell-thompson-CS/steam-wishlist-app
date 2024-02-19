@@ -16,7 +16,7 @@ const gameSchema = {
     'name': 'games',
     'fields': [
         { 'name': 'name', 'type': 'string' },
-        { 'name': 'appid', 'type': 'int32' },
+        { 'name': 'id', 'type': 'int32' },
     ]
 }
 
@@ -96,7 +96,11 @@ async function getSteamData() {
 
     try {
         return await axios.get(urlToPrint).then((response) => {
-            return response.data.applist.apps;
+            let newResponse = JSON.parse(JSON.stringify(response.data).replaceAll("\"appid\"", "\"id\"")).applist.apps;
+            for (let i = 0; i < newResponse.length; i++) {
+                newResponse[i].id = String(newResponse[i].id);
+            }
+            return newResponse;
         });
     }
     catch (e) {
@@ -119,6 +123,7 @@ async function setupTypeSenseCollection(collection, data) {
         Logging.log(function_name, "Finished setting up Typesense for collection " + collection);
         return res;
     } catch (e) {
+        console.log(e)
         Logging.log(function_name, e, LogLevels.ERROR);
     }
 }
@@ -127,15 +132,16 @@ async function setupTypeSenseCollection(collection, data) {
  * Searches the Typesense games collection for a game with the given name
  * @param {string} gameName - the name of the game to search for
  * @param {number} numPerPage - the number of results to return per page
+ * @param {string} collectionName - the name of the collection to search (default "games")
  * @returns {any} - the results of the search
  */
-async function searchForGame(gameName, numPerPage) {
+async function searchForGame(gameName, numPerPage, collectionName = "games") {
     let searchParameters = {
         'q': gameName,
         'query_by': 'name',
         'per_page': numPerPage,
     };
-    return await searchTypesenseCollection('games', searchParameters);
+    return await searchTypesenseCollection(collectionName, searchParameters);
 }
 
 /**
