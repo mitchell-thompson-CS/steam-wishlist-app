@@ -1,16 +1,5 @@
-require('dotenv').config({path: __dirname + '/../../../.env'});
 const { exportedForTesting, searchForGame, startTypesense, searchTypesenseCollection } = require("../../modules/typesense");
-const Typesense = require('typesense');
-
-const typesenseClient = new Typesense.Client({
-    'nodes': [{
-        'host': 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
-        'port': 8108,      // For Typesense Cloud use 443
-        'protocol': 'http'   // For Typesense Cloud use https
-    }],
-    'apiKey': `${process.env.TYPESENSE_API_KEY}`,
-    'connectionTimeoutSeconds': 2
-});
+const { typesenseClient } = require("../typesenseClient");
 
 exportedForTesting.setTypesenseClient(typesenseClient);
 
@@ -24,6 +13,10 @@ let searchParameters = {
 };
 
 beforeEach(async () => {
+    await exportedForTesting.clearTypesenseCollection("games_test");
+});
+
+afterAll(async () => {
     await exportedForTesting.clearTypesenseCollection("games_test");
 });
 
@@ -80,4 +73,6 @@ it("searchForGame with final startTypesense false", async () => {
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
     expect(results.hits[0].document.name).toBe("Half-Life 2")
+    expect(results.hits[0].document.id).toBeDefined();
+    expect(results.hits[0].document.appid).toBe(undefined)
 }, 10000);

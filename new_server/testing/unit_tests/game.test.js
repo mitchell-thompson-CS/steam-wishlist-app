@@ -1,6 +1,17 @@
 const { getGamePage, getGameData, searchGamePage } = require("../../modules/game");
+const { startTypesense, exportedForTesting, searchTypesenseCollection } = require("../../modules/typesense");
+const { typesenseClient } = require("../typesenseClient");
 
 let resTemplate;
+
+beforeAll(async () => {
+    exportedForTesting.setTypesenseClient(typesenseClient);
+    await startTypesense(true, "games_test");
+});
+
+afterAll(async () => {
+    await exportedForTesting.clearTypesenseCollection("games_test");
+});
 
 beforeEach(() => {
     resTemplate = {
@@ -102,16 +113,14 @@ describe("Game Module", () => {
         expect(res[game_id].data.type).toBe("game");
     });
 
-    // test("searchGamePage", () => {
-    //     let req = {
-    //         params: {
-    //             query: "123"
-    //         }
-    //     };
-    //     let res = {
-    //         send: jest.fn()
-    //     };
-    //     searchGamePage(req, res);
-    //     expect(res.send).toHaveBeenCalled();
-    // });
+    test("searchGamePage - failure", async () => {
+        let req = {
+            params: {}
+        };
+        let res = resTemplate;
+        await searchGamePage(req, res);
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
 });

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watch --detectOpenHandles",
+    "test-dev": "NODE_ENV=dev jest --watch --detectOpenHandles",
     "start": "node index.js",
     "start-dev": "node index.js -v"
   },
