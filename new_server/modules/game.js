@@ -51,8 +51,13 @@ async function searchGamePage(req, res) {
  * @param {Response} res
  */
 async function getGamePage(req, res) {
+    if (!req || !req.params || !req.params.game_id) {
+        Logging.handleResponse(res, 400, {}, "getGamePage", "Invalid request", LogLevels.ERROR);
+        return;
+    } 
+
     await getGameData(req.params.game_id).then((data) => {
-        if (data[req.params.game_id]['success']) {
+        if (data && data[req.params.game_id] && data[req.params.game_id]['success']) {
             let entry = data[req.params.game_id]['data'];
             // we want type, name, dlc, short_description, header_image, website, pc_requirements, mac_requirements, 
             // linux_requirements, developers, publishers, price_overview, platforms, categories, genres, release_date

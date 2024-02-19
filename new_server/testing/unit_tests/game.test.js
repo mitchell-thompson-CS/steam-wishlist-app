@@ -1,31 +1,106 @@
 const { getGamePage, getGameData, searchGamePage } = require("../../modules/game");
 
+let resTemplate;
+
+beforeEach(() => {
+    resTemplate = {
+        status: -1,
+        data: {},
+        send: function(data) {
+            this.data = data;
+            return this;
+        },
+        sendStatus: function(code) {
+            this.status = code;
+            return this;
+        },
+        status: function(code) {
+            this.status = code;
+            return this;
+        }
+    };
+});
+
 describe("Game Module", () => {
-    test("getGamePage", async () => {
+    test("getGamePage - success", async () => {
         let req = {
             params: {
                 game_id: "400"
             }
         };
-        let res = {
-            status: -1,
-            send: jest.fn(),
-            sendStatus: jest.fn(),
-            status: function(code) {
-                this.status = code;
-                return this;
-            }
-        };
+        let res = resTemplate;
+        
         await getGamePage(req, res);
-        expect(res.send).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
+        expect(res.data).toBeDefined();
+        expect(res.data).toHaveProperty("name");
+        expect(res.data).toHaveProperty("type");
+        expect(res.data.name).toBe("Portal");
+        expect(res.data.type).toBe("game");
     });
 
-    // test("getGameData", () => {
-    //     let game_id = "123";
-    //     let res = getGameData(game_id);
-    //     expect(res).toBeDefined();
-    // });
+    test("getGamePage - failure - invalid id", async () => {
+        let req = {
+            params: {
+                game_id: "asdfg"
+            }
+        };
+        let res = resTemplate;
+        
+        await getGamePage(req, res);
+
+        expect(res.status).toBe(404);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamePage - failure - no id", async () => {
+        let req = {
+            params: {}
+        };
+        let res = resTemplate;
+        
+        await getGamePage(req, res);
+
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamePage - failure - no params", async () => {
+        let req = {}
+        let res = resTemplate;
+
+        await getGamePage(req, res);
+
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGameData - failure - nonexistant game_id", async () => {
+        let game_id = "123";
+        let res = await getGameData(game_id);
+
+        expect(res).toBeDefined();
+        expect(res[game_id]).toBeDefined();
+        expect(res[game_id].success).toBe(false);
+    });
+
+    test("getGameData - success", async () => {
+        let game_id = "400";
+        let res = await getGameData(game_id);
+
+        expect(res).toBeDefined();
+        expect(res[game_id]).toBeDefined();
+        expect(res[game_id].success).toBe(true);
+        expect(res[game_id].data).toBeDefined();
+        expect(res[game_id].data).toHaveProperty("name");
+        expect(res[game_id].data).toHaveProperty("type");
+        expect(res[game_id].data.name).toBe("Portal");
+        expect(res[game_id].data.type).toBe("game");
+    });
 
     // test("searchGamePage", () => {
     //     let req = {
