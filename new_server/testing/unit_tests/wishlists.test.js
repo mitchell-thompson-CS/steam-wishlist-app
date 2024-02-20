@@ -209,4 +209,13 @@ describe("Wishlists", () => {
             }
         }
     });
+
+    test("createWishlist - failure - no wishlist_name", async () => {
+        await login(req, res);
+
+        req.body = {};
+        await createWishlist(req, res);
+
+        expect(res.status).toBe(400);
+    });
 });
