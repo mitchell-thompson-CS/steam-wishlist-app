@@ -9,12 +9,8 @@ if (process.env.NODE_ENV !== "test" && process.env.NODE_ENV !== "test-dev") {
   firebaseAdmin = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
-} else {
-  process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
-  firebaseAdmin = admin.initializeApp({projectId: "steam-wishlist-app"});
+  db = firebaseAdmin.firestore();
 }
-
-db = admin.firestore();
 
 exports.admin = firebaseAdmin;
 
