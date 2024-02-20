@@ -1,4 +1,4 @@
-const { admin, getDb } = require("../../modules/firebase");
+const { getDb } = require("../../modules/firebase");
 const axios = require("axios");
 
 async function clearFirestore() {
