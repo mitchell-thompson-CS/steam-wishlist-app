@@ -44,7 +44,7 @@ class Logging {
    * @param {number} level - the level of the message
    */
   static log(function_name, message, level=LogLevels.INFO) {
-    if ((write_to_console || level !== LogLevels.INFO || process.env.NODE_ENV === "dev") && process.env.NODE_ENV !== "test") {
+    if ((write_to_console || level !== LogLevels.INFO || process.env.NODE_ENV === "test-dev") && process.env.NODE_ENV !== "test") {
       console.log("(" + LogLevelsStrings[level] + ")(" + function_name + ") " + message);
     }
   }
