@@ -126,35 +126,37 @@ async function deleteWishlist(req, res) {
                     });
                 } catch (error2) {
                     // editor doesn't exist
-                    Logging.log(function_name, 
-                        "Unable to delete wishlist " + wishlist_id + " from editor " + editor + ": " + error2, 
+                    Logging.log(function_name,
+                        "Unable to delete wishlist " + wishlist_id + " from editor " + editor + ": " + error2,
                         LogLevels.WARN);
                 }
             }
         } catch (error) {
             // problem with user
-            Logging.log(function_name, 
-                "Error deleting wishlist " + wishlist_id + " from user " + req.user.id + ": " + error, 
+            Logging.log(function_name,
+                "Error deleting wishlist " + wishlist_id + " from user " + req.user.id + ": " + error,
                 LogLevels.WARN);
+        }
+
+        // we will delete the wishlist regardless of if there was an error with the users
+        // if there was an error getting the users, they likely don't exist so wishlist shouldn't exist
+        try {
+            await getDb().collection('wishlists').doc(wishlist_id).delete()
+                .then(() => {
+                    Logging.handleResponse(res, 200, null, function_name,
+                        "Wishlist " + wishlist_id + " deleted by " + req.user.id);
+                });
+        } catch (error) {
+            // couldn't delete wishlist
+            Logging.handleResponse(res, 500, null, function_name,
+                "Error deleting wishlist " + wishlist_id + " by " + req.user.id + ": " + error, 
+                LogLevels.ERROR);
         }
     } catch (error) {
         // problem getting the wishlist
         Logging.handleResponse(res, 500, null, function_name,
-            "Error getting wishlist " + wishlist_id + " by " + req.user.id + ": " + error, LogLevels.ERROR);
-    }
-
-    // we will delete the wishlist regardless of if there was an error with the users
-    // if there was an error getting the users, they likely don't exist so wishlist shouldn't exist
-    try {
-        await getDb().collection('wishlists').doc(wishlist_id).delete()
-            .then(() => {
-                Logging.handleResponse(res, 200, null, function_name,
-                    "Wishlist " + wishlist_id + " deleted by " + req.user.id);
-            });
-    } catch (error) {
-        // couldn't delete wishlist
-        Logging.handleResponse(res, 500, null, function_name, 
-            "Error deleting wishlist " + wishlist_id + " by " + req.user.id + ": " + error, LogLevels.ERROR);
+            "Error getting wishlist " + wishlist_id + " by " + req.user.id + ": " + error, 
+            LogLevels.ERROR);
     }
 }
 
