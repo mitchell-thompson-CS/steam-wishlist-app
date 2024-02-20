@@ -1,5 +1,11 @@
-const { getDb } = require("../../modules/firebase");
+const admin = require("firebase-admin");
+const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
+
+process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
+firebaseAdmin = admin.initializeApp({projectId: "steam-wishlist-app"});
+
+setDb(firebaseAdmin.firestore());
 
 async function clearFirestore() {
     await axios.delete("http://localhost:8080/emulator/v1/projects/steam-wishlist-app/databases/(default)/documents");
