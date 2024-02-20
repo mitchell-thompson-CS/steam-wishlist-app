@@ -7,12 +7,31 @@ require('dotenv').config({ path: __dirname + '/../../.env' });
 const base_url = `${process.env.API_BASE_URL}`
 console.log(base_url);
 
+/** Checks if the user is logged in.
+ * 
+ * @param {Request} req
+ * @param {Response} res
+ * @param {*} next
+ */
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
 
     Logging.handleResponse(res, 401, null, "isLoggedIn", "Not logged in");
+}
+
+/** Saves the previous page to the session so we can redirect back to it after logging in.
+ * 
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param {*} next 
+ */
+async function savePrevPageToSession(req, res, next) {
+    req.session.prevPage = req.query.redir;
+    await req.session.save(() => {
+        next();
+    });
 }
 
 // this gets called whenever a user logs in
@@ -50,19 +69,6 @@ passport.use(new SteamStrategy({
         });
     }
 ));
-
-/** Saves the previous page to the session so we can redirect back to it after logging in.
- * 
- * @param {Request} req 
- * @param {Response} res 
- * @param {*} next 
- */
-async function savePrevPageToSession(req, res, next) {
-    req.session.prevPage = req.query.redir;
-    await req.session.save(() => {
-        next();
-    });
-}
 
 /** Logs in the user and creates a custom token for them to use with firebase.
  * 
@@ -106,8 +112,8 @@ function getUser(req, res) {
     Logging.handleResponse(res, 200, req.user, "getUser", "Got user " + req.user.name + " (" + req.user.id + ")");
 }
 
-exports.passport = passport;
 exports.login = login;
 exports.logout = logout;
 exports.savePrevPageToSession = savePrevPageToSession;
+exports.isLoggedIn = isLoggedIn;
 exports.getUser = getUser;
