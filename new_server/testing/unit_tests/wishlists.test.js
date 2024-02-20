@@ -252,6 +252,17 @@ describe("Wishlists", () => {
     test("deleteWishlist - success", async () => {
         await login(req, res);
 
+        let req2 = {
+            ...req,
+            user: {
+                id: "54321",
+                name: "testUserName2",
+                avatar: "testAvatarURL"
+            },
+        }
+
+        await login(req2, res);
+
         // create the wishlist
         await createWishlist(req, res);
 
@@ -263,6 +274,31 @@ describe("Wishlists", () => {
         let wishlist_id = Object.keys(data.wishlists)[0];
 
         expect(wishlist_id).toBeDefined();
+
+        // add the wishlist to the other user
+        await getDb().collection("wishlists").doc(wishlist_id).update({
+            editors: {
+                "54321": getDb().collection("users").doc("54321")
+            }
+        });
+
+        await getDb().collection("users").doc("54321").update({
+            ["shared_wishlists." + wishlist_id]: getDb().collection("wishlists").doc(wishlist_id)
+        });
+
+        // make sure editor was added
+        let wishlist_collection = await getDb().collection("wishlists").doc(wishlist_id).get();
+        let wishlist_data = wishlist_collection.data();
+        let user2 = await getDb().collection("users").doc("54321");
+        let user2_data = await user2.get();
+        expect(wishlist_data.editors).toBeDefined();
+        expect(wishlist_data.editors["54321"]).toBeDefined();
+        expect(await wishlist_data.editors["54321"]).toEqual(await user2);
+        expect(user2_data.data()).toBeDefined();
+        expect(user2_data.data().shared_wishlists).toBeDefined();
+        expect(user2_data.data().shared_wishlists[wishlist_id]).toBeDefined();
+        expect(await user2_data.data().shared_wishlists[wishlist_id]).toEqual(await getDb().collection("wishlists").doc(wishlist_id));
+
 
         // delete the wishlist
         req.body = {
@@ -277,6 +313,9 @@ describe("Wishlists", () => {
         let data2 = collection2.data();
         expect(data2.wishlists).toBeDefined();
         expect(data2.wishlists[wishlist_id]).toBeUndefined();
+
+        let collection3 = await getDb().collection("wishlists").doc(wishlist_id).get();
+        expect(collection3.exists).toBe(false);
     });
 
     test("deleteWishlist - failure - no wishlist_id", async () => {
