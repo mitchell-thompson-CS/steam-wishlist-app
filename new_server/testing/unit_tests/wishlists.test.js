@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
-const { exportedForTesting, getWishlists, createWishlist } = require('../../modules/wishlists');
+const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
 
 process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
@@ -206,7 +206,7 @@ describe("Wishlists", () => {
         });
 
         await getWishlists(req, res);
-        
+
         expect(res.status).toBe(500);
     });
 
@@ -245,6 +245,45 @@ describe("Wishlists", () => {
 
         req.body = {};
         await createWishlist(req, res);
+
+        expect(res.status).toBe(400);
+    });
+
+    test("deleteWishlist - success", async () => {
+        await login(req, res);
+
+        // create the wishlist
+        await createWishlist(req, res);
+
+        res.status = -1;
+
+        // get the wishlist
+        let collection = await getDb().collection("users").doc("12345").get();
+        let data = collection.data();
+        let wishlist_id = Object.keys(data.wishlists)[0];
+
+        expect(wishlist_id).toBeDefined();
+
+        // delete the wishlist
+        req.body = {
+            wishlist_id: wishlist_id
+        }
+        await deleteWishlist(req, res);
+
+        expect(res.status).toBe(200);
+
+        // make sure it was deleted
+        let collection2 = await getDb().collection("users").doc("12345").get();
+        let data2 = collection2.data();
+        expect(data2.wishlists).toBeDefined();
+        expect(data2.wishlists[wishlist_id]).toBeUndefined();
+    });
+
+    test("deleteWishlist - failure - no wishlist_id", async () => {
+        await login(req, res);
+
+        req.body = {};
+        await deleteWishlist(req, res);
 
         expect(res.status).toBe(400);
     });
