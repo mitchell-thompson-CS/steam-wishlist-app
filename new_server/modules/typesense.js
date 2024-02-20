@@ -32,14 +32,14 @@ async function setTypesenseClient(client) {
 async function startTypesense(reset = false, collectionName = "games") {
     let function_name = "start_typesense";
     gameSchema.name = collectionName;
-    let data = await typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === collectionName) });
     try {
+        let data = await typesenseClient.collections().retrieve().then(function (data) { return data.find(({ name }) => name === collectionName) });
         if (reset) {
             // since we are resetting, need to delete the collection and then reinitialize it and put data in it
             await clearTypesenseCollection(collectionName);
             await initializeTypesenseCollection(gameSchema);
             await setupTypeSenseCollection(collectionName, await getSteamData());
-        } 
+        }
         else if (data) {
             // update the collection with any new data from steam
             await setupTypeSenseCollection(collectionName, await getSteamData());
