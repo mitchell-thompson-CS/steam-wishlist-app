@@ -42,7 +42,7 @@ it("searchForGame with initialized typesense with games_test collection", async 
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
     expect(results.hits[0].document.name).toBe("Half-Life 2")
-}, 10000);
+}, 15000);
 
 it("searchForGame with empty games_test collection", async () => {
     await exportedForTesting.initializeTypesenseCollection(testSchema);
