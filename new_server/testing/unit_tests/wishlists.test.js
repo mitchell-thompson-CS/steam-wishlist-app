@@ -125,12 +125,13 @@ describe("Wishlists", () => {
             ["shared_wishlists." + "testSharedWishlist"]: wishlistCollection.doc("testWishlist3"),
         });
 
-        let result = await exportedForTesting.getWishlistsHelper("12345");
-        expect(result).toBeDefined();
-        expect(result.owned).toBeDefined();
-        expect(result.shared).toBeDefined();
-        expect(result.owned).toEqual({});
-        expect(result.shared).toEqual({});
+        let error = false;
+        try {
+            await exportedForTesting.getWishlistsHelper("12345");
+        } catch (e) {
+            error = true;
+        }
+        expect(error).toBe(true);
     });
 
     test("getWishlistsHelper - no user", async () => {
@@ -178,6 +179,35 @@ describe("Wishlists", () => {
         expect(res.data.owned.testWishlist.name).toBe("testWishlist");
         expect(res.data.owned.testWishlist2.name).toBe("testWishlist2");
         expect(res.data.shared.testWishlist3.name).toBe("testWishlist3");
+    });
+
+    test("getWishlists - failure - db format broken", async () => {
+        // create the user entry with login
+        await login(req, res);
+
+        // manually create the wishlists and add them to the user
+        let wishlistCollection = await getDb().collection("wishlists");
+        await wishlistCollection.doc("testWishlist").set({
+            name: "testWishlist"
+        });
+        await wishlistCollection.doc("testWishlist2").set({
+            name: "testWishlist2"
+        });
+
+        await wishlistCollection.doc("testWishlist3").set({
+            name: "testWishlist3"
+        });
+
+        let collection = await getDb().collection("users");
+        await collection.doc("12345").update({
+            ["wishlists." + "testWishlist"]: "testString",
+            ["wishlists." + "testWishlist2"]: wishlistCollection.doc("testWishlist2"),
+            ["shared_wishlists." + "testSharedWishlist"]: wishlistCollection.doc("testWishlist3"),
+        });
+
+        await getWishlists(req, res);
+        
+        expect(res.status).toBe(500);
     });
 
     test("createWishlist - success", async () => {

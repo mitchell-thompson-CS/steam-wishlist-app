@@ -1,6 +1,7 @@
 const { getDb } = require('./firebase')
 const { Logging, LogLevels } = require('./logging')
 const { v4: uuidv4 } = require('uuid');
+const FieldValue = require('firebase-admin').firestore.FieldValue;
 
 /** Gets a users wishlists and sends the wishlists to the client as a JSON object
  * @params request object
@@ -69,13 +70,80 @@ async function createWishlist(req, res) {
                     "Unable to delete wishlist " + new_id + " after failing to add to user " + req.user.id,
                     LogLevels.WARN);
             }
-            Logging.handleResponse(res, 500, null, function_name, 
+            Logging.handleResponse(res, 500, null, function_name,
                 "Error adding wishlist " + new_id + " to user " + req.user.id + ": " + error);
         }
     } catch (error) {
         // problem creating the wishlist
-        Logging.handleResponse(res, 500, null, function_name, 
+        Logging.handleResponse(res, 500, null, function_name,
             "Error creating wishlist " + new_id + " by " + req.user.id + ": " + error);
+    }
+}
+
+/** Deletes a wishlist from the firestore database and sends a 200 status code if successful
+ * @params request object with a wishlist_id in the body
+ * @params response object
+ */
+async function deleteWishlist(req, res) {
+    let function_name = deleteWishlist.name;
+    let post = JSON.parse(JSON.stringify(req.body));
+    var wishlist_id = post['wishlist_id'];
+    // TODO: add sanitization to the ids like this one that are inputted by user
+    if (!wishlist_id) {
+        // no wishlist id
+        Logging.handleResponse(res, 400, null, function_name,
+            "No wishlist id provided by " + req.user.id);
+        return;
+    }
+
+    let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get()
+    if (!wishlistSnapshot.exists) {
+        // wishlist doesn't exist
+        Logging.handleResponse(res, 404, null, function_name,
+            "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
+        return;
+    }
+
+    let data = wishlistSnapshot.data();
+    // need to check permissions of user then can delete
+    if (data.owner.id != req.user.id) {
+        // user is not the owner
+        Logging.handleResponse(res, 403, null, function_name,
+            "User " + req.user.id + " is not the owner of wishlist " + wishlist_id);
+        return;
+    }
+
+    try {
+        // delete from user first, then will delete from editors
+        await getDb().collection('users').doc(req.user.id).update({
+            [`wishlists.${wishlist_id}`]: FieldValue.delete()
+        })
+
+        for (let editor in data.editors) {
+            try {
+                await getDb().collection('users').doc(editor).update({
+                    [`shared_wishlists.${wishlist_id}`]: FieldValue.delete()
+                });
+            } catch (error2) {
+                // editor doesn't exist
+                Logging.log(function_name, "Unable to delete wishlist " + wishlist_id + " from editor " + editor, LogLevels.WARN);
+            }
+        }
+    } catch (error) {
+        // problem with user
+    }
+
+    // we will delete the wishlist regardless of if there was an error with the users
+    // if there was an error getting the users, they likely don't exist so wishlist shouldn't exist
+    try {
+        await getDb().collection('wishlists').doc(wishlist_id).delete()
+            .then(() => {
+                Logging.handleResponse(res, 200, null, function_name,
+                    "Wishlist " + wishlist_id + " deleted by " + req.user.id);
+            });
+    } catch (error) {
+        // couldn't delete wishlist
+        Logging.handleError(error, res);
     }
 }
 
@@ -116,7 +184,7 @@ async function getWishlistsHelper(user_id) {
             })
         } catch (e) {
             Logging.log(function_name, "Issue getting wishlists from firestore: " + e, LogLevels.ERROR);
-            return final_wishlists;
+            throw new Error("Issue getting wishlists from firestore");
         }
     });
 }
@@ -124,6 +192,7 @@ async function getWishlistsHelper(user_id) {
 
 exports.getWishlists = getWishlists;
 exports.createWishlist = createWishlist;
+exports.deleteWishlist = deleteWishlist;
 exports.exportedForTesting = {
     getWishlistsHelper: getWishlistsHelper,
 }
