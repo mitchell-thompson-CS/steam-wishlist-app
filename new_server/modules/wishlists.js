@@ -95,42 +95,52 @@ async function deleteWishlist(req, res) {
             "No wishlist id provided by " + req.user.id);
         return;
     }
-
-    let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get()
-    if (!wishlistSnapshot.exists) {
-        // wishlist doesn't exist
-        Logging.handleResponse(res, 404, null, function_name,
-            "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
-        return;
-    }
-
-    let data = wishlistSnapshot.data();
-    // need to check permissions of user then can delete
-    if (data.owner.id != req.user.id) {
-        // user is not the owner
-        Logging.handleResponse(res, 403, null, function_name,
-            "User " + req.user.id + " is not the owner of wishlist " + wishlist_id);
-        return;
-    }
-
     try {
-        // delete from user first, then will delete from editors
-        await getDb().collection('users').doc(req.user.id).update({
-            [`wishlists.${wishlist_id}`]: FieldValue.delete()
-        })
+        let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get()
+        if (!wishlistSnapshot.exists) {
+            // wishlist doesn't exist
+            Logging.handleResponse(res, 404, null, function_name,
+                "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
+            return;
+        }
 
-        for (let editor in data.editors) {
-            try {
-                await getDb().collection('users').doc(editor).update({
-                    [`shared_wishlists.${wishlist_id}`]: FieldValue.delete()
-                });
-            } catch (error2) {
-                // editor doesn't exist
-                Logging.log(function_name, "Unable to delete wishlist " + wishlist_id + " from editor " + editor, LogLevels.WARN);
+        let data = wishlistSnapshot.data();
+        // need to check permissions of user then can delete
+        if (data.owner.id != req.user.id) {
+            // user is not the owner
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " is not the owner of wishlist " + wishlist_id);
+            return;
+        }
+
+        try {
+            // delete from user first, then will delete from editors
+            await getDb().collection('users').doc(req.user.id).update({
+                [`wishlists.${wishlist_id}`]: FieldValue.delete()
+            })
+
+            for (let editor in data.editors) {
+                try {
+                    await getDb().collection('users').doc(editor).update({
+                        [`shared_wishlists.${wishlist_id}`]: FieldValue.delete()
+                    });
+                } catch (error2) {
+                    // editor doesn't exist
+                    Logging.log(function_name, 
+                        "Unable to delete wishlist " + wishlist_id + " from editor " + editor + ": " + error2, 
+                        LogLevels.WARN);
+                }
             }
+        } catch (error) {
+            // problem with user
+            Logging.log(function_name, 
+                "Error deleting wishlist " + wishlist_id + " from user " + req.user.id + ": " + error, 
+                LogLevels.WARN);
         }
     } catch (error) {
-        // problem with user
+        // problem getting the wishlist
+        Logging.handleResponse(res, 500, null, function_name,
+            "Error getting wishlist " + wishlist_id + " by " + req.user.id + ": " + error, LogLevels.ERROR);
     }
 
     // we will delete the wishlist regardless of if there was an error with the users
@@ -143,7 +153,8 @@ async function deleteWishlist(req, res) {
             });
     } catch (error) {
         // couldn't delete wishlist
-        Logging.handleError(error, res);
+        Logging.handleResponse(res, 500, null, function_name, 
+            "Error deleting wishlist " + wishlist_id + " by " + req.user.id + ": " + error, LogLevels.ERROR);
     }
 }
 
