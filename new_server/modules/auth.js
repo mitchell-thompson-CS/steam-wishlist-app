@@ -1,6 +1,6 @@
 const passport = require("passport");
 const SteamStrategy = require("passport-steam");
-const { admin, getDb } = require("./initFirebase");
+const { getDb } = require("./firebase");
 const { Logging, LogLevels } = require("./logging");
 
 require('dotenv').config({ path: __dirname + '/../../.env' });

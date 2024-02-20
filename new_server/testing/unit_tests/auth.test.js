@@ -1,3 +1,4 @@
+const admin = require("firebase-admin");
 const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
 const { login, logout, savePrevPageToSession, isLoggedIn, getUser } = require("../../modules/auth");
@@ -19,7 +20,7 @@ beforeEach(async () => {
 
     req = {
         session: {
-            prevPage: ""
+            prevPage: "http://localhost:3000"
         },
         query: {
             redir: "http://localhost:3000"
@@ -68,6 +69,7 @@ describe("Auth", () => {
     });
 
     test("Testing login", async () => {
-
+        await login(req, res);
+        expect(res.redirect_url).toBe("http://localhost:3000");
     });
 });
