@@ -50,23 +50,5 @@ class Logging {
   }
 }
 
-class FirebaseError extends Error {
-  constructor(message, code) {
-    super(message);
-    this.name = 'FirebaseError';
-  }
-}
-
-class UserError extends Error {
-  constructor(message, code) {
-    super(message);
-    this.name = 'UserError';
-  }
-}
-
-// exports.handleError = handleError;
-// exports.handleResponse = handleResponse;
-exports.FirebaseError = FirebaseError;
-exports.UserError = UserError;
 exports.LogLevels = LogLevels;
 exports.Logging = Logging;
