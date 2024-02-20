@@ -153,7 +153,7 @@ async function searchForGame(gameName, numPerPage, collectionName = "games") {
 async function searchTypesenseCollection(collection, searchParameters) {
     let function_name = "searchTypesenseCollection";
     Logging.log(function_name, "Searching for " + searchParameters.q + " in collection " + collection);
-    return typesenseClient.collections(collection).documents().search(searchParameters).then(function (data) {
+    return await typesenseClient.collections(collection).documents().search(searchParameters).then(function (data) {
         return data;
     }).catch((e) => {
         Logging.log(function_name, e, LogLevels.ERROR);
