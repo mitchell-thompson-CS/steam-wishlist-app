@@ -80,6 +80,10 @@ function logout(req, res) {
     });
 }
 
+/** Gets the user object from the request.
+ * @param {Request} req
+ * @param {Response} res
+ */
 function getUser(req, res) {
     Logging.handleResponse(res, 200, req.user, "getUser", "Got user " + req.user.name + " (" + req.user.id + ")");
 }
