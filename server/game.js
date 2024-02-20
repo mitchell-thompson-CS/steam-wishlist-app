@@ -1,5 +1,5 @@
 const { Logging } = require('./errors.js');
-const { searchForGame } = require('./typesense.js');
+// const { searchForGame } = require('./typesense.js');
 
 // TODO: restructure game data method with a SteamError or something similar
 /** Gets data for a game from the Steam API and returns JSON object of it if it exists.
@@ -35,7 +35,8 @@ async function getGameData(appid) {
  */
 async function searchGamePage(req, res){
   let query = req.params.query;
-  let gameList = await searchForGame(query, 5);
+  // let gameList = await searchForGame(query, 5);
+  let gameList = {};
   Logging.handleResponse(res, 200, gameList.hits, "searchGamePage", "Searched for game " + query);
 }
 
