@@ -68,9 +68,9 @@ beforeEach(async () => {
     };
 });
 
-// afterAll(async () => {
-//     await clearFirestore();
-// });
+afterAll(async () => {
+    await clearFirestore();
+});
 
 
 describe("Wishlists", () => {
