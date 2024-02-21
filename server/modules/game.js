@@ -1,4 +1,4 @@
-const { Logging, LogLevels } = require('./logging');
+const { Logging, LogLevels } = require('./logging.js');
 const { searchForGame } = require('./typesense.js');
 
 // TODO: restructure game data method with a SteamError or something similar

@@ -1,10 +1,11 @@
 {
-  "name": "steam-api-test",
+  "name": "new_server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest --watch --detectOpenHandles",
+    "test-dev": "NODE_ENV=test-dev jest --watch --detectOpenHandles",
     "start": "node index.js",
     "start-dev": "node index.js -v"
   },
