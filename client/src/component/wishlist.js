@@ -4,6 +4,7 @@ import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import Popup from './Popup';
 import '../Wishlist.css';
+import WishlistSidebar from "./WishlistSidebar";
 
 async function createWishlistPost(wishlistName) {
     try {
@@ -129,21 +130,7 @@ const Wishlist = () => {
 
     return (
         <div className="wishlist">
-            <div className="sidebar">
-                <ul>
-                    <li id="wishlistSearchArea">
-                        <form>
-                            <input type="text" id="wishlistSearch" name="search" placeholder="Search..."/>
-                        </form>
-                    </li>
-                    {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
-                        <li key={key} className="wishlistItem">{value.name}</li>
-                    ))}
-                    {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
-                        <li key={key} className="wishlistItem">{value.name}</li>
-                    ))}
-                </ul>
-            </div>
+            <WishlistSidebar />
             {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
             <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
             <div className="gridContainer">
