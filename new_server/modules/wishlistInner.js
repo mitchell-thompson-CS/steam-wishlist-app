@@ -51,4 +51,51 @@ async function renameWishlist(req, res) {
     }
 }
 
+/** Gets a wishlist from the firestore database and sends it to the client
+ * @params request object that has a parameter with id
+ * @params response object
+ */
+async function getWishlistInner(req, res) {
+    let function_name = getWishlistInner.name;
+    if (!req.params || !req.params.id) {
+        Logging.handleResponse(res, 400, null, function_name,
+            "Wishlist id is empty in request by " + req.user.id);
+        return;
+    }
+
+    try {
+        let wishlistSnapshot = await getDb().collection('wishlists').doc(req.params.id).get();
+        if (!wishlistSnapshot.exists) {
+            Logging.handleResponse(res, 404, null, function_name,
+                "Wishlist " + req.params.id + " doesn't exist by " + req.user.id);
+            return;
+        }
+
+        let data = wishlistSnapshot.data();
+        data['id'] = req.params.id;
+        if (!data.editors[req.user.id] && data.owner.id != req.user.id) {
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " is not the owner or editor of wishlist " + req.params.id);
+            return;
+        }
+
+        // change document references to ids
+        if (data.owner) {
+            data.owner = data.owner.id;
+        }
+        if (data.editors) {
+            for (editor in data.editors) {
+                data.editors[editor] = data.editors[editor].id;
+            }
+        }
+
+        Logging.handleResponse(res, 200, data, function_name,
+            "Sent wishlist " + req.params.id + " to user " + req.user.id);
+    } catch (error) {
+        Logging.handleResponse(res, 500, null, function_name,
+            "Error getting wishlist " + req.params.id + " by user " + req.user.id + ": " + error);
+    }
+}
+
 exports.renameWishlist = renameWishlist;
+exports.getWishlistInner = getWishlistInner;
