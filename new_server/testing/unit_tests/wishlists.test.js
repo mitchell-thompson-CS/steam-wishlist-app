@@ -331,6 +331,54 @@ describe("Wishlists", () => {
         expect(collection3.exists).toBe(false);
     });
 
+    test("deleteWishlist - failure - not owner", async () => {
+        await login(req, res);
+
+        let req2 = {
+            ...req,
+            user: {
+                id: "54321",
+                name: "testUserName2",
+                avatar: "testAvatarURL"
+            },
+        }
+
+        await login(req2, res);
+
+        // create the wishlist
+        await createWishlist(req, res);
+
+        res.status = -1;
+
+        // get the wishlist
+        let collection = await getDb().collection("users").doc("12345").get();
+        let data = collection.data();
+        let wishlist_id = Object.keys(data.wishlists)[0];
+
+        expect(wishlist_id).toBeDefined();
+
+        // add the wishlist to the other user
+        await getDb().collection("wishlists").doc(wishlist_id).update({
+            editors: {
+                "54321": getDb().collection("users").doc("54321")
+            }
+        });
+
+        await getDb().collection("users").doc("54321").update({
+            ["shared_wishlists." + wishlist_id]: getDb().collection("wishlists").doc(wishlist_id)
+        });
+
+        // try to delete as the other user
+        req2.body = {
+            wishlist_id: wishlist_id
+        }
+        await deleteWishlist(req2, res);
+
+        expect(res.status).toBe(403);
+        let wishlist_collection = await getDb().collection("wishlists").doc(wishlist_id).get();
+        expect(wishlist_collection.exists).toBe(true);
+    });
+
     test("deleteWishlist - failure - no wishlist_id", async () => {
         await login(req, res);
 
