@@ -147,11 +147,11 @@ const Wishlist = () => {
             {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
             <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
             <div className="gridContainer">
-                <button onClick={() => setButtonPopup(true)} className="gridItem" id="createWishlistButton">+</button>
+                <button onClick={() => {setButtonPopup(true); setInputText("");}} className="gridItem" id="createWishlistButton">+</button>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
                     <div className="gridItemContainer">
                         <a key={key} className="gridItem" href={"/wishlist/" + key}>{value.name}</a>
-                        <div className="contextMenu" onClick={() => {setContextPopup(key)}}>...</div>
+                        <div className="contextMenu" onClick={() => {setContextPopup(key); setInputText(value.name);}}>...</div>
                     </div>
                 ))}
                 {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
@@ -169,14 +169,19 @@ const Wishlist = () => {
             <button onClick={deleteEditorFromWishlist}>Delete Editor from Wishlist</button>
             <button onClick={() => setButtonPopup(true)}>Open Popup</button>
             <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
-                <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
-                <button onClick={() => {setButtonPopup(false); createWishlistPost(inputText)}} className="popupButton">Create Wishlist Post</button>
+                <div class="popupInputContainer">
+                    <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
+                    <button onClick={() => {setButtonPopup(false); createWishlistPost(inputText)}} className="popupButton">Create Wishlist</button>
+                </div>
             </Popup>
             <Popup trigger={contextPopup} setTrigger={setContextPopup}>
-                <button onClick={() => {setContextPopup(""); deleteWishlistPost(contextPopup)}} className="popupButton">Delete Wishlist Post</button>
-                <br></br>
-                <input type="text" placeholder="Enter New Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
-                <button onClick={() => {setContextPopup(""); renameWishlistPost(contextPopup, inputText)}} className="popupButton">Rename Wishlist Post</button>
+                <div class="popupInputContainer">
+                    <input type="text" placeholder="Enter New Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
+                    <button onClick={() => {setContextPopup(""); renameWishlistPost(contextPopup, inputText)}} className="popupButton">Rename</button>
+                </div>
+                <div class="popupButtonContainer">
+                    <button onClick={() => {setContextPopup(""); deleteWishlistPost(contextPopup)}} className="popupButton">Delete Wishlist</button>
+                </div>
             </Popup>
         </div>
     );
