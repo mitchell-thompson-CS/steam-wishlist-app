@@ -1,5 +1,6 @@
 const { getDb } = require('./firebase')
 const { Logging, LogLevels } = require('./logging')
+const { getGameData } = require('./game')
 const FieldValue = require('firebase-admin').firestore.FieldValue;
 
 
@@ -97,5 +98,62 @@ async function getWishlistInner(req, res) {
     }
 }
 
+/** Adds a game to a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a game_id and wishlist_id in the body
+ * @params response object
+ */
+async function addGameToWishlist(req, res) {
+    let function_name = addGameToWishlist.name;
+    var post = JSON.parse(JSON.stringify(req.body));
+    var game_id = post['game_id'];
+    var wishlist_id = post['wishlist_id'];
+    if (!game_id || !wishlist_id) {
+        // no game id or wishlist id
+        Logging.handleResponse(res, 400, null, function_name,
+            "No game id or wishlist id given by user " + req.user.id);
+        return;
+    }
+
+    try {
+        let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get();
+        if (!wishlistSnapshot.exists) {
+            // wishlist doesn't exist
+            Logging.handleResponse(res, 404, null, function_name,
+                "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
+            return;
+        }
+        var data = wishlistSnapshot.data();
+
+        if (!data.editors[req.user.id] && data.owner.id != req.user.id) {
+            // user is not the owner or editor
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " is not the owner or editor of wishlist " + wishlist_id);
+            return;
+        }
+
+        let gameData = await getGameData(game_id);
+
+        // game doesn't exist
+        if (!gameData || !gameData[game_id] || gameData[game_id]['success'] === false) {
+            Logging.handleResponse(res, 404, null, function_name,
+                "Game " + game_id + " doesn't exist");
+            return;
+        }
+
+        await getDb().collection('wishlists').doc(wishlist_id).update({
+            [`games.${game_id}`]: gameData[game_id]['data']['name']
+        })
+
+        Logging.handleResponse(res, 200, null, function_name,
+            "Game " + game_id + " added to wishlist " + wishlist_id + " by user " + req.user.id);
+        return;
+    } catch (error) {
+        Logging.handleResponse(res, 500, null, function_name,
+            "Error adding game " + game_id + " to wishlist " + wishlist_id + " by user " + req.user.id + ": " + error);
+        return;
+    }
+}
+
 exports.renameWishlist = renameWishlist;
 exports.getWishlistInner = getWishlistInner;
+exports.addGameToWishlist = addGameToWishlist;
