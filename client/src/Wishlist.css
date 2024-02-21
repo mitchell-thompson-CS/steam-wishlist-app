@@ -53,17 +53,17 @@
   .gridContainer {
     padding: 50px;
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: 50px;
   }
   
   .gridItem {
-    width: 120px;
-    height: 120px;
+    width: 160px;
+    height: 160px;
+    line-height: 160px;
     text-align: center;
     display: inline-block;
     vertical-align: middle;
-    line-height: 120px;
     border: 1px gray;
     border-radius: 10%;
     color: white;
@@ -88,10 +88,12 @@
 
   .contextMenu {
     position: relative;
-    top: -120px;
-    right: -90px;
+    top: -160px;
+    right: -130px;
     width: 30px;
     height: 30px;
+    font-size: 18px;
+    font-weight: bold;
     background-color: #393f46;
     color: #fff;
     text-align: center;
@@ -101,8 +103,8 @@
 
   .sharedTag {
     position: relative;
-    top: -125px;
-    right: -70px;
+    top: -160px;
+    right: -110px;
     width: 50px;
     height: 25px;
     color: #fff;
@@ -112,7 +114,17 @@
     font-size: 10px;
   }
 
+  .popupInputContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px; /* Optional: Adjust margin as needed */
+    padding: 0px 80px;
+  }
+
   .popupInput {
+    flex: 1; /* Allow the input to grow and fill available space */
+    margin-right: 10px; /* Add some space between input and button */
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -126,10 +138,14 @@
     box-shadow: 0 0 0 3px rgba(35, 39, 77, 0.2);
   }
 
+  .popupButtonContainer {
+    display: flex;
+    justify-content: center;
+  }
+
   .popupButton {
     background-color: #393f46;
     color: white;
-    display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
     font-weight: bold;

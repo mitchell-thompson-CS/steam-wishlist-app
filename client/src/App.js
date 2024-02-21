@@ -1,5 +1,6 @@
 import './App.css';
 import Wishlist from './component/wishlist';
+import WishlistInner from './component/wishlistInner';
 // import Login from './component/Navbar';
 import { Provider } from 'react-redux';
 import store from './store';
@@ -21,6 +22,7 @@ function App() {
           </header>
           <Routes>
             <Route path="/wishlists" element={<Wishlist />} />
+            <Route path="/wishlist/:id" element={<WishlistInner />} />
             {/* <Route path ="/login" element={<Login />} /> */}
           </Routes>
         </div>
