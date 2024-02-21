@@ -3,7 +3,7 @@ const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
 const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
-const { renameWishlist, getWishlistInner, addGameToWishlist } = require('../../modules/wishlistInner');
+const { renameWishlist, getWishlistInner, addGameToWishlist, removeGameFromWishlist } = require('../../modules/wishlistInner');
 
 process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
 firebaseAdmin = admin.initializeApp({ projectId: "steam-wishlist-app" });
@@ -555,5 +555,209 @@ describe("Wishlist Inner", () => {
         let db = getDb();
         let wishlist = await db.collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({});
+    });
+
+    test("removeGameFromWishlist - success - owner", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
+        }
+
+        await addGameToWishlist(req, res);
+
+        let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().games).toEqual({ "400": "Portal" });
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await removeGameFromWishlist(req, res);
+        expect(res.status).toBe(200);
+
+        wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().games).toEqual({});
+    });
+
+    test("removeGameFromWishlist - success - editor", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
+        }
+
+        await addGameToWishlist(req, res);
+
+        let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().games).toEqual({ "400": "Portal" });
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        let db = getDb();
+        await db.collection('wishlists').doc(wishlist_id).update({
+            editors: {
+                "54321": db.collection('users').doc("54321")
+            }
+        });
+
+        req.user.id = "54321";
+        await removeGameFromWishlist(req, res);
+        expect(res.status).toBe(200);
+
+        wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().games).toEqual({});
+    });
+
+    test("removeGameFromWishlist - failure - no game id or wishlist id", async () => {
+        await login(req, res);
+
+        req.body = {
+            game_id: "",
+            wishlist_id: ""
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await removeGameFromWishlist(req, res);
+        expect(res.status).toBe(400);
+    });
+
+    test("removeGameFromWishlist - failure - no game in wishlist", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await removeGameFromWishlist(req, res);
+        expect(res.status).toBe(404);
+    });
+
+    test("removeGameFromWishlist - failure - no wishlist", async () => {
+        await login(req, res);
+
+        req.body = {
+            game_id: "400",
+            wishlist_id: "12345"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await removeGameFromWishlist(req, res);
+        expect(res.status).toBe(404);
+    });
+
+    test("removeGameFromWishlist - failure - not an editor or owner", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addGameToWishlist(req, res);
+
+        req.user.id = "543210";
+        await removeGameFromWishlist(req, res);
+        expect(res.status).toBe(403);
+
+        let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().games).toEqual({ "400": "Portal" });
     });
 });
