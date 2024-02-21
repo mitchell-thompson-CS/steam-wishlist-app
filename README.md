@@ -16,6 +16,10 @@ TBD if there is an easy way to do this. Typesense needs to be installed and its 
 
 More information about setting up Typesense can be found [here](https://typesense.org/docs/guide/install-typesense.html)
 
+# Running Tests
+
+`npm test` inside the `server/` directory or `npm run test-dev` for more logging information.
+
 
 
 # Getting Started with Create React App
