@@ -81,7 +81,11 @@ describe("Wishlists", () => {
         // manually create the wishlists and add them to the user
         let wishlistCollection = await getDb().collection("wishlists");
         await wishlistCollection.doc("testWishlist").set({
-            name: "testWishlist"
+            name: "testWishlist",
+            owner: getDb().collection("users").doc("12345"),
+            editors: {
+                "12345": getDb().collection("users").doc("12345")
+            },
         });
         await wishlistCollection.doc("testWishlist2").set({
             name: "testWishlist2"
@@ -109,6 +113,15 @@ describe("Wishlists", () => {
         expect(result.owned.testWishlist.name).toBe("testWishlist");
         expect(result.owned.testWishlist2.name).toBe("testWishlist2");
         expect(result.shared.testWishlist3.name).toBe("testWishlist3");
+
+        expect(result.owned.testWishlist.owner).toBeDefined();
+        expect(result.owned.testWishlist.editors).toBeDefined();
+        expect(result.owned.testWishlist.owner).toBe("12345");
+        for (editor in result.owned.testWishlist.editors){
+            expect(editor).toBeDefined();
+            expect(editor).toBe("12345");
+        }
+
     })
 
     test("getWishlistsHelper - invalid format of db", async () => {
