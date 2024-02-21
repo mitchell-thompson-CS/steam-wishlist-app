@@ -3,7 +3,7 @@ const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
 const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
-const { renameWishlist, getWishlistInner, addGameToWishlist, removeGameFromWishlist } = require('../../modules/wishlistInner');
+const { renameWishlist, getWishlistInner, addGameToWishlist, removeGameFromWishlist, addEditorToWishlist } = require('../../modules/wishlistInner');
 
 process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
 firebaseAdmin = admin.initializeApp({ projectId: "steam-wishlist-app" });
@@ -759,5 +759,240 @@ describe("Wishlist Inner", () => {
 
         let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({ "400": "Portal" });
+    });
+
+    test("addEditorToWishlist - success - owner", async () => {
+        let db = getDb();
+        await login(req, res);
+
+        let req2 = {
+            ...req,
+            user: {
+                id: "54321",
+                name: "testUserName",
+                avatar: "testAvatarURL"
+            }
+        }
+
+        await login(req2, res);
+
+        let editor_snapshot = await db.collection('users').doc("54321").get();
+        expect(editor_snapshot.exists).toBe(true);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            wishlist_id: wishlist_id,
+            editor_id: "54321"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addEditorToWishlist(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlist = await db.collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().editors).toEqual({ "54321": db.collection('users').doc("54321") });
+    });
+    
+    test("addEditorToWishlist - success - editor already added", async () => {
+        let db = getDb();
+        await login(req, res);
+
+        let req2 = {
+            ...req,
+            user: {
+                id: "54321",
+                name: "testUserName",
+                avatar: "testAvatarURL"
+            }
+        }
+
+        await login(req2, res);
+
+        let editor_snapshot = await db.collection('users').doc("54321").get();
+        expect(editor_snapshot.exists).toBe(true);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            wishlist_id: wishlist_id,
+            editor_id: "54321"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addEditorToWishlist(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlist = await db.collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().editors).toEqual({ "54321": db.collection('users').doc("54321") });
+
+        await addEditorToWishlist(req, res);
+        expect(res.status).toBe(200);
+
+        wishlist = await db.collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().editors).toEqual({ "54321": db.collection('users').doc("54321") });
+    });
+
+    test("addEditorToWishlist - failure - can't as editor", async () => {
+        let db = getDb();
+        await login(req, res);
+
+        let req2 = {
+            ...req,
+            user: {
+                id: "54321",
+                name: "testUserName",
+                avatar: "testAvatarURL"
+            }
+        }
+
+        await login(req2, res);
+
+        let editor_snapshot = await db.collection('users').doc("54321").get();
+        expect(editor_snapshot.exists).toBe(true);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req2.body = {
+            wishlist_id: wishlist_id,
+            editor_id: "54321"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addEditorToWishlist(req2, res);
+        expect(res.status).toBe(403);
+
+        let wishlist = await db.collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().editors).toEqual({});
+    });
+
+    test("addEditorToWishlist - failure - no editor id or wishlist id", async () => {
+        await login(req, res);
+
+        req.body = {
+            wishlist_id: "",
+            editor_id: ""
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addEditorToWishlist(req, res);
+        expect(res.status).toBe(400);
+    });
+
+    test("addEditorToWishlist - failure - owner can't add themselves", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            wishlist_id: wishlist_id,
+            editor_id: "12345"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addEditorToWishlist(req, res);
+        expect(res.status).toBe(400);
+
+        let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
+        expect(wishlist.data().editors).toEqual({});
+    });
+
+    test("addEditorToWishlist - failure - editor doesn't exist", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body = {
+            wishlist_id: wishlist_id,
+            editor_id: "54321"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await addEditorToWishlist(req, res);
+        expect(res.status).toBe(404);
     });
 });
