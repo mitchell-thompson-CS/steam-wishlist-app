@@ -3,7 +3,7 @@ const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
 const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
-const { renameWishlist } = require('../../modules/wishlistInner');
+const { renameWishlist, getWishlistInner } = require('../../modules/wishlistInner');
 
 process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
 firebaseAdmin = admin.initializeApp({ projectId: "steam-wishlist-app" });
@@ -171,6 +171,176 @@ describe("Wishlist Inner", () => {
         req.body.wishlist_name = "";
         await renameWishlist(req,res);
 
+        expect(res.status).toBe(400);
+    });
+
+    test("getWishlistInner - success - owner access", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.params = {
+            id: wishlist_id
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        // add games directly to the wishlist in the db
+        let db = getDb();
+        await db.collection('wishlists').doc(wishlist_id).update({
+            games: {
+                "testGameID": "testGameName"
+            },
+            editors: {
+                "54321": db.collection('users').doc("54321")
+            }
+        });
+
+        await getWishlistInner(req, res);
+        expect(res.status).toBe(200);
+
+        expect(res.data).toBeDefined();
+        expect(res.data.id).toBe(wishlist_id);
+        expect(res.data.name).toBe("testWishlist");
+        expect(res.data.games).toBeDefined();
+        expect(res.data.games).toEqual({ "testGameID": "testGameName" });
+        expect(res.data.editors).toBeDefined();
+        expect(res.data.editors).toEqual({ "54321": "54321" });
+    });
+
+    test("getWishlistInner - success - editor access", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.params = {
+            id: wishlist_id
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        // add games directly to the wishlist in the db
+        let db = getDb();
+        await db.collection('wishlists').doc(wishlist_id).update({
+            editors: {
+                "54321": db.collection('users').doc("54321")
+            }
+        });
+
+        req.user.id = "54321";
+        await getWishlistInner(req, res);
+        expect(res.status).toBe(200);
+
+        expect(res.data).toBeDefined();
+        expect(res.data.id).toBe(wishlist_id);
+        expect(res.data.name).toBe("testWishlist");
+        expect(res.data.games).toBeDefined();
+        expect(res.data.editors).toBeDefined();
+        expect(res.data.editors).toEqual({ "54321": "54321" });
+    });
+
+    test("getWishlistInner - failure - no wishlist", async () => {
+        await login(req, res);
+
+        req.params = {
+            id: "12345"
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlistInner(req, res);
+        expect(res.status).toBe(404);
+    });
+
+    test("getWishlistInner - failure - not an editor or owner", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.params = {
+            id: wishlist_id
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        req.user.id = "543210";
+        await getWishlistInner(req, res);
+        expect(res.status).toBe(403);
+    });
+
+    test("getWishlistInner - failure - no id", async () => {
+        await login(req, res);
+
+        req.params = {
+            id: ""
+        }
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlistInner(req, res);
         expect(res.status).toBe(400);
     });
 });
