@@ -210,7 +210,91 @@ async function removeGameFromWishlist(req, res) {
     }
 }
 
+/** Adds an editor to a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a editor_id and wishlist_id in the body
+ * @params response object
+ */
+async function addEditorToWishlist(req, res) {
+    let function_name = addEditorToWishlist.name;
+    var post = JSON.parse(JSON.stringify(req.body));
+    var wishlist_id = post['wishlist_id'];
+    var editor_id = post['editor_id'];
+    if (!wishlist_id || !editor_id) {
+        // no wishlist id or editor id
+        Logging.handleResponse(res, 400, null, function_name,
+            "No wishlist id or editor id by user " + req.user.id);
+        return;
+    }
+    try {
+        let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get();
+        if (!wishlistSnapshot.exists) {
+            // wishlist doesn't exist
+            Logging.handleResponse(res, 404, null, function_name,
+                "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
+            return;
+        }
+        var data = wishlistSnapshot.data();
+
+        if (data.owner.id != req.user.id) {
+            // user is not the owner
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " is not the owner of wishlist " + wishlist_id);
+            return;
+        } else if (data.editors[editor_id]) {
+            // editor already exists
+            Logging.handleResponse(res, 200, null, function_name,
+                "Editor " + editor_id + " already exists in wishlist " + wishlist_id + " by user " + req.user.id);
+            return;
+        } else if (data.owner.id == editor_id) {
+            // can't add owner as editor
+            Logging.handleResponse(res, 400, null, function_name,
+                "User " + editor_id + " is the owner of wishlist " + wishlist_id);
+            return;
+        } else if (!(await getDb().collection('users').doc(editor_id).get()).exists) {
+            // editor doesn't exist
+            Logging.handleResponse(res, 404, null, function_name,
+                "User " + editor_id + " doesn't exist");
+            return;
+        }
+
+        try {
+            await getDb().collection('users').doc(editor_id).update({
+                [`shared_wishlists.${wishlist_id}`]: getDb().collection('wishlists').doc(wishlist_id)
+            })
+            try {
+                await getDb().collection('wishlists').doc(wishlist_id).update({
+                    [`editors.${editor_id}`]: getDb().collection('users').doc(editor_id)
+                })
+                Logging.handleResponse(res, 200, null, function_name,
+                    "Editor " + editor_id + " added to wishlist " + wishlist_id + " by user " + req.user.id);
+            } catch (error) {
+                // issue with adding shared wishlist to editor
+                Logging.handleResponse(res, 500, null, function_name,
+                    "Error adding shared wishlist " + wishlist_id + " to editor " + editor_id + " by user " + req.user.id + ": " + error);
+
+                // have to attempt to remove the wishlist from the editor
+                try {
+                    await getDb().collection('users').doc(editor_id).update({
+                        [`shared_wishlists.${wishlist_id}`]: FieldValue.delete()
+                    });
+                } catch (error2) {
+                    // issue with removing editor from the wishlist
+                    Logging.log(function_name,
+                        "Unable to remove editor " + editor_id + " from wishlist " + wishlist_id, LogLevels.WARN);
+                }
+            }
+        } catch (error) {
+            Logging.handleResponse(res, 500, null, function_name,
+                "Error adding editor " + editor_id + " to wishlist database " + wishlist_id + " by user " + req.user.id + ": " + error);
+        }
+    } catch (error) {
+        Logging.handleResponse(res, 500, null, function_name,
+            "Error adding editor " + editor_id + " to wishlist " + wishlist_id + " by user " + req.user.id + ": " + error);
+    }
+}
+
 exports.renameWishlist = renameWishlist;
 exports.getWishlistInner = getWishlistInner;
 exports.addGameToWishlist = addGameToWishlist;
 exports.removeGameFromWishlist = removeGameFromWishlist;
+exports.addEditorToWishlist = addEditorToWishlist;
