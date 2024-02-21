@@ -1,167 +1,119 @@
-.sidebar {
-    width: 260px;
-    height: 100vh;
-    background-color: #282e35;
-    font-size: 20px;
-    display: flex;
-    justify-content: center;
-    float: left;
-  }
+#createWishlistButton {
+  font-size: 50px;
+}
 
-  #wishlistSearchArea {
-    vertical-align: top;
-  }
-  
-  #wishlistSearchArea form{
-    /* line-height: 51px; */
-    height: 51px;
-    display: flex;
-    align-items: center;
-  }
-  
-  #wishlistSearch {
-    background-color: #393f46;
-    color: white;
-    position: relative;
-    height: 29px;
-    width: 250px;
-    border: 0px;
-    /* margin-top: 11px;
-    margin-bottom: 11px; */
-    padding: 0;
-    padding-left: 10px;
-    /* line-height: 25px; */
-    vertical-align: middle;
-    border-radius: 20px;
-  }
-  
-  .wishlistItem {
-    width: 256px;
-    background-color: #393f46;
-    margin-top: 1px;
-    list-style: none;
-    padding-left: 5px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
+.gridContainer {
+  padding: 50px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 50px;
+}
 
-  #createWishlistButton {
-    font-size: 50px;
-  }
-  
-  .gridContainer {
-    padding: 50px;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 50px;
-  }
-  
-  .gridItem {
-    width: 160px;
-    height: 160px;
-    line-height: 160px;
-    text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-    border: 1px gray;
-    border-radius: 10%;
-    color: white;
-    background-color: #282e35;
-    box-shadow: 10px white;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 0px 5px;
-    font-size: 16px;
-    transition: 0.2s;
-  }
-  
-  .gridItem:hover {
-    background-color: #393f46;
-  }
+.gridItem {
+  width: 160px;
+  height: 160px;
+  line-height: 160px;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px gray;
+  border-radius: 10%;
+  color: white;
+  background-color: #282e35;
+  box-shadow: 10px white;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0px 5px;
+  font-size: 16px;
+  transition: 0.2s;
+}
 
-  .gridItemContainer {
-    position: relative;
-  }
+.gridItem:hover {
+  background-color: #393f46;
+}
 
-  .contextMenu {
-    position: relative;
-    top: -160px;
-    right: -130px;
-    width: 30px;
-    height: 30px;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #393f46;
-    color: #fff;
-    text-align: center;
-    line-height: 30px;
-    cursor: pointer;
-  }
+.gridItemContainer {
+  position: relative;
+}
 
-  .sharedTag {
-    position: relative;
-    top: -160px;
-    right: -110px;
-    width: 50px;
-    height: 25px;
-    color: #fff;
-    text-align: center;
-    line-height: 25px;
-    cursor: pointer;
-    font-size: 10px;
-  }
+.contextMenu {
+  position: relative;
+  top: -160px;
+  right: -130px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #393f46;
+  color: #fff;
+  text-align: center;
+  line-height: 30px;
+  cursor: pointer;
+}
 
-  .popupInputContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px; /* Optional: Adjust margin as needed */
-    padding: 0px 80px;
-  }
+.sharedTag {
+  position: relative;
+  top: -160px;
+  right: -110px;
+  width: 50px;
+  height: 25px;
+  color: #fff;
+  text-align: center;
+  line-height: 25px;
+  cursor: pointer;
+  font-size: 10px;
+}
 
-  .popupInput {
-    flex: 1; /* Allow the input to grow and fill available space */
-    margin-right: 10px; /* Add some space between input and button */
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    transition: border-color 0.3s ease;
-  }
+.popupInputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px; /* Optional: Adjust margin as needed */
+  padding: 0px 80px;
+}
 
-  .popupInput:focus {
-    outline: none;
-    border-color: rgb(35, 39, 77);
-    box-shadow: 0 0 0 3px rgba(35, 39, 77, 0.2);
-  }
+.popupInput {
+  flex: 1; /* Allow the input to grow and fill available space */
+  margin-right: 10px; /* Add some space between input and button */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
 
-  .popupButtonContainer {
-    display: flex;
-    justify-content: center;
-  }
+.popupInput:focus {
+  outline: none;
+  border-color: rgb(35, 39, 77);
+  box-shadow: 0 0 0 3px rgba(35, 39, 77, 0.2);
+}
 
-  .popupButton {
-    background-color: #393f46;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+.popupButtonContainer {
+  display: flex;
+  justify-content: center;
+}
 
-  .popupButton:hover {
-    background-color: rgb(35, 39, 77);
-  }
-  
-  .popupButton:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
-  }
+.popupButton {
+  background-color: #393f46;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.popupButton:hover {
+  background-color: rgb(35, 39, 77);
+}
+
+.popupButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+}
