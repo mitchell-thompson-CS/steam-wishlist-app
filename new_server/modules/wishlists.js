@@ -1,3 +1,4 @@
+const e = require('express');
 const { getDb } = require('./firebase')
 const { Logging, LogLevels } = require('./logging')
 const { v4: uuidv4 } = require('uuid');
@@ -186,10 +187,19 @@ async function getWishlistsHelper(user_id) {
             return await getDb().getAll(...combined_wishlists).then((wishlists) => {
                 for (let wishlist of wishlists) {
                     if (wishlist.exists) {
+                        let wishlist_data = wishlist.data();
+                        if (wishlist_data.owner) {
+                            wishlist_data.owner = wishlist_data.owner.id;
+                        }
+                        if (wishlist_data.editors) {
+                            for (editor in wishlist_data.editors) {
+                                wishlist_data.editors[editor] = wishlist_data.editors[editor].id;
+                            }
+                        }
                         if (db_wishlists[wishlist.id]) {
-                            final_wishlists["owned"][wishlist.id] = wishlist.data();
+                            final_wishlists["owned"][wishlist.id] = wishlist_data;
                         } else {
-                            final_wishlists["shared"][wishlist.id] = wishlist.data();
+                            final_wishlists["shared"][wishlist.id] = wishlist_data;
                         }
                     }
                 }
