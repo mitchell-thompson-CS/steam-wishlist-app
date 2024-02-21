@@ -293,8 +293,69 @@ async function addEditorToWishlist(req, res) {
     }
 }
 
+/** Deletes an editor from a wishlist in the firestore database and sends a 200 status code if successful
+ * @params request object with a editor_id and wishlist_id in the body
+ * @params response object
+ */
+async function deleteEditorFromWishlist(req, res) {
+    let function_name = deleteEditorFromWishlist.name;
+    var post = JSON.parse(JSON.stringify(req.body));
+    var wishlist_id = post['wishlist_id'];
+    var editor_id = post['editor_id'];
+    if (!wishlist_id || !editor_id) {
+        // no wishlist id or editor id
+        Logging.handleResponse(res, 400, null, function_name,
+            "No wishlist id or editor id by user " + req.user.id);
+        return;
+    }
+    try {
+        let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get()
+        if (!wishlistSnapshot.exists) {
+            // wishlist doesn't exist
+            Logging.handleResponse(res, 404, null, function_name,
+                "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
+            return;
+        }
+        var data = wishlistSnapshot.data();
+        if (data.owner.id != req.user.id) {
+            // user is not the owner
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " is not the owner of wishlist " + wishlist_id + " by user " + req.user.id);
+            return;
+        } else if (!data.editors[editor_id]) {
+            // editor does not exist
+            Logging.handleResponse(res, 200, null, function_name,
+                "Editor " + editor_id + " does not exist in wishlist " + wishlist_id + " by user " + req.user.id);
+            return;
+        }
+        try {
+            await getDb().collection('users').doc(editor_id).update({
+                [`shared_wishlists.${wishlist_id}`]: FieldValue.delete()
+            })
+            try {
+                await getDb().collection('wishlists').doc(wishlist_id).update({
+                    [`editors.${editor_id}`]: FieldValue.delete()
+                })
+                Logging.handleResponse(res, 200, null, "deleteEditorFromWishlist",
+                    "Editor " + editor_id + " deleted from wishlist " + wishlist_id + " by user " + req.user.id);
+            } catch (error) {
+                // issue with adding shared wishlist to editor
+                Logging.handleResponse(res, 500, null, function_name,
+                    "Error deleting shared wishlist " + wishlist_id + " from editor " + editor_id + " by user " + req.user.id + ": " + error);
+            }
+        } catch (error) {
+            Logging.handleResponse(res, 500, null, function_name,
+                "Error deleting editor " + editor_id + " from firestore wishlist " + wishlist_id + " by user " + req.user.id + ": " + error);
+        }
+    } catch (error) {
+        Logging.handleResponse(res, 500, null, function_name,
+            "Error deleting editor " + editor_id + " from wishlist " + wishlist_id + " by user " + req.user.id + ": " + error);
+    }
+}
+
 exports.renameWishlist = renameWishlist;
 exports.getWishlistInner = getWishlistInner;
 exports.addGameToWishlist = addGameToWishlist;
 exports.removeGameFromWishlist = removeGameFromWishlist;
 exports.addEditorToWishlist = addEditorToWishlist;
+exports.deleteEditorFromWishlist = deleteEditorFromWishlist;
