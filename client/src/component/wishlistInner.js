@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import Popup from './Popup';
-import '../Wishlist.css';
+import '../WishlistInner.css';
 import { useParams } from "react-router-dom";
 import WishlistSidebar from "./WishlistSidebar";
 
@@ -42,11 +42,21 @@ const WishlistInner = () => {
     return (
         <div className="wishlistInner">
             <WishlistSidebar />
-            <ul className="gameList">
-                {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
-                    <li key={key} className="gameItem">{value}</li>
-                ))}
-            </ul>
+            {/* <div className="listContainer"> */}
+                <ul className="gameList">
+                    {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
+                        <li key={key} className="gameItem">
+                            <div className="gameContainer">
+                                <a href={"/game/" + key} className="gameLink">{value}</a>
+                                <p className="priceTitle">Price</p>
+                                <p className="lowestPriceTitle">Lowest Price</p>
+                                <p className="playingNowTitle">Playing Now</p>
+                                <p className="reviewPercentTitle">Positive Review %</p>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            {/* </div> */}
             <button onClick={() => addGameToWishlist(id)}>Add Game to Wishlist</button>
         </div>
     )

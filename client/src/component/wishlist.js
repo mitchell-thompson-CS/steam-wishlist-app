@@ -130,7 +130,7 @@ const Wishlist = () => {
 
     return (
         <div className="wishlist">
-        <WishlistSidebar />
+            <WishlistSidebar />
             {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
             <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
             <div className="gridContainer">
