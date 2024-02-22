@@ -12,43 +12,7 @@ const LogLevelsStrings = Object.freeze({
   2: "ERROR"
 });
 
-class Logging {
-  /** handles an error and sends the appropriate status code to the client
-   * @param {Error} err - the error to handle
-   * @param {Response} res - the response object, used to send the status code to the client
-   */
-  static handleError(err, res) {
-    let function_name = "handleError";
-
-    switch (err.name) {
-      case 'FirebaseError':
-        res.sendStatus(500);
-        break;
-      case 'UserError':
-          res.sendStatus(401);
-          break;
-      default:
-  
-        // not an error we created, so lets check firebase errors next
-        switch (err.code) {
-          case 5:
-            // NOT_FOUND error
-            res.sendStatus(400);
-            break;
-          default:
-            res.sendStatus(500);
-            break;
-        }
-  
-        if (!res.headersSent) {
-          res.sendStatus(500);
-        }
-        break;
-    }
-
-    this.log(function_name, err, LogLevels.ERROR);
-  }
-  
+class Logging {  
   /** sends a response to the client with the code and data (data can be null)
    * and logs the message if flags are set
    * 
@@ -80,29 +44,11 @@ class Logging {
    * @param {number} level - the level of the message
    */
   static log(function_name, message, level=LogLevels.INFO) {
-    if (write_to_console || level !== LogLevels.INFO) {
+    if ((write_to_console || level !== LogLevels.INFO || process.env.NODE_ENV === "test-dev") && process.env.NODE_ENV !== "test") {
       console.log("(" + LogLevelsStrings[level] + ")(" + function_name + ") " + message);
     }
   }
 }
 
-class FirebaseError extends Error {
-  constructor(message, code) {
-    super(message);
-    this.name = 'FirebaseError';
-  }
-}
-
-class UserError extends Error {
-  constructor(message, code) {
-    super(message);
-    this.name = 'UserError';
-  }
-}
-
-// exports.handleError = handleError;
-// exports.handleResponse = handleResponse;
-exports.FirebaseError = FirebaseError;
-exports.UserError = UserError;
 exports.LogLevels = LogLevels;
 exports.Logging = Logging;

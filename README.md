@@ -1,3 +1,27 @@
+# Setting up for tests
+Make sure to first go into the `server/` directory.
+
+## Local firebase emulators
+Make sure the Firebase CLI is installed, using the command `firebase --version`
+If it isn't installed you can generally install it using `npm install -g firebase-tools`
+You can check out [Firebase CLI Reference](https://firebase.google.com/docs/cli#windows-npm) for more information.
+
+At this point, you should be able to run `firebase emulators:start` inside of the `server/` directory. If it isn't you can initialize it using `firebase init emulators`. We only need `firestore` for our project.
+
+See this link [Install and Configure Local Emulators](https://firebase.google.com/docs/emulator-suite/install_and_configure) for more information.
+
+## Typesense
+
+TBD if there is an easy way to do this. Typesense needs to be installed and its API key in the env file (currently Typesense only works with a local Typesense session).
+
+More information about setting up Typesense can be found [here](https://typesense.org/docs/guide/install-typesense.html)
+
+# Running Tests
+
+`npm test` inside the `server/` directory or `npm run test-dev` for more logging information.
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
