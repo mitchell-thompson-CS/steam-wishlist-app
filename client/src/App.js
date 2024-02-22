@@ -8,6 +8,7 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar';
 import axios from 'axios';
 import { CookiesProvider } from 'react-cookie';
+import WishlistView from './component/WishlistView';
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';
@@ -21,8 +22,7 @@ function App() {
             <Navbar />
           </header>
           <Routes>
-            <Route path="/wishlists" element={<Wishlist />} />
-            <Route path="/wishlist/:id" element={<WishlistInner />} />
+            <Route path="/wishlists/*" element={<WishlistView />} />
             {/* <Route path ="/login" element={<Login />} /> */}
           </Routes>
         </div>

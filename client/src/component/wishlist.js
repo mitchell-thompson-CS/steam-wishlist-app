@@ -5,6 +5,7 @@ import axios from "axios";
 import Popup from './Popup';
 import '../Wishlist.css';
 import WishlistSidebar from "./WishlistSidebar";
+import { Link } from "react-router-dom";
 
 async function createWishlistPost(wishlistName) {
     try {
@@ -130,20 +131,19 @@ const Wishlist = () => {
 
     return (
         <div className="wishlist">
-            <WishlistSidebar />
             {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
             <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
             <div className="gridContainer">
                 <button onClick={() => {setButtonPopup(true); setInputText("");}} className="gridItem" id="createWishlistButton">+</button>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
                     <div key={key} className="gridItemContainer">
-                        <a className="gridItem" href={"/wishlist/" + key}>{value.name}</a>
+                        <Link className="gridItem" to={"/wishlists/" + key}>{value.name}</Link>
                         <div className="contextMenu" onClick={() => {setContextPopup(key); setInputText(value.name);}}>...</div>
                     </div>
                 ))}
                 {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
                     <div key={key} className="gridItemContainer">
-                        <a className="gridItem" href={"/wishlist/" + key}>{value.name}</a>
+                        <Link className="gridItem" to={"/wishlists/" + key}>{value.name}</Link>
                         <div className="sharedTag">(shared)</div>
                     </div>
                 ))}

@@ -4,6 +4,7 @@ import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import Popup from './Popup';
 import '../WishlistSidebar.css';
+import { Link } from "react-router-dom";
 
 const WishlistSidebar = () => {
 
@@ -31,10 +32,10 @@ const WishlistSidebar = () => {
                     </form>
                 </li>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
-                    <li key={key} className="wishlistItem"><a href={"/wishlist/" + key}>{value.name}</a></li>
+                    <li key={key} className="wishlistItem"><Link to={"/wishlists/" + key}>{value.name}</Link></li>
                 ))}
                 {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
-                    <li key={key} className="wishlistItem"><a href={"/wishlist/" + key}>{value.name}</a></li>
+                    <li key={key} className="wishlistItem"><Link to={"/wishlists/" + key}>{value.name}</Link></li>
                 ))}
             </ul>
         </div>

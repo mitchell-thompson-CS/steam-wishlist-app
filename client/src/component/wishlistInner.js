@@ -37,11 +37,10 @@ const WishlistInner = () => {
                     console.log(data);
                 }
             })
-    }, []);
+    }, [useParams()]);
 
     return (
         <div className="wishlistInner">
-            <WishlistSidebar />
             {/* <div className="listContainer"> */}
                 <ul className="gameList">
                     {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
