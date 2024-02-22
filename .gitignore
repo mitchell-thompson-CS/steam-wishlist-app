@@ -140,6 +140,7 @@ dist
 
 # production
 /build
+/private
 
 # misc
 .DS_Store
