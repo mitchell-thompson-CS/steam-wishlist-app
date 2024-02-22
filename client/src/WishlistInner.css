@@ -1,0 +1,18 @@
+.gameList {
+    width: calc(100% - 260px);
+    padding: 50px 50px 0px 50px;
+    display: inline-block;
+}
+
+.gameItem {
+    height: 160px;
+    list-style: none;
+    border: 1px gray;
+    border-radius: 20px;
+    background-color: #393f46;
+}
+
+.gameLink {
+    color: white;
+    text-decoration: none;
+}

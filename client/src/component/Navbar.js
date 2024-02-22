@@ -86,6 +86,12 @@ const Navbar = () => {
         return () => clearTimeout(delayDebounce);
     }, [searchTerm, user, cookies.user, setCookie, loggingIn]);
 
+    useEffect(() => {
+        if (window.location.pathname === "/wishlists") {
+            document.getElementById("wishlistsLink").style = 'color: lightskyblue';
+        }
+    }, []);
+
     async function logout() {
         try {
             let response = await axios.post('/api/auth/logout');
@@ -167,7 +173,7 @@ const Navbar = () => {
                     <ul id="gameSearchResults"></ul>
                 </li>
                 <li>
-                    <a href="/wishlists">WISHLISTS</a>
+                    <a id="wishlistsLink" href="/wishlists">WISHLISTS</a>
                 </li>
             </ul>
             <ul className="right">
