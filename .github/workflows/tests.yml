@@ -38,7 +38,7 @@ jobs:
         path: ~/.cache/firebase/emulators
         key: ${{ runner.os }}-firebase-emulators-${{ github.sha }}
         restore-keys: |
-          ${{ runner.os }}-firebase-emulators-
+          ${{ runner.os }}-firebase-emulators-${{ github.sha }}
     - name: Typesense Server in GitHub Actions
       uses: jirevwe/typesense-github-action@v1.0.1
       with:
