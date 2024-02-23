@@ -12,7 +12,7 @@ on:
 jobs:
   build:
 
-    runs-on: mt-utility
+    runs-on: [self-hosted, linux]
 
     strategy:
       matrix:
