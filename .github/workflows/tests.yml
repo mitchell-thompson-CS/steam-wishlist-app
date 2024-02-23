@@ -44,6 +44,7 @@ jobs:
       with:
         typesense-version: ${{ matrix.typesense-version }}
         typesense-api-key: test-key
+        typesense-port: 8109
     - run: npm ci
     - run: npm install -g firebase-tools
     - run: npm run build --if-present
@@ -51,3 +52,4 @@ jobs:
       run: npm test
       env:
         TYPESENSE_API_KEY: test-key
+        TYPESENSE_PORT: 8109
