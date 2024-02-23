@@ -17,6 +17,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
     await clearFirestore();
+    await firebaseAdmin.delete();
 });
 
 describe("Firebase", () => {    
