@@ -25,6 +25,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -39,6 +40,7 @@ jobs:
         key: ${{ runner.os }}-firebase-emulators-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-firebase-emulators-${{ github.sha }}
+    - run: docker rm typesense || true
     - name: Typesense Server in GitHub Actions
       uses: jirevwe/typesense-github-action@v1.0.1
       with:
