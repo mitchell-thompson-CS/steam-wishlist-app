@@ -1,5 +1,6 @@
+require('dotenv').config({ path: __dirname + '/../../.env' });
 const admin = require("firebase-admin");
-const serviceAccount = require("../private/steam-wishlist-app-firebase-adminsdk-ere8r-e012cbbea1.json");
+const serviceAccount = require(`../private/${process.env.FIREBASE_ADMIN_CREDENTIALS_FILE_NAME}`);
 
 let firebaseAdmin;
 
