@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles",
+    "test": "firebase emulators:exec --only firestore \"jest --detectOpenHandles\"",
     "test-dev": "NODE_ENV=test-dev jest --watch --detectOpenHandles",
     "start": "node index.js",
     "start-dev": "node index.js -v"
