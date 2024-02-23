@@ -12,11 +12,11 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: mt-utility
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -26,10 +26,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: ./server/package-lock.json
+        cache-dependency-path: server/package-lock.json
+    - run: cd server
     - run: npm ci
-      working-directory: ./server
     - run: npm run build --if-present
-      working-directory: ./server
     - run: npm test
-      working-directory: ./server
