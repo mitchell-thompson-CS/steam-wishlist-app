@@ -32,7 +32,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: server/package-lock.json
+    - name: Cache firebase emulators
+      uses: actions/cache@v4
+      with:
         path: ~/.cache/firebase/emulators
+        key: ${{ runner.os }}-firebase-emulators-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-firebase-emulators-
     - name: Typesense Server in GitHub Actions
       uses: jirevwe/typesense-github-action@v1.0.1
       with:
