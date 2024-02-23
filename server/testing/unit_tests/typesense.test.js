@@ -1,8 +1,6 @@
 const { exportedForTesting, searchForGame, startTypesense, searchTypesenseCollection } = require("../../modules/typesense");
 const { typesenseClient } = require("../typesenseClient");
 
-exportedForTesting.setTypesenseClient(typesenseClient);
-
 let testSchema = exportedForTesting.gameSchema;
 testSchema.name = "games_test";
 
@@ -11,6 +9,10 @@ let searchParameters = {
     'query_by': 'name',
     'per_page': 10,
 };
+
+beforeAll(async () => {
+    await exportedForTesting.setTypesenseClient(typesenseClient);
+});
 
 beforeEach(async () => {
     await exportedForTesting.clearTypesenseCollection("games_test");
