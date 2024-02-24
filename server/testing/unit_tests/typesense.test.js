@@ -31,7 +31,7 @@ it("steamData is not empty", async () => {
     const data = await exportedForTesting.getSteamData();
     expect(data).toBeDefined();
     expect(data.length).toBeGreaterThan(0);
-});
+}, 10000);
 
 it("searchForGame with initialized typesense with games_test collection", async () => {
     await exportedForTesting.initializeTypesenseCollection(testSchema);
