@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import Popup from './Popup';
-import '../Wishlist.css';
+import '../Wishlists.css';
 import WishlistSidebar from "./WishlistSidebar";
 import { Link } from "react-router-dom";
 
@@ -105,7 +105,7 @@ async function deleteEditorFromWishlist() {
 
 }
 
-const Wishlist = () => {
+const Wishlists = () => {
     const state = useSelector((state) => state);
     // console.log(state);
     const dispatch = useDispatch();
@@ -128,6 +128,21 @@ const Wishlist = () => {
     const [buttonPopup, setButtonPopup] = useState(false);
     const [inputText, setInputText] = useState("");
     const [contextPopup, setContextPopup] = useState("");
+
+    useEffect(() => {
+        if (buttonPopup == false || contextPopup == "") {
+            fetch('/api/wishlists', { mode: 'cors', credentials: 'include' })
+            .then(function (response) {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            }).then(function (data) {
+                if (data) {
+                    setWishlistItems(data);
+                }
+            })
+        }
+    }, [buttonPopup, contextPopup]);
 
     return (
         <div className="wishlist">
@@ -158,20 +173,21 @@ const Wishlist = () => {
             <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
                 <div className="popupInputContainer">
                     <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
-                    <button onClick={() => {setButtonPopup(false); createWishlistPost(inputText)}} className="popupButton">Create Wishlist</button>
+                    {/* .THEN STATE CHANGE SUCKS. FIND ANOTHER WAY TO GET COMPONENT TO RERENDER */}
+                    <button onClick={() => {createWishlistPost(inputText).then(() => {setButtonPopup(false)})}} className="popupButton">Create Wishlist</button>
                 </div>
             </Popup>
             <Popup trigger={contextPopup} setTrigger={setContextPopup}>
                 <div className="popupInputContainer">
                     <input type="text" placeholder="Enter New Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
-                    <button onClick={() => {setContextPopup(""); renameWishlistPost(contextPopup, inputText)}} className="popupButton">Rename</button>
+                    <button onClick={() => {renameWishlistPost(contextPopup, inputText); setContextPopup("")}} className="popupButton">Rename</button>
                 </div>
                 <div className="popupButtonContainer">
-                    <button onClick={() => {setContextPopup(""); deleteWishlistPost(contextPopup)}} className="popupButton">Delete Wishlist</button>
+                    <button onClick={() => {deleteWishlistPost(contextPopup); setContextPopup("")}} className="popupButton">Delete Wishlist</button>
                 </div>
             </Popup>
         </div>
     );
 };
 
-export default Wishlist;
+export default Wishlists;

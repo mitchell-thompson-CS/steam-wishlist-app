@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import WishlistSidebar from "./WishlistSidebar";
-import Wishlist from "./wishlist";
-import WishlistInner from "./wishlistInner";
+import Wishlists from "./Wishlists";
+import WishlistInner from "./WishlistInner";
 
 const WishlistView = () => {
 
@@ -9,7 +9,7 @@ const WishlistView = () => {
         <div className="wishlistView">
             <WishlistSidebar />
             <Routes>
-                <Route path="/" element={<Wishlist />} />
+                <Route path="/" element={<Wishlists />} />
                 <Route path="/:id" element={<WishlistInner />} />
             </Routes>
         </div>

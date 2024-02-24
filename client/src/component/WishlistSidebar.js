@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 
 const WishlistSidebar = () => {
 
+    // HOW TO GET WISHLISTITEMS TO CHANGE WHEN THEY CHANGE FOR WISHLISTS COMPONENT??
+
     const [wishlistItems, setWishlistItems] = useState([]);
 
     useEffect(() => {
