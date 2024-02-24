@@ -32,7 +32,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        # cache-dependency-path: server/package-lock.json
+        cache-dependency-path: server/package-lock.json
     - run: docker rm -f typesense || true
     - name: Typesense Server in GitHub Actions
       uses: jirevwe/typesense-github-action@v1.0.1
