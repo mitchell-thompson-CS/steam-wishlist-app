@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "firebase emulators:exec --only firestore \"jest --detectOpenHandles\"",
-    "test-dev": "NODE_ENV=test-dev jest --watch --detectOpenHandles",
+    "test": "firebase emulators:exec --only firestore \"jest --runInBand --detectOpenHandles\"",
+    "test-dev": "NODE_ENV=test-dev jest --watch --runInBand --detectOpenHandles",
     "start": "node index.js",
     "start-dev": "node index.js -v"
   },

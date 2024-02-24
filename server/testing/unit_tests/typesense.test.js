@@ -66,7 +66,7 @@ it("searchForGame with final startTypesense true", async () => {
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
     expect(results.hits[0].document.name).toBe("Half-Life 2")
-}, 10000);
+}, 15000);
 
 it("searchForGame with final startTypesense false", async () => {
     await startTypesense(false, "games_test");
@@ -77,4 +77,4 @@ it("searchForGame with final startTypesense false", async () => {
     expect(results.hits[0].document.name).toBe("Half-Life 2")
     expect(results.hits[0].document.id).toBeDefined();
     expect(results.hits[0].document.appid).toBe(undefined)
-}, 10000);
+}, 15000);

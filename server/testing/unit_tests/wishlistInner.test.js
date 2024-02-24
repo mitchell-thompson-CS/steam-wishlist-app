@@ -5,16 +5,16 @@ const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = req
 const { login } = require('../../modules/auth');
 const { renameWishlist, getWishlistInner, addGameToWishlist, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist } = require('../../modules/wishlistInner');
 
-process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
-
 let res;
 let req;
+let firebaseAdmin;
 
 async function clearFirestore() {
     await axios.delete("http://localhost:8080/emulator/v1/projects/steam-wishlist-app/databases/(default)/documents");
 }
 
 beforeAll(async () => {
+    process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080";
     firebaseAdmin = admin.initializeApp({ projectId: "steam-wishlist-app" });
     setDb(firebaseAdmin.firestore());
 });
@@ -72,7 +72,8 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-    // await clearFirestore();
+    await clearFirestore();
+    await firebaseAdmin.delete();
 });
 
 
