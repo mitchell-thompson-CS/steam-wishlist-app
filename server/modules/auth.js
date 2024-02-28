@@ -49,10 +49,10 @@ passport.use(new SteamStrategy({
  */
 async function login(req, res) {
     // TODO: test with disabling user accounts and see what happens? might be security issue there
-    await getDb().collection('users').doc(req.user.id).get().then((docSnapshot) => {
+    await getDb().collection('users').doc(req.user.id).get().then(async (docSnapshot) => {
         if (!docSnapshot.exists) {
             Logging.log("login", "User " + req.user.id + " does not exist, creating new user");
-            getDb().collection('users').doc(req.user.id).set({
+            await getDb().collection('users').doc(req.user.id).set({
                 wishlists: {},
                 shared_wishlists: {}
             });

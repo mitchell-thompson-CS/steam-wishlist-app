@@ -1,6 +1,7 @@
 const Typesense = require('typesense');
 const { Logging, LogLevels } = require('./logging');
 const { default: axios } = require('axios');
+require('dotenv').config({ path: __dirname + '/../../.env' });
 
 let typesenseClient;
 
@@ -8,7 +9,7 @@ try {
     typesenseClient = new Typesense.Client({
         'nodes': [{
             'host': 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
-            'port': 8108,      // For Typesense Cloud use 443
+            'port': `${process.env.TYPESENSE_PORT}`,      // For Typesense Cloud use 443
             'protocol': 'http'   // For Typesense Cloud use https
         }],
         'apiKey': `${process.env.TYPESENSE_API_KEY}`,
