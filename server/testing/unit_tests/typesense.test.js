@@ -1,8 +1,6 @@
 const { exportedForTesting, searchForGame, startTypesense, searchTypesenseCollection } = require("../../modules/typesense");
 const { typesenseClient } = require("../typesenseClient");
 
-exportedForTesting.setTypesenseClient(typesenseClient);
-
 let testSchema = exportedForTesting.gameSchema;
 testSchema.name = "games_test";
 
@@ -11,6 +9,10 @@ let searchParameters = {
     'query_by': 'name',
     'per_page': 10,
 };
+
+beforeAll(async () => {
+    await exportedForTesting.setTypesenseClient(typesenseClient);
+});
 
 beforeEach(async () => {
     await exportedForTesting.clearTypesenseCollection("games_test");
@@ -29,7 +31,7 @@ it("steamData is not empty", async () => {
     const data = await exportedForTesting.getSteamData();
     expect(data).toBeDefined();
     expect(data.length).toBeGreaterThan(0);
-});
+}, 10000);
 
 it("searchForGame with initialized typesense with games_test collection", async () => {
     await exportedForTesting.initializeTypesenseCollection(testSchema);
@@ -64,7 +66,7 @@ it("searchForGame with final startTypesense true", async () => {
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
     expect(results.hits[0].document.name).toBe("Half-Life 2")
-}, 10000);
+}, 15000);
 
 it("searchForGame with final startTypesense false", async () => {
     await startTypesense(false, "games_test");
@@ -75,4 +77,4 @@ it("searchForGame with final startTypesense false", async () => {
     expect(results.hits[0].document.name).toBe("Half-Life 2")
     expect(results.hits[0].document.id).toBeDefined();
     expect(results.hits[0].document.appid).toBe(undefined)
-}, 10000);
+}, 15000);

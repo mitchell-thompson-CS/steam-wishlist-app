@@ -24,7 +24,7 @@ class Logging {
    * @param {string} message - the message to log
    * @param {number} level - the level of the message
    */
-  static handleResponse(res, code, data=null, function_name, message="", level=LogLevels.INFO) {
+  static async handleResponse(res, code, data=null, function_name, message="", level=LogLevels.INFO) {
     if (res.headersSent) {
       this.log(function_name, "Response already sent", LogLevels.ERROR);
     } else {
@@ -43,7 +43,7 @@ class Logging {
    * @param {any} message - the message to log
    * @param {number} level - the level of the message
    */
-  static log(function_name, message, level=LogLevels.INFO) {
+  static async log(function_name, message, level=LogLevels.INFO) {
     if ((write_to_console || level !== LogLevels.INFO || process.env.NODE_ENV === "test-dev") && process.env.NODE_ENV !== "test") {
       console.log("(" + LogLevelsStrings[level] + ")(" + function_name + ") " + message);
     }
