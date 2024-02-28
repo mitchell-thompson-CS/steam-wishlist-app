@@ -2,7 +2,6 @@ const { default: axios } = require('axios');
 const { Logging, LogLevels } = require('./logging.js');
 const { searchForGame } = require('./typesense.js');
 
-// TODO: restructure game data method with a SteamError or something similar
 /** Gets data for a game from the Steam API and returns JSON object of it if it exists.
  *  Returns null if the game does not exist.
  * 
@@ -29,7 +28,6 @@ async function getGameData(appid) {
     }
 }
 
-// TODO: do we need to handle errors from searchForGame?
 /** Searches for a game and sends the top 5 results.
  * 
  * @param {Request} req
@@ -46,7 +44,6 @@ async function searchGamePage(req, res) {
     Logging.handleResponse(res, 200, gameList.hits, "searchGamePage", "Searched for game " + query);
 }
 
-// TODO: handle error from the note on getGameData
 /** Gets the game data for a game and sends it to the client.
  * 
  * @param {Request} req

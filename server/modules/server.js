@@ -32,8 +32,6 @@ app.use(passport.session());
 
 // index path renders index.ejs with user data
 app.get('/', async function (req, res) {
-    // var wishlists = await getWishlists(req);
-    // res.render('index', { user: req.user, wishlists: wishlists });
     // TODO: send to react frontend
     res.sendStatus(200);
 });
