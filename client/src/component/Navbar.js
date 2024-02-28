@@ -1,6 +1,5 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useCookies } from 'react-cookie';
 import '../Navbar.css'
 
 const searchDelay = 500;
@@ -13,12 +12,11 @@ const Navbar = () => {
     const [user, setUser] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const searchPosition = useRef(-1);
-    const [cookies, setCookie, removeCookie] = useCookies(['user']);
     const[loggingIn, setLoggingIn] = useState(false);
 
     useEffect(() => {
-        let cookieUser = cookies.user;
-        if (!cookieUser && !loggingIn) {
+        let sessionUser = sessionStorage.getItem('user');
+        if ((sessionUser === null || sessionUser === "false") && !loggingIn) {
             console.log("getting user")
             fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache'})
                 .then(function (response) {
@@ -28,13 +26,17 @@ const Navbar = () => {
                 }).then(function (data) {
                     if (data) {
                         setUser(data);
-                        setCookie('user', data);
+                        sessionStorage.setItem('user', JSON.stringify(data));
                     } else {
-                        setCookie('user', {});
+                        sessionStorage.setItem('user', JSON.stringify({}));
                     }
                 });
-        } else {
-            setUser(cookieUser);
+        } else if(user === null || user.length === 0) {
+            try {
+                setUser(JSON.parse(sessionUser));
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         const delayDebounce = setTimeout(() => {
@@ -84,7 +86,7 @@ const Navbar = () => {
             }
         }
         return () => clearTimeout(delayDebounce);
-    }, [searchTerm, user, cookies.user, setCookie, loggingIn]);
+    }, [searchTerm, user, loggingIn]);
 
     useEffect(() => {
         if (window.location.pathname === "/wishlists") {
@@ -96,11 +98,13 @@ const Navbar = () => {
         try {
             let response = await axios.post('/api/auth/logout');
             if (response.status === 200) {
-                setCookie('user', {});
+                sessionStorage.setItem('user', JSON.stringify({}));
+                setUser({});
             }
         } catch (error) {
             if (error.response.status === 401) {
-                setCookie('user', {});
+                sessionStorage.setItem('user', JSON.stringify({}));
+                setUser({});
             }
             console.error(error);
         }
@@ -109,7 +113,7 @@ const Navbar = () => {
     async function login() {
         setLoggingIn(true);
         // removeCookie('user');
-        setCookie('user', false);
+        sessionStorage.setItem('user', false);
     }
 
     function focusSearch(event) {
