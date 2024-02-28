@@ -138,6 +138,10 @@
   input[type=text] {
     margin: auto;
   }
+
+  #focusNav {
+    color: lightskyblue;
+  }
   
   .clear {
     clear: both;

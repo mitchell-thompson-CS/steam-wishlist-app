@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import '../Navbar.css'
+import { Link, useLocation } from "react-router-dom";
 
 const searchDelay = 500;
 
@@ -13,8 +14,10 @@ const Navbar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const searchPosition = useRef(-1);
     const[loggingIn, setLoggingIn] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
+        // deal with setting the users state (if it needs setting)
         let sessionUser = sessionStorage.getItem('user');
         if ((sessionUser === null || sessionUser === "false") && !loggingIn) {
             console.log("getting user")
@@ -38,7 +41,10 @@ const Navbar = () => {
                 console.error(error);
             }
         }
+    }, [user, loggingIn]);
 
+    useEffect(() => {
+        // setup delay for the search bar
         const delayDebounce = setTimeout(() => {
             if (searchTerm && searchTerm !== "") {
                 fetch('/api/game/search/' + searchTerm, { mode: 'cors', credentials: 'include' })
@@ -75,6 +81,7 @@ const Navbar = () => {
             }
         }, searchDelay);
 
+        // setup click away for search results (so they disappear when clicked away from)
         document.onclick = function (event) {
             if (event.target.id !== "gameSearch" && event.target.id !== "gameSearchResults") {
                 let searchResults = document.getElementById("gameSearchResults");
@@ -86,13 +93,18 @@ const Navbar = () => {
             }
         }
         return () => clearTimeout(delayDebounce);
-    }, [searchTerm, user, loggingIn]);
+    }, [searchTerm]);
 
     useEffect(() => {
-        if (window.location.pathname === "/wishlists") {
-            document.getElementById("wishlistsLink").style = 'color: lightskyblue';
+        let pages = document.getElementsByClassName("navPage");
+        for (let i = 0; i < pages.length; i++) {
+            if (pages[i].pathname === location.pathname) {
+                pages[i].id = "focusNav"
+            } else {
+                pages[i].id = ""
+            }
         }
-    }, []);
+    }, [location]);
 
     async function logout() {
         try {
@@ -158,13 +170,9 @@ const Navbar = () => {
     return (
         <nav>
             <ul className="left">
-
                 <li>
-                    <a href="/"><img id="logo" src="/logo.svg" alt="logo" /></a>
+                    <Link className="navPage" to="/"><img id="logo" src="/logo.svg" alt="logo" /></Link>
                 </li>
-                {/* <li>
-                        <a href="http://localhost:3000/">HOME</a>
-                    </li> */}
                 <li id="searchArea" onFocus={focusSearch} onKeyDown={handleSearchKeyDown}>
                     <form>
                         <input type="text" id="gameSearch" name="search" placeholder="Search..." autoComplete="off"
@@ -177,7 +185,7 @@ const Navbar = () => {
                     <ul id="gameSearchResults"></ul>
                 </li>
                 <li>
-                    <a id="wishlistsLink" href="/wishlists">WISHLISTS</a>
+                    <Link className="navPage" to="/wishlists">WISHLISTS</Link>
                 </li>
             </ul>
             <ul className="right">
