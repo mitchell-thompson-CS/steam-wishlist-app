@@ -7,7 +7,7 @@ let resTemplate;
 beforeAll(async () => {
     exportedForTesting.setTypesenseClient(typesenseClient);
     await startTypesense(true, "games_test");
-});
+}, 10000);
 
 afterAll(async () => {
     await exportedForTesting.clearTypesenseCollection("games_test");

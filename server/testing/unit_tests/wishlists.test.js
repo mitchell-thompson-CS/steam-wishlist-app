@@ -232,6 +232,8 @@ describe("Wishlists", () => {
         await createWishlist(req, res);
 
         expect(res.status).toBe(200);
+        expect(res.data).toBeDefined();
+        expect(res.data.id).toBeDefined();
 
         let collection = await getDb().collection("users").doc("12345").get();
         let data = collection.data();
