@@ -1,0 +1,8 @@
+#errorpopup {
+    position: absolute;
+    background-color: red;
+    margin-left: 45vw;
+    padding: 25px;
+    z-index: 1000;
+    border-radius: 10px;
+}

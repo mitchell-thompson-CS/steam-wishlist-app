@@ -1,6 +1,7 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import wishlistReducer from "./reducers/wishlistReducer";
 import userReducer from './reducers/userReducer';
+import eventReducer from './reducers/eventReducer';
 
 function loadFromSessionStorage() {
     try {
@@ -26,6 +27,7 @@ const store = configureStore({
     reducer: combineReducers({
         wishlistReducer,
         userReducer,
+        eventReducer,
     }),
     preloadedState: loadFromSessionStorage(),
 });

@@ -5,6 +5,7 @@ import axios from "axios";
 import Popup from './Popup';
 import '../styles/Wishlists.css';
 import { Link } from "react-router-dom";
+import { setEvent } from "../actions/eventAction";
 
 const Wishlists = () => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -13,33 +14,37 @@ const Wishlists = () => {
     const [contextPopup, setContextPopup] = useState("");
     const dispatch = useDispatch();
 
+    function handleResponse(response) {
+        try {
+            if(response.status === 200){
+                dispatch(setEvent(true, "Operation Successful"));
+                return true;
+            } else {
+                // if response is not 200 we are going to make an error appear for the user
+                dispatch(setEvent(false, "Error " + response.status + ": " + response.statusText));
+            }
+        } catch (error) {
+            // don't need to handle response here, just means that response put in is null
+        }
+
+        return false;
+    }
+
     async function createWishlistPost(wishlistName) {
         try {
             let res = await axios.post('/api/wishlist/create', {
                 wishlist_name: wishlistName
             });
-            if (res.status === 200) {
+            console.log("here?")
+            if (handleResponse(res)) {
                 dispatch(createWishlist(res.data.id, wishlistName));
             }
         } catch (error) {
-            console.log("error")
+            handleResponse(error.response)
             console.error(error);
         }
     }
-    
-    async function addGameToWishlist() {
-        try {
-            let res = await axios.post('/api/game/add', {
-                wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
-                game_id: "105600"
-            });
-            console.log(res);
-        } catch (error) {
-            console.log("error")
-            console.error(error);
-        }
-    }
-    
+
     async function deleteWishlistPost(id) {
         try {
             let res = await axios.delete('/api/wishlist/delete', {
@@ -48,11 +53,11 @@ const Wishlists = () => {
                 }
             });
             console.log(res);
-            if (res.status === 200) {
+            if (handleResponse(res)) {
                 dispatch(deleteWishlist(id));
             }
         } catch (error) {
-            console.log("error")
+            handleResponse(error.response)
             console.error(error);
         }
     
@@ -65,9 +70,22 @@ const Wishlists = () => {
                 wishlist_name: name
             });
             // only on success we want to change the wishlist
-            if(res.status === 200){
+            if(handleResponse(res)){
                 dispatch(renameWishlist(id, name));
             }
+        } catch (error) {
+            handleResponse(error.response)
+            console.error(error);
+        }
+    }
+    
+    async function addGameToWishlist() {
+        try {
+            let res = await axios.post('/api/game/add', {
+                wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
+                game_id: "105600"
+            });
+            console.log(res);
         } catch (error) {
             console.log("error")
             console.error(error);
