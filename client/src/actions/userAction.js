@@ -17,4 +17,15 @@ const deleteUser = () => {
     };
 };
 
-export { setUser, deleteUser };
+const isUser = (inputUser) => {
+    try {
+        if (inputUser && Object.keys(inputUser).length > 0) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        return false;
+    }
+}
+
+export { setUser, deleteUser, isUser };

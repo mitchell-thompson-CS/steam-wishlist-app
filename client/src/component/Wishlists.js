@@ -1,152 +1,126 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
+import { createWishlist, deleteWishlist, renameWishlist, setWishlists } from "../actions/wishlistAction";
 import axios from "axios";
 import Popup from './Popup';
 import '../styles/Wishlists.css';
 import { Link } from "react-router-dom";
 
-async function createWishlistPost(wishlistName) {
-    try {
-        let res = await axios.post('/api/wishlist/create', {
-            wishlist_name: wishlistName
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-}
-
-async function addGameToWishlist() {
-    try {
-        let res = await axios.post('/api/game/add', {
-            wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
-            game_id: "105600"
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-}
-
-async function deleteWishlistPost(id) {
-    try {
-        let res = await axios.delete('/api/wishlist/delete', {
-            data: {
-                wishlist_id: id
-            }
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-
-}
-
-async function renameWishlistPost(id, name) {
-    try {
-        let res = await axios.post('/api/wishlist/rename', {
-            wishlist_id: id,
-            wishlist_name: name
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-}
-
-async function removeGameFromWishlist() {
-    try {
-        let res = await axios.delete('/api/game/remove', {
-            data: {
-                wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
-                game_id: "105600"
-            }
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-}
-
-async function addEditorToWishlist() {
-    try {
-        let res = await axios.post('/api/wishlist/add-editor', {
-            wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
-            editor_id: "76561198012386061"
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-
-}
-
-async function deleteEditorFromWishlist() {
-    try {
-        let res = await axios.delete('/api/wishlist/delete-editor', {
-            data: {
-                wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
-                editor_id: "76561198012386061"
-            }
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-
-}
-
 const Wishlists = () => {
-    const state = useSelector((state) => state);
-    // console.log(state);
-    const dispatch = useDispatch();
-
-    const [wishlistItems, setWishlistItems] = useState([]);
-
-    useEffect(() => {
-        fetch('/api/wishlists', { mode: 'cors', credentials: 'include' })
-            .then(function (response) {
-                if (response.status === 200) {
-                    return response.json();
-                }
-            }).then(function (data) {
-                if (data) {
-                    setWishlistItems(data);
-                }
-            })
-    }, []);
-
+    const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
     const [buttonPopup, setButtonPopup] = useState(false);
     const [inputText, setInputText] = useState("");
     const [contextPopup, setContextPopup] = useState("");
+    const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (buttonPopup == false || contextPopup == "") {
-            fetch('/api/wishlists', { mode: 'cors', credentials: 'include' })
-            .then(function (response) {
-                if (response.status === 200) {
-                    return response.json();
-                }
-            }).then(function (data) {
-                if (data) {
-                    setWishlistItems(data);
-                }
-            })
+    async function createWishlistPost(wishlistName) {
+        try {
+            let res = await axios.post('/api/wishlist/create', {
+                wishlist_name: wishlistName
+            });
+            if (res.status === 200) {
+                dispatch(createWishlist(res.data.id, wishlistName));
+            }
+        } catch (error) {
+            console.log("error")
+            console.error(error);
         }
-    }, [buttonPopup, contextPopup]);
+    }
+    
+    async function addGameToWishlist() {
+        try {
+            let res = await axios.post('/api/game/add', {
+                wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
+                game_id: "105600"
+            });
+            console.log(res);
+        } catch (error) {
+            console.log("error")
+            console.error(error);
+        }
+    }
+    
+    async function deleteWishlistPost(id) {
+        try {
+            let res = await axios.delete('/api/wishlist/delete', {
+                data: {
+                    wishlist_id: id
+                }
+            });
+            console.log(res);
+            if (res.status === 200) {
+                dispatch(deleteWishlist(id));
+            }
+        } catch (error) {
+            console.log("error")
+            console.error(error);
+        }
+    
+    }
+    
+    async function renameWishlistPost(id, name) {
+        try {
+            let res = await axios.post('/api/wishlist/rename', {
+                wishlist_id: id,
+                wishlist_name: name
+            });
+            // only on success we want to change the wishlist
+            if(res.status === 200){
+                dispatch(renameWishlist(id, name));
+            }
+        } catch (error) {
+            console.log("error")
+            console.error(error);
+        }
+    }
+    
+    async function removeGameFromWishlist() {
+        try {
+            let res = await axios.delete('/api/game/remove', {
+                data: {
+                    wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
+                    game_id: "105600"
+                }
+            });
+            console.log(res);
+        } catch (error) {
+            console.log("error")
+            console.error(error);
+        }
+    }
+    
+    async function addEditorToWishlist() {
+        try {
+            let res = await axios.post('/api/wishlist/add-editor', {
+                wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
+                editor_id: "76561198012386061"
+            });
+            console.log(res);
+        } catch (error) {
+            console.log("error")
+            console.error(error);
+        }
+    
+    }
+    
+    async function deleteEditorFromWishlist() {
+        try {
+            let res = await axios.delete('/api/wishlist/delete-editor', {
+                data: {
+                    wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
+                    editor_id: "76561198012386061"
+                }
+            });
+            console.log(res);
+        } catch (error) {
+            console.log("error")
+            console.error(error);
+        }
+    
+    }
 
     return (
         <div className="wishlist">
-            {/* <button className="green" onClick={() => {dispatch(createWishlist("123456789secret", "test wishlist"))}}>Create Wishlist</button>
-            <button className="red" onClick={() => {dispatch(deleteWishlist("123456789secret"))}}>Delete Wishlist</button> */}
             <div className="gridContainer">
                 <button onClick={() => {setButtonPopup(true); setInputText("");}} className="gridItem" id="createWishlistButton">+</button>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
