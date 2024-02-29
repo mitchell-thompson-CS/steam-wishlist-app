@@ -59,7 +59,7 @@ async function createWishlist(req, res) {
                 [`wishlists.${new_id}`]: getDb().collection('wishlists').doc(new_id)
             })
             // wishlist added to user
-            Logging.handleResponse(res, 200, null, function_name,
+            Logging.handleResponse(res, 200, {"id": new_id}, function_name,
                 "Wishlist " + new_id + " created by " + req.user.id);
         } catch (error) {
             // problem adding the wishlist to the user
