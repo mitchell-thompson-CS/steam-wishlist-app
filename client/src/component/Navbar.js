@@ -15,16 +15,12 @@ const Navbar = () => {
     const user = useSelector(state => state.userReducer.user);
     const [searchTerm, setSearchTerm] = useState("");
     const searchPosition = useRef(-1);
-    const[loggingIn, setLoggingIn] = useState(false);
     const location = useLocation();
     const dispatch = useDispatch();
-
     useEffect(() => {
         // deal with setting the users state (if it needs setting)
-        let sessionUser = sessionStorage.getItem('user');
-        if ((sessionUser === null || sessionUser === "false") && !loggingIn) {
-            console.log("getting user")
-            fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache'})
+        if ((user === null || Object.keys(user).length === 0)) {
+            fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache' })
                 .then(function (response) {
                     if (response.status === 200) {
                         return response.json();
@@ -32,24 +28,10 @@ const Navbar = () => {
                 }).then(function (data) {
                     if (data) {
                         dispatch(setUser(data.id, data.name, data.avatar));
-                        sessionStorage.setItem('user', JSON.stringify(data));
-                    } else {
-                        dispatch(deleteUser())
-                        sessionStorage.setItem('user', JSON.stringify({}));
                     }
                 });
-        } else if((user === undefined || user === null || Object.keys(user).length === 0) && (sessionUser !== null)) {
-            try {
-                let u = JSON.parse(sessionUser);
-                if(u.id && u.name && u.avatar){
-                    dispatch(setUser(u.id, u.name, u.avatar));
-                }
-            } catch (error) {
-                console.error(error);
-                sessionStorage.setItem('user', false);
-            }
         }
-    }, [user, loggingIn, dispatch]);
+    }, [user, dispatch]);
 
     useEffect(() => {
         // setup delay for the search bar
@@ -118,21 +100,14 @@ const Navbar = () => {
         try {
             let response = await axios.post('/api/auth/logout');
             if (response.status === 200) {
-                sessionStorage.setItem('user', JSON.stringify({}));
                 dispatch(deleteUser())
             }
         } catch (error) {
             if (error.response.status === 401) {
-                sessionStorage.setItem('user', JSON.stringify({}));
                 dispatch(deleteUser())
             }
             console.error(error);
         }
-    }
-
-    async function login() {
-        setLoggingIn(true);
-        sessionStorage.setItem('user', false);
     }
 
     function focusSearch(event) {
@@ -199,9 +174,8 @@ const Navbar = () => {
                 <li>
                     {user.name ?
                         <button className="signin" onClick={logout}>{user.name}</button> :
-                        <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)} 
-                        onClick={login}
-                        className="signin">LOGIN</a>
+                        <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)}
+                            className="signin">LOGIN</a>
                     }
                 </li>
                 <li>
