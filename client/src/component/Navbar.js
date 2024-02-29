@@ -1,7 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import '../Navbar.css'
+import '../styles/Navbar.css'
 import { Link, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteUser, setUser } from "../actions/userAction";
 
 const searchDelay = 500;
 
@@ -10,11 +12,12 @@ const searchDelay = 500;
 
 const Navbar = () => {
 
-    const [user, setUser] = useState([]);
+    const user = useSelector(state => state.userReducer.user);
     const [searchTerm, setSearchTerm] = useState("");
     const searchPosition = useRef(-1);
     const[loggingIn, setLoggingIn] = useState(false);
     const location = useLocation();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         // deal with setting the users state (if it needs setting)
@@ -28,20 +31,25 @@ const Navbar = () => {
                     }
                 }).then(function (data) {
                     if (data) {
-                        setUser(data);
+                        dispatch(setUser(data.id, data.name, data.avatar));
                         sessionStorage.setItem('user', JSON.stringify(data));
                     } else {
+                        dispatch(deleteUser())
                         sessionStorage.setItem('user', JSON.stringify({}));
                     }
                 });
-        } else if(user === null || user.length === 0) {
+        } else if((user === undefined || user === null || Object.keys(user).length === 0) && (sessionUser !== null)) {
             try {
-                setUser(JSON.parse(sessionUser));
+                let u = JSON.parse(sessionUser);
+                if(u.id && u.name && u.avatar){
+                    dispatch(setUser(u.id, u.name, u.avatar));
+                }
             } catch (error) {
                 console.error(error);
+                sessionStorage.setItem('user', false);
             }
         }
-    }, [user, loggingIn]);
+    }, [user, loggingIn, dispatch]);
 
     useEffect(() => {
         // setup delay for the search bar
@@ -111,12 +119,12 @@ const Navbar = () => {
             let response = await axios.post('/api/auth/logout');
             if (response.status === 200) {
                 sessionStorage.setItem('user', JSON.stringify({}));
-                setUser({});
+                dispatch(deleteUser())
             }
         } catch (error) {
             if (error.response.status === 401) {
                 sessionStorage.setItem('user', JSON.stringify({}));
-                setUser({});
+                dispatch(deleteUser())
             }
             console.error(error);
         }
@@ -124,7 +132,6 @@ const Navbar = () => {
 
     async function login() {
         setLoggingIn(true);
-        // removeCookie('user');
         sessionStorage.setItem('user', false);
     }
 

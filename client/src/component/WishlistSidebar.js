@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
-import Popup from './Popup';
-import '../WishlistSidebar.css';
+import '../styles/WishlistSidebar.css';
 import { Link } from "react-router-dom";
 
 const WishlistSidebar = () => {

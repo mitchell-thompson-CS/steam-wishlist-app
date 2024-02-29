@@ -3,8 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import Popup from './Popup';
-import '../Wishlists.css';
-import WishlistSidebar from "./WishlistSidebar";
+import '../styles/Wishlists.css';
 import { Link } from "react-router-dom";
 
 async function createWishlistPost(wishlistName) {

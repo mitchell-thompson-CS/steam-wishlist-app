@@ -1,4 +1,4 @@
-import './App.css';
+import './styles/App.css';
 // import Login from './component/Navbar';
 import { Provider } from 'react-redux';
 import store from './store';
@@ -14,7 +14,6 @@ function App() {
 
   return (
     <Provider store={store}>
-      <CookiesProvider defaultSetOptions={{ path: '/' }} >
         <div className="App">
           <header>
             <Navbar />
@@ -24,7 +23,6 @@ function App() {
             {/* <Route path ="/login" element={<Login />} /> */}
           </Routes>
         </div>
-      </CookiesProvider>
     </Provider>
   );
 }

@@ -10,9 +10,14 @@
     border: 1px gray;
     border-radius: 20px;
     background-color: #393f46;
+    display: flex;
 }
 
 .gameLink {
     color: white;
     text-decoration: none;
+}
+
+.gameTitle img {
+    scale: 33%;
 }

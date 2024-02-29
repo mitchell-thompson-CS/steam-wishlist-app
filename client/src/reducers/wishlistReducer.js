@@ -15,7 +15,6 @@ const wishlistReducer = (state = initialState, action) => {
                     [action.payload.wishlistID]: { name: action.payload.wishlistName },
                 },
             };
-
         case DELETE_WISHLIST:
             let newState = Object.keys(state.wishlists).reduce((object, key) => {
                 if (key !== action.payload.wishlistID) {
@@ -28,7 +27,6 @@ const wishlistReducer = (state = initialState, action) => {
                 wishlists: newState,
             };
         default:
-            console.log("undefined action");
             return state;
     }
 };
