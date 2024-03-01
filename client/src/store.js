@@ -2,12 +2,19 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import wishlistReducer from "./reducers/wishlistReducer";
 import userReducer from './reducers/userReducer';
 import eventReducer from './reducers/eventReducer';
+import gameReducer from './reducers/gameReducer';
 
 function loadFromSessionStorage() {
     try {
         const serializedState = sessionStorage.getItem("state");
         if (serializedState === null) return undefined;
-        return JSON.parse(serializedState);
+        let state = JSON.parse(serializedState);
+        const serializedState2 = localStorage.getItem("state");
+        let state2 = JSON.parse(serializedState2);
+        return {
+            ...state,
+            ...state2,
+        };
     } catch (e) {
         console.log(e);
         return undefined;
@@ -21,6 +28,12 @@ function saveToSessionStorage(state) {
             wishlistReducer: state.wishlistReducer,
         });
         sessionStorage.setItem("state", serializedState);
+
+        // TODO: remove gameReducer from local storage? what happens if it gets full?
+        const serializedState2 = JSON.stringify({
+            gameReducer: state.gameReducer,
+        });
+        localStorage.setItem("state", serializedState2);
     } catch (e) {
         console.log(e);
     }
@@ -31,6 +44,7 @@ const store = configureStore({
         wishlistReducer,
         userReducer,
         eventReducer,
+        gameReducer,
     }),
     preloadedState: loadFromSessionStorage(),
 });

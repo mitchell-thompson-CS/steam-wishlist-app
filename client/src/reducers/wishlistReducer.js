@@ -16,7 +16,7 @@ const wishlistReducer = (state = initialState, action) => {
     };
     switch (action.type) {
         case CREATE_WISHLIST:
-            newState["owned"][action.payload.wishlistID] = {
+            newState[action.payload.wishlistType][action.payload.wishlistID] = {
                 name: action.payload.wishlistName,
                 games: []
             };

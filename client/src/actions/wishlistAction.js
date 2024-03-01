@@ -1,11 +1,12 @@
 import { CREATE_WISHLIST, DELETE_WISHLIST, DELETE_WISHLISTS, RENAME_WISHLIST, SET_WISHLISTS } from "../actionTypes/actionTypes";
 
-const createWishlist = (inputId, inputName) => {
+const createWishlist = (inputId, inputName, inputWishlistType="owned") => {
     return {
         type: CREATE_WISHLIST,
         payload: {
             wishlistID: inputId,
             wishlistName: inputName,
+            wishlistType: inputWishlistType,
         }
     };
 };
