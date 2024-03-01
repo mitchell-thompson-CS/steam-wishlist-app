@@ -25,6 +25,9 @@ const WishlistView = () => {
                         // if we got 401 that means they somehow got logged out
                         dispatch(deleteUser());
                         dispatch(setEvent(false, response.statusText));
+                    } else if (response.status === 429) {
+                        // if we got 429 that means they are being rate limited
+                        dispatch(setEvent(false, response.statusText));
                     }
                 }).then(function (data) {
                     if (data) {
