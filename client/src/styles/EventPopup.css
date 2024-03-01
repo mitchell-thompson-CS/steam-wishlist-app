@@ -1,6 +1,6 @@
 /* TODO: need to make sure this is centered (i just eyeballed it for now) */
 #errorpopup {
-    position: absolute;
+    position: fixed;
     background-color: red;
     margin-left: 45vw;
     padding: 25px;
