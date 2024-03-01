@@ -35,7 +35,6 @@ const Wishlists = () => {
             let res = await axios.post('/api/wishlist/create', {
                 wishlist_name: wishlistName
             });
-            console.log("here?")
             if (handleResponse(res)) {
                 dispatch(createWishlist(res.data.id, wishlistName));
             }
