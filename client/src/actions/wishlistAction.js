@@ -1,4 +1,4 @@
-import { CREATE_WISHLIST, DELETE_WISHLIST, DELETE_WISHLISTS, RENAME_WISHLIST, SET_WISHLISTS } from "../actionTypes/actionTypes";
+import { ADD_GAME_TO_WISHLIST, CREATE_WISHLIST, DELETE_GAME_FROM_WISHLIST, DELETE_WISHLIST, DELETE_WISHLISTS, RENAME_WISHLIST, SET_WISHLISTS } from "../actionTypes/actionTypes";
 
 const createWishlist = (inputId, inputName, inputWishlistType="owned") => {
     return {
@@ -45,4 +45,28 @@ const deleteWishlists = () => {
     };
 };
 
-export { createWishlist, deleteWishlist, setWishlists, deleteWishlists, renameWishlist};
+const addGameToWishlist = (inputWishlistID, inputGameID, inputWishlistType) => {
+    return {
+        type: ADD_GAME_TO_WISHLIST,
+        payload: {
+            wishlistID: inputWishlistID,
+            gameID: inputGameID,
+            wishlistType: inputWishlistType,
+        }
+    };
+}
+
+const deleteGameFromWishlist = (inputWishlistID, inputGameID, inputWishlistType) => {
+    return {
+        type: DELETE_GAME_FROM_WISHLIST,
+        payload: {
+            wishlistID: inputWishlistID,
+            gameID: inputGameID,
+            wishlistType: inputWishlistType,
+        }
+    };
+}
+
+export { createWishlist, deleteWishlist, setWishlists, 
+    deleteWishlists, renameWishlist, addGameToWishlist, 
+    deleteGameFromWishlist};
