@@ -16,16 +16,13 @@ const resetEvent = () => {
     };
 }
 
-const setLoading = () => {
+const setLoading = (newLoading = true) => {
     return {
         type: SET_LOADING,
+        payload: {
+            loading: newLoading,
+        }
     };
 }
 
-const resetLoading = () => {
-    return {
-        type: RESET_LOADING,
-    };
-}
-
-export { setEvent, resetEvent, setLoading, resetLoading };
+export { setEvent, resetEvent, setLoading };

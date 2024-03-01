@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import '../styles/Navbar.css'
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteUser, setUser } from "../actions/userAction";
+import { deleteUser, isUser, setUser } from "../actions/userAction";
+import { setLoading } from "../actions/eventAction";
 
 const searchDelay = 500;
 
@@ -19,7 +20,8 @@ const Navbar = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         // deal with setting the users state (if it needs setting)
-        if ((user === null || Object.keys(user).length === 0)) {
+        if (!isUser(user)) {
+            dispatch(setLoading(true));
             fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache' })
                 .then(function (response) {
                     if (response.status === 200) {
@@ -29,6 +31,7 @@ const Navbar = () => {
                     if (data) {
                         dispatch(setUser(data.id, data.name, data.avatar));
                     }
+                    dispatch(setLoading(false));
                 });
         }
     }, [user, dispatch]);

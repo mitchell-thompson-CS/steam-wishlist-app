@@ -5,7 +5,7 @@ import axios from "axios";
 import Popup from './Popup';
 import '../styles/Wishlists.css';
 import { Link } from "react-router-dom";
-import { setEvent } from "../actions/eventAction";
+import { setEvent, setLoading } from "../actions/eventAction";
 import WishlistGridHeader from "./WishlistGridHeader";
 
 const Wishlists = () => {
@@ -33,6 +33,7 @@ const Wishlists = () => {
 
     async function createWishlistPost(wishlistName) {
         try {
+            dispatch(setLoading(true));
             let res = await axios.post('/api/wishlist/create', {
                 wishlist_name: wishlistName
             });
@@ -43,10 +44,12 @@ const Wishlists = () => {
             handleResponse(error.response)
             console.error(error);
         }
+        dispatch(setLoading(false))
     }
 
     async function deleteWishlistPost(id) {
         try {
+            dispatch(setLoading(true));
             let res = await axios.delete('/api/wishlist/delete', {
                 data: {
                     wishlist_id: id
@@ -60,11 +63,13 @@ const Wishlists = () => {
             handleResponse(error.response)
             console.error(error);
         }
+        dispatch(setLoading(false));
     
     }
     
     async function renameWishlistPost(id, name) {
         try {
+            dispatch(setLoading(true));
             let res = await axios.post('/api/wishlist/rename', {
                 wishlist_id: id,
                 wishlist_name: name
@@ -77,6 +82,7 @@ const Wishlists = () => {
             handleResponse(error.response)
             console.error(error);
         }
+        dispatch(setLoading(false));
     }
     
     async function addGameToWishlist() {

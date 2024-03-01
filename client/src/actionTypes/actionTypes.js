@@ -10,4 +10,3 @@ export const DELETE_USER = "DEL_USER";
 export const SET_EVENT = "SET_EVENT";
 export const RESET_EVENT = "RESET_EVENT";
 export const SET_LOADING = "SET_LOADING";
-export const RESET_LOADING = "RESET_LOADING";

@@ -1,4 +1,4 @@
-import { RESET_EVENT, SET_EVENT, SET_LOADING, RESET_LOADING } from "../actionTypes/actionTypes";
+import { RESET_EVENT, SET_EVENT, SET_LOADING } from "../actionTypes/actionTypes";
 
 
 const initialState = {
@@ -26,12 +26,7 @@ const eventReducer = (state = initialState, action) => {
         case SET_LOADING:
             return {
                 ...state,
-                loading: true,
-            };
-        case RESET_LOADING:
-            return {
-                ...state,
-                loading: false,
+                loading: action.payload.loading,
             };
         default:
             return state;
