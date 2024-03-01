@@ -16,7 +16,10 @@ function loadFromSessionStorage() {
 
 function saveToSessionStorage(state) {
     try {
-        const serializedState = JSON.stringify(state);
+        const serializedState = JSON.stringify({
+            userReducer: state.userReducer,
+            wishlistReducer: state.wishlistReducer,
+        });
         sessionStorage.setItem("state", serializedState);
     } catch (e) {
         console.log(e);

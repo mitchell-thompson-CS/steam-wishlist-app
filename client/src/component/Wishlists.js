@@ -6,6 +6,7 @@ import Popup from './Popup';
 import '../styles/Wishlists.css';
 import { Link } from "react-router-dom";
 import { setEvent } from "../actions/eventAction";
+import WishlistGridHeader from "./WishlistGridHeader";
 
 const Wishlists = () => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -138,6 +139,7 @@ const Wishlists = () => {
 
     return (
         <div className="wishlist">
+            <WishlistGridHeader />
             <div className="gridContainer">
                 <button onClick={() => {setButtonPopup(true); setInputText("");}} className="gridItem" id="createWishlistButton">+</button>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
