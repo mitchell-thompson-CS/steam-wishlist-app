@@ -5,7 +5,7 @@ import WishlistInner from "./WishlistInner";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteWishlists, setWishlists } from "../actions/wishlistAction";
-import { isUser } from "../actions/userAction";
+import { deleteUser, isUser } from "../actions/userAction";
 
 const WishlistView = () => {
     const dispatch = useDispatch();
@@ -19,6 +19,9 @@ const WishlistView = () => {
                 .then(function (response) {
                     if (response.status === 200) {
                         return response.json();
+                    } else if (response.status === 401) {
+                        // if we got 401 that means they somehow got logged out
+                        dispatch(deleteUser());
                     }
                 }).then(function (data) {
                     if (data) {
