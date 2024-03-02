@@ -114,7 +114,7 @@
 
 .game-sidebar-button {
     width: 48%;
-    height: 57px;
+    min-height: 57px;
     padding: 16px 7px;
     background-color: #427b9c;
     border: none;
