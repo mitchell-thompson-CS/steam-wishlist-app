@@ -1,0 +1,117 @@
+.game-info {
+    width: 30%;
+    max-width: 500px;
+    min-width: 300px;
+    float: left;
+    background-color: #282e35;
+    border-radius: 10px;
+}
+
+.game-info img {
+    width: 100%;
+    height: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.game-info .loading-header {
+    width: 210px;
+    height: 210px;
+    margin: auto;
+    display: block;
+}
+
+.game-info-body {
+    padding: 5px 10px 20px 10px;
+}
+
+.game-info-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #3e444b;
+    line-height: 25px;
+}
+
+.game-info-body h1 {
+    font-size: 30px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+#game-tag-more, #game-genres-more {
+    float: right;
+    width: 15%;
+}
+
+#game-tag-more button, #game-genres-more button {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    color: white;
+    border: none;
+}
+
+#game-tag-more button:hover, #game-genres-more button:hover{
+    color: lightskyblue;
+    cursor: pointer;
+}
+
+#game-tags, #game-genres {
+    height: 25px;
+    overflow: hidden;
+    float: left;
+    max-width: 80%;
+}
+
+#game-tags *, #game-genres *{
+    display: inline;
+    word-wrap: normal;
+    text-wrap: none;   
+}
+
+#game-tags p, #game-genres p {
+    padding: 0 5px;
+    text-decoration: underline;
+    color: lightskyblue;
+}
+
+#game-tags span span, #game-genres span span{
+    display: inline-block;
+}
+
+#game-coming-soon {
+    color: #ffcc00;
+}
+
+.game-quick-info {
+    padding-top: 10px;
+}
+
+.no-top-padding {
+    padding-top: 0;
+}
+
+.game-quick-info h2, .game-quick-info h3, .game-quick-info h4 {
+    float: left;
+}
+
+.game-quick-info span {
+    float: right;
+    width: 40%;
+}
+
+.price-game {
+    display: flex;
+    margin: auto;
+}
+
+.priceInitial-game {
+    margin-right: 10px;
+    text-decoration: line-through;
+    color: #88929c;
+}
+
+.clear {
+    clear: both;
+}
