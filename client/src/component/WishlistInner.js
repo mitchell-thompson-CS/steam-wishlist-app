@@ -8,7 +8,7 @@ import { setLoading } from "../actions/eventAction";
 import { addGame, removeGame } from "../actions/gameAction";
 
 
-async function addGameToWishlist(wishlist, game = "105600") {
+async function addGameToWishlist(wishlist, game = "1676840") {
     try {
         let res = await axios.post('/api/game/add', {
             wishlist_id: wishlist,
@@ -44,8 +44,8 @@ const WishlistInner = () => {
                 data = await response.json();
 
                 // now need to update redux store with this new wishlist in the correct spot
-                if(data !== null && user !== undefined && user.id !== undefined) {
-                    if(user.id === data.owner){
+                if (data !== null && user !== undefined && user.id !== undefined) {
+                    if (user.id === data.owner) {
                         dispatch(createWishlist(data.id, data.name, "owned"));
                     } else if (data.editors[user.id] !== undefined) {
                         dispatch(createWishlist(data.id, data.name, "shared"));
@@ -67,7 +67,7 @@ const WishlistInner = () => {
 
         function fetchGameData(data) {
             for (const [key, value] of Object.entries(data.games)) {
-                if(gameData[key] === undefined){
+                if (gameData[key] === undefined) {
                     try {
                         dispatch(setLoading(true));
                         fetch('/api/game/' + key, { mode: 'cors', credentials: 'include' })
@@ -109,7 +109,12 @@ const WishlistInner = () => {
                             </div>
                             <div className="gamePrice">
                                 <p className="priceTitle">Price</p>
-                                <p>{gameData[key].price_overview.final_formatted}</p>
+                                <span className="price">
+                                    {gameData[key].price_overview.initial_formatted !== "" ?
+                                        <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
+                                        : null}
+                                    <p className="priceFinal">{gameData[key].price_overview.final_formatted}</p>
+                                </span>
                             </div>
                             <div className="gameLowestPrice">
                                 <p className="lowestPriceTitle">Lowest Price</p>
@@ -119,7 +124,7 @@ const WishlistInner = () => {
                             </div>
                             <div className="gamePercent">
                                 <p className="reviewPercentTitle">Positive Review %</p>
-                                <p>{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</p>
+                                <p className="reviewPercent">{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</p>
                             </div>
                             {/* </div> */}
                         </li>
