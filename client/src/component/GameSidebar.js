@@ -14,6 +14,7 @@ const GameSidebar = () => {
     const [viewTags, setViewTags] = useState(false);
     const [viewGenres, setViewGenres] = useState(false);
     const [curReviewPercent, setCurReviewPercent] = useState(NaN);
+    const user = useSelector(state => state.userReducer.user);
 
     useEffect(() => {
         if (!gameData[id]) {
@@ -35,6 +36,23 @@ const GameSidebar = () => {
 
         }
     }, [id, gameData, dispatch]);
+
+    useEffect(() => {
+        let wishlistButton = document.getElementById("add-to-wishlist");
+        if (wishlistButton !== undefined && wishlistButton !== null) {
+            if (user && Object.keys(user).length > 0) {
+                wishlistButton.style.fontSize = "";
+                wishlistButton.style.backgroundColor = "";
+                wishlistButton.style.color = "";
+                wishlistButton.style.cursor = ""
+            } else {
+                wishlistButton.style.fontSize = "14px";
+                wishlistButton.style.backgroundColor = "#888888";
+                wishlistButton.style.color = "#aaaaaa";
+                wishlistButton.style.cursor = "auto"
+            }
+        }
+    }, [user]);
 
     useEffect(() => {
         if (gameData && gameData[id] && gameData[id].reviews !== undefined &&
@@ -114,11 +132,11 @@ const GameSidebar = () => {
             }
             <div className="game-info-body">
                 <h1>{gameData[id] ? gameData[id].name : "Game Title"}</h1>
-                <div className="game-info-section">
+                <div className="game-info-section"> {/* game description section */}
                     <p>{gameData[id] ? gameData[id].short_description : "Game Description"}</p>
-                </div>
+                </div> {/* end of game-info-section */}
                 <div className="game-info-section">
-                    <div className="game-quick-info no-top-padding">
+                    <div className="game-quick-info no-top-padding"> {/* release date, dev, and pub section */}
                         <h3>Release Date:</h3>
                         <span>
                             {gameData[id] && gameData[id].release_date !== undefined &&
@@ -136,8 +154,8 @@ const GameSidebar = () => {
                             }
                         </span>
                         <div className="clear"></div>
-                    </div>
-                    <div className="game-quick-info no-top-padding">
+                    </div> {/* end of game-quick-info */}
+                    <div className="game-quick-info no-top-padding"> {/* developer section */}
                         <h4>Developer:</h4>
                         <span>
                             {gameData[id] && gameData[id].developers !== undefined
@@ -147,9 +165,8 @@ const GameSidebar = () => {
                             }
                         </span>
                         <div className="clear"></div>
-                    </div>
-
-                    <div className="game-quick-info no-top-padding">
+                    </div> {/* end of game-quick-info */}
+                    <div className="game-quick-info no-top-padding"> {/* publisher section */}
                         <h4>Publisher:</h4>
                         <span>
                             {gameData[id] && gameData[id].publishers !== undefined
@@ -159,9 +176,9 @@ const GameSidebar = () => {
                             }
                         </span>
                         <div className="clear"></div>
-                    </div>
-                </div>
-                <div className="game-info-section">
+                    </div> {/* end of game-quick-info */}
+                </div> {/* end of game-info-section */}
+                <div className="game-info-section"> {/* genres section */}
                     <div id="game-genres">
                         <h3>Genres:</h3>
                         <span>
@@ -176,8 +193,8 @@ const GameSidebar = () => {
                         }}>View All</button>
                     </div>
                     <div className="clear"></div>
-                </div>
-                <div className="game-info-section">
+                </div> {/* end of game-info-section */}
+                <div className="game-info-section"> {/* tags section */}
                     <div id="game-tags">
                         <h3>Tags:</h3>
                         <span>
@@ -192,9 +209,9 @@ const GameSidebar = () => {
                         }}>View All</button>
                     </div>
                     <div className="clear"></div>
-                </div>
+                </div> {/* end of game-info-section */}
                 <div className="game-info-section">
-                    <div className="game-quick-info">
+                    <div className="game-quick-info"> {/* review section */}
                         <h3>Positive Reviews:</h3>
                         <span className="reviews-game">
                             {gameData[id] !== undefined && gameData[id].reviews &&
@@ -211,8 +228,8 @@ const GameSidebar = () => {
                             }
                         </span>
                         <div className="clear"></div>
-                    </div>
-                    <div className="game-quick-info">
+                    </div> {/* end of game-quick-info */}
+                    <div className="game-quick-info"> {/* price section */}
                         <h3>Current Price:</h3>
                         <span className="price-game">
                             {gameData[id] !== undefined && gameData[id].price_overview &&
@@ -227,10 +244,20 @@ const GameSidebar = () => {
                             }
                         </span>
                         <div className="clear"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </div> {/* end of game-quick-info */}
+                </div> {/* end of game-info-section */}
+                <div className="game-info-section"> {/* view on steam and add to wishlist section */}
+                    <a href={"https://store.steampowered.com/app/" + id} className="game-sidebar-button" id="view-on-steam">View on Steam</a>
+                    <button className="game-sidebar-button" id="add-to-wishlist">
+                        { user && Object.keys(user).length > 0 ?
+                            "Add to Wishlist"
+                            : "Login to add to wishlist"
+                        }
+                    </button>
+                    <div className="clear"></div>
+                </div> {/* end of game-info-section */}
+            </div> {/* end of game-info-body */}
+        </div> // end of game-info
     )
 }
 

@@ -22,7 +22,7 @@
 }
 
 .game-info-body {
-    padding: 5px 10px 20px 10px;
+    padding: 5px 10px 10px 10px;
 }
 
 .game-info-section {
@@ -110,6 +110,32 @@
     margin-right: 10px;
     text-decoration: line-through;
     color: #88929c;
+}
+
+.game-sidebar-button {
+    width: 48%;
+    height: 57px;
+    padding: 16px 7px;
+    background-color: #427b9c;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 14px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.game-sidebar-button:hover {
+    background-color: #3a6e8e;
+}
+
+#view-on-steam {
+    float: left;
+}
+
+#add-to-wishlist {
+    float: right;
 }
 
 .clear {
