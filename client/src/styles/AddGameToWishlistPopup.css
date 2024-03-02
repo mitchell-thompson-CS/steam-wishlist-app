@@ -23,6 +23,7 @@
     background-color: #282e35;
     border-radius: 25px;
     box-shadow: 0 0 10px 5px #171d25;
+    user-select: none;
 }
 
 .addGameToWishlistPopupInner h1 {
@@ -58,7 +59,27 @@
     color: white;
 }
 
-.wishlistGamePopupWishlistName:hover {
+.wishlistGamePopupWishlistName:hover, .wishlistGamePopupWishlistName:focus {
     background-color: #444;
     cursor: pointer;
+}
+
+.wishlist-popup-name {
+    width: 85%;
+    height: 25px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    float: left;
+}
+
+.wishlist-popup-wishlist-status {
+    width: 15%;
+    height: 25px;
+    text-align: center;
+    float: right;
+}
+
+.clear {
+    clear: both;
 }
