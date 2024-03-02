@@ -13,6 +13,7 @@ button {
   background-color: #1b2838;
   min-height: 100vh;
   color: white;
+  overflow: scroll;
 }
 
 header {
