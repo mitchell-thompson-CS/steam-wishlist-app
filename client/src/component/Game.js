@@ -34,6 +34,27 @@ const Game = () => {
         }
     }, [id, gameData, dispatch]);
 
+    useEffect(() => {
+        if (gameData && gameData[id] && gameData[id].reviews !== undefined &&
+            gameData[id].reviews.total_positive !== undefined &&
+            gameData[id].reviews.total_reviews !== undefined) {
+            let reviewPercent = document.getElementsByClassName("review-percent-game");
+            for (let element of reviewPercent) {
+                element.style.color = getReviewColor((gameData[id].reviews.total_positive / gameData[id].reviews.total_reviews));
+            }
+        }
+    }, [gameData, id]);
+
+    function getReviewColor(value) {
+        if (value > 0.80) {
+            return "lightskyblue";
+        } else if (value > 0.5) {
+            return "#ffff00";
+        } else {
+            return "#ff0000";
+        }
+    }
+
     function viewAllTags() {
         let tags = document.getElementById("game-tags");
         let tagsMore = document.getElementById("game-tag-more");
@@ -86,17 +107,17 @@ const Game = () => {
                     </div>
                     <div className="game-info-section">
                         <div className="game-quick-info">
-                            <h2>Current Price:</h2>
-                            <span className="price-game">
-                                {gameData[id] !== undefined && gameData[id].price_overview &&
-                                    gameData[id].price_overview.initial_formatted !== null ?
-                                    <>
-                                        {gameData[id].price_overview.initial_formatted !== "" ?
-                                            <p className="priceInitial-game">{gameData[id].price_overview.initial_formatted}</p>
-                                            : null}
-                                        <p className="priceFinal-game">{gameData[id].price_overview.final_formatted}</p>
-                                    </>
-                                    : null}
+                            <h2>Positive Reviews:</h2>
+                            <span className="reviews-game">
+                                {gameData[id] !== undefined && gameData[id].reviews &&
+                                    gameData[id].reviews.total_positive !== null &&
+                                    gameData[id].reviews.total_reviews !== null
+                                    ?
+                                    <p className="review-percent-game">
+                                        {(Math.round(((gameData[id].reviews.total_positive / gameData[id].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%
+                                    </p>
+                                    : null
+                                }
                             </span>
                             <div className="clear"></div>
                         </div>
@@ -111,7 +132,8 @@ const Game = () => {
                                             : null}
                                         <p className="priceFinal-game">{gameData[id].price_overview.final_formatted}</p>
                                     </>
-                                    : null}
+                                    : gameData[id] !== undefined ? <p>Free</p> : null
+                                }
                             </span>
                             <div className="clear"></div>
                         </div>
