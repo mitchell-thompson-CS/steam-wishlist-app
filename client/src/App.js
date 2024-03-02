@@ -8,6 +8,7 @@ import { CookiesProvider } from 'react-cookie';
 import WishlistView from './component/WishlistView';
 import EventPopup from './component/EventPopup';
 import LoadingPopup from './component/LoadingPopup';
+import Game from './component/Game';
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';
@@ -25,6 +26,7 @@ function App() {
         <LoadingPopup trigger={isLoading}/>
         <Routes>
           <Route path="/wishlists/*" element={<WishlistView />} />
+          <Route path="/game/:id" element={<Game />} />
           {/* <Route path ="/login" element={<Login />} /> */}
         </Routes>
       </div>
