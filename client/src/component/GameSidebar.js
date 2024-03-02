@@ -6,6 +6,7 @@ import { addGame } from "../actions/gameAction";
 import '../styles/GameSidebar.css';
 import { setLoading } from "../actions/eventAction";
 import loadingImage from '../resources/rolling-loading.apng';
+import { setAddGameToWishlist } from "../actions/eventAction";
 
 const GameSidebar = () => {
     let { id } = useParams();
@@ -30,9 +31,6 @@ const GameSidebar = () => {
                     }
                     dispatch(setLoading(false));
                 });
-
-        } else {
-            console.log(gameData[id]);
 
         }
     }, [id, gameData, dispatch]);
@@ -121,6 +119,13 @@ const GameSidebar = () => {
                 }
             }
             setViewGenres(!viewGenres);
+        }
+    }
+
+    function addToWishlist() {
+        if (user && Object.keys(user).length > 0) {
+            // set flag to pull up popup
+            dispatch(setAddGameToWishlist(id));
         }
     }
 
@@ -248,7 +253,7 @@ const GameSidebar = () => {
                 </div> {/* end of game-info-section */}
                 <div className="game-info-section"> {/* view on steam and add to wishlist section */}
                     <a href={"https://store.steampowered.com/app/" + id} className="game-sidebar-button" id="view-on-steam">View on Steam</a>
-                    <button className="game-sidebar-button" id="add-to-wishlist">
+                    <button className="game-sidebar-button" id="add-to-wishlist" onClick={() => addToWishlist()}>
                         { user && Object.keys(user).length > 0 ?
                             "Add to Wishlist"
                             : "Login to add to wishlist"

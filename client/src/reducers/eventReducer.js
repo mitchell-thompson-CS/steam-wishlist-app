@@ -1,4 +1,4 @@
-import { RESET_EVENT, SET_EVENT, SET_LOADING } from "../actionTypes/actionTypes";
+import { RESET_EVENT, SET_ADD_GAME_TO_WISHLIST, SET_EVENT, SET_LOADING } from "../actionTypes/actionTypes";
 
 
 const initialState = {
@@ -6,6 +6,7 @@ const initialState = {
     eventbody: {},
     eventPositive: false,
     loading: false,
+    addingGame: null,
 };
 
 const eventReducer = (state = initialState, action) => {
@@ -27,6 +28,11 @@ const eventReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: action.payload.loading,
+            };
+        case SET_ADD_GAME_TO_WISHLIST:
+            return {
+                ...state,
+                addingGame: action.payload.addingGame,
             };
         default:
             return state;

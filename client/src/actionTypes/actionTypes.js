@@ -10,6 +10,7 @@ export const SET_WISHLISTS = "CREATE_WISHLISTS";
 export const DELETE_WISHLISTS = "DELETE_WISHLISTS";
 export const ADD_GAME_TO_WISHLIST = "ADD_GAME_TO_WISHLIST";
 export const DELETE_GAME_FROM_WISHLIST = "DELETE_GAME_FROM_WISHLIST";
+export const SET_ADD_GAME_TO_WISHLIST = "SET_ADD_GAME_TO_WISHLIST";
 // these are for editing the stored user
 export const SET_USER = "SET_USER";
 export const DELETE_USER = "DEL_USER";

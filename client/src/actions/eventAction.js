@@ -1,4 +1,4 @@
-import { SET_EVENT, RESET_EVENT, SET_LOADING, RESET_LOADING } from "../actionTypes/actionTypes";
+import { SET_EVENT, RESET_EVENT, SET_LOADING, RESET_LOADING, SET_ADD_GAME_TO_WISHLIST } from "../actionTypes/actionTypes";
 
 const setEvent = (postive, inputEvent) => {
     return {
@@ -25,4 +25,14 @@ const setLoading = (newLoading = true) => {
     };
 }
 
-export { setEvent, resetEvent, setLoading };
+const setAddGameToWishlist = (input) => {
+    return {
+        type: SET_ADD_GAME_TO_WISHLIST,
+        payload: {
+            addingGame: input,
+        }
+    };
+
+}
+
+export { setEvent, resetEvent, setLoading, setAddGameToWishlist };

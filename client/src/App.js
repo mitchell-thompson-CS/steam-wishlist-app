@@ -9,6 +9,8 @@ import WishlistView from './component/WishlistView';
 import EventPopup from './component/EventPopup';
 import LoadingPopup from './component/LoadingPopup';
 import Game from './component/Game';
+import AddGameToWishlistPopup from './component/AddGameToWishlistPopup';
+import { useEffect } from 'react';
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';
@@ -16,6 +18,7 @@ function App() {
 
   const event = useSelector(state => state.eventReducer.event);
   const isLoading = useSelector(state => state.eventReducer.loading);
+  const addingGame = useSelector(state => state.eventReducer.addingGame);
 
   return (
       <div className="App">
@@ -24,6 +27,7 @@ function App() {
         </header>
         <EventPopup trigger={event}/>
         <LoadingPopup trigger={isLoading}/>
+        <AddGameToWishlistPopup trigger={addingGame} />
         <Routes>
           <Route path="/wishlists/*" element={<WishlistView />} />
           <Route path="/game/:id" element={<Game />} />
