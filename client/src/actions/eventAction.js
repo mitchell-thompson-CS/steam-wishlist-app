@@ -1,4 +1,4 @@
-import { SET_EVENT, RESET_EVENT, SET_LOADING, RESET_LOADING, SET_ADD_GAME_TO_WISHLIST } from "../actionTypes/actionTypes";
+import { SET_EVENT, RESET_EVENT, SET_LOADING, SET_ADD_GAME_TO_WISHLIST } from "../actionTypes/actionTypes";
 
 const setEvent = (postive, inputEvent) => {
     return {
