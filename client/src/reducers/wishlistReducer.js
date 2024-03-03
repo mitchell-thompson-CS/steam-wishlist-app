@@ -73,13 +73,35 @@ const wishlistReducer = (state = initialState, action) => {
                     }
                 };
             case ADD_GAME_TO_WISHLIST:
-                newState[action.payload.wishlistType][action.payload.wishlistID].games.push(action.payload.gameID);
+                newState[action.payload.wishlistType] = {
+                    ...state.wishlists[action.payload.wishlistType],
+                    [action.payload.wishlistID]: {
+                        ...state.wishlists[action.payload.wishlistType][action.payload.wishlistID],
+                        games: {
+                            ...state.wishlists[action.payload.wishlistType][action.payload.wishlistID].games,
+                            [action.payload.gameID]: action.payload.gameName
+                        }
+                    }
+                }
                 return {
                     ...state,
                     wishlists: newState,
                 };
             case DELETE_GAME_FROM_WISHLIST:
-                newState[action.payload.wishlistType][action.payload.wishlistID].games = newState[action.payload.wishlistType][action.payload.wishlistID].games.filter((game) => game !== action.payload.gameID);
+                let newGames = {};
+                for (let g of Object.keys(newState[action.payload.wishlistType][action.payload.wishlistID].games)) {
+                    if (g !== action.payload.gameID) {
+                        newGames[g] = newState[action.payload.wishlistType][action.payload.wishlistID].games[g];
+                    }
+                }
+                newState[action.payload.wishlistType] = {
+                    ...state.wishlists[action.payload.wishlistType],
+                    [action.payload.wishlistID]: {
+                        ...state.wishlists[action.payload.wishlistType][action.payload.wishlistID],
+                        games: newGames
+                    }
+                
+                }
                 return {
                     ...state,
                     wishlists: newState,

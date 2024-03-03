@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import '../styles/AddGameToWishlistPopup.css';
 import { setAddGameToWishlist, setLoading } from "../actions/eventAction";
 import axios from "axios";
-import { deleteWishlists } from "../actions/wishlistAction";
+import { addGameToWishlist, deleteGameFromWishlist, deleteWishlists } from "../actions/wishlistAction";
 
 const AddGameToWishlistPopup = (props) => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
+    const gameData = useSelector(state => state.gameReducer.games);
     // const addingGame = useSelector(state => state.eventReducer.addingGame);
     const dispatch = useDispatch();
     const [wishlistsToAddTo, setWishlistToAddTo] = useState({});
@@ -65,16 +66,51 @@ const AddGameToWishlistPopup = (props) => {
             // need to send the changes to the server
             let add = Object.keys(wishlistsToAddTo);
             let remove = Object.keys(wishlistsToRemoveFrom);
-            if (add.length > 0 || remove.length > 0) {
-                let gameId = props.trigger;
-                let res = await axios.post('/api/game/add', { game_id: gameId, wishlists: add });
-                console.log(res);
+            let gameId = props.trigger;
+            let success = true;
+            if (add.length > 0) {
+                let res_add = await axios.post('/api/game/add', { game_id: gameId, wishlists: add });
+                if (res_add.status !== 200) {
+                    success = false;
+                }
+            }
 
-                dispatch(deleteWishlists())
+            if (remove.length > 0) {
+                let res_del = await axios.delete('/api/game/remove', { data: { game_id: gameId, wishlists: remove } });
+                if (res_del.status !== 200) {
+                    success = false;
+                }
+            }
+            if (!success) {
+                throw new Error("Error saving changes");
+            } else {
+                // successful, so need to update the redux store
+                for (let a in add) {
+                    if (gameData[gameId] !== undefined) {
+                        dispatch(addGameToWishlist(add[a],
+                            wishlistItems.owned[add[a]] !== undefined ? "owned" : "shared",
+                            gameId,
+                            gameData[gameId].name));
+                    } else {
+                        throw new Error("Game not found");
+                    }
+                }
+                for (let r in remove) {
+                    dispatch(deleteGameFromWishlist(remove[r],
+                        wishlistItems.owned[remove[r]] !== undefined ? "owned" : "shared",
+                        gameId));
+                }
             }
         } catch (err) {
             console.log(err);
+            // if there was an error, need to reset the wishlists to see what changed
+            dispatch(deleteWishlists());
         }
+
+        // after the operations, clear the lists (even if there was an error)
+        setWishlistToAddTo({});
+        setWishlistsToRemoveFrom({});
+
         dispatch(setLoading(false));
     }
 

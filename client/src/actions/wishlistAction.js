@@ -45,24 +45,25 @@ const deleteWishlists = () => {
     };
 };
 
-const addGameToWishlist = (inputWishlistID, inputGameID, inputWishlistType) => {
+const addGameToWishlist = (inputWishlistID, inputWishlistType, inputGameID, inputGameName) => {
     return {
         type: ADD_GAME_TO_WISHLIST,
         payload: {
             wishlistID: inputWishlistID,
-            gameID: inputGameID,
             wishlistType: inputWishlistType,
+            gameID: inputGameID,
+            gameName: inputGameName,
         }
     };
 }
 
-const deleteGameFromWishlist = (inputWishlistID, inputGameID, inputWishlistType) => {
+const deleteGameFromWishlist = (inputWishlistID, inputWishlistType, inputGameID) => {
     return {
         type: DELETE_GAME_FROM_WISHLIST,
         payload: {
             wishlistID: inputWishlistID,
-            gameID: inputGameID,
             wishlistType: inputWishlistType,
+            gameID: inputGameID,
         }
     };
 }
