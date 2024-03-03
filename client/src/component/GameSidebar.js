@@ -243,7 +243,7 @@ const GameSidebar = () => {
                                     {gameData[id].price_overview.initial_formatted !== "" ?
                                         <p className="priceInitial-game">{gameData[id].price_overview.initial_formatted}</p>
                                         : null}
-                                    <p className="priceFinal-game">{gameData[id].price_overview.final_formatted}</p>
+                                    <p className="priceFinal-game" id={gameData[id].price_overview.initial_formatted !== "" ? "sale-price" : ""}>{gameData[id].price_overview.final_formatted}</p>
                                 </>
                                 : gameData[id] !== undefined ? <p>Free</p> : null
                             }
