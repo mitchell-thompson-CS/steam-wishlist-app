@@ -3,7 +3,7 @@ const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
 const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
-const { renameWishlist, getWishlistInner, addGameToWishlist, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist } = require('../../modules/wishlistInner');
+const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist } = require('../../modules/wishlistInner');
 
 let res;
 let req;
@@ -347,7 +347,7 @@ describe("Wishlist Inner", () => {
         expect(res.status).toBe(400);
     });
 
-    test("addGameToWishlist - success - owner", async () => {
+    test("addGameToWishlists - success - owner", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -370,7 +370,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -378,7 +378,7 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(200);
 
         let db = getDb();
@@ -386,7 +386,7 @@ describe("Wishlist Inner", () => {
         expect(wishlist.data().games).toEqual({ "400": "Portal" });
     });
 
-    test("addGameToWishlist - success - editor", async () => {
+    test("addGameToWishlists - success - editor", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -409,7 +409,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -425,19 +425,19 @@ describe("Wishlist Inner", () => {
         });
 
         req.user.id = "54321";
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(200);
 
         let wishlist = await db.collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({ "400": "Portal" });
     });
 
-    test("addGameToWishlist - failure - no game id or wishlist id", async () => {
+    test("addGameToWishlists - failure - no game id or wishlist id", async () => {
         await login(req, res);
 
         req.body = {
             game_id: "",
-            wishlist_id: ""
+            wishlists: ""
         }
 
         res.status = function (code) {
@@ -445,11 +445,11 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(400);
     });
 
-    test("addGameToWishlist - failure - game doesn't exist", async () => {
+    test("addGameToWishlists - failure - game doesn't exist", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -472,7 +472,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "-1",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -480,7 +480,7 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(404);
 
         let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
@@ -488,7 +488,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "200",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -496,19 +496,19 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(404);
 
         wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({});
     });
 
-    test("addGameToWishlist - failure - no wishlist", async () => {
+    test("addGameToWishlists - failure - no wishlist", async () => {
         await login(req, res);
 
         req.body = {
             game_id: "400",
-            wishlist_id: "12345"
+            wishlists: ["12345"]
         }
 
         res.status = function (code) {
@@ -516,11 +516,11 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(404);
     });
 
-    test("addGameToWishlist - failure - not an editor or owner", async () => {
+    test("addGameToWishlists - failure - not an editor or owner", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -543,7 +543,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -552,7 +552,7 @@ describe("Wishlist Inner", () => {
         }
 
         req.user.id = "543210";
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
         expect(res.status).toBe(403);
 
         let db = getDb();
@@ -583,10 +583,10 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
 
         let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({ "400": "Portal" });
@@ -594,6 +594,11 @@ describe("Wishlist Inner", () => {
         res.status = function (code) {
             this.status = code;
             return this;
+        }
+
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
         }
 
         await removeGameFromWishlist(req, res);
@@ -626,10 +631,10 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
 
         let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({ "400": "Portal" });
@@ -647,6 +652,10 @@ describe("Wishlist Inner", () => {
         });
 
         req.user.id = "54321";
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
+        }
         await removeGameFromWishlist(req, res);
         expect(res.status).toBe(200);
 
@@ -725,7 +734,6 @@ describe("Wishlist Inner", () => {
 
     test("removeGameFromWishlist - failure - not an editor or owner", async () => {
         await login(req, res);
-
         await createWishlist(req, res);
 
         res.status = function (code) {
@@ -746,7 +754,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -754,9 +762,13 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await addGameToWishlist(req, res);
+        await addGameToWishlists(req, res);
 
         req.user.id = "543210";
+        req.body = {
+            game_id: "400",
+            wishlist_id: wishlist_id
+        }
         await removeGameFromWishlist(req, res);
         expect(res.status).toBe(403);
 

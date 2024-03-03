@@ -4,7 +4,7 @@ const cors = require("cors");
 const passport = require("passport");
 const { login, logout, savePrevPageToSession, getUser, isLoggedIn } = require("./auth.js");
 const { getWishlists, createWishlist, deleteWishlist } = require("./wishlists.js");
-const { renameWishlist, getWishlistInner, addGameToWishlist, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist } = require("./wishlistInner.js");
+const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist } = require("./wishlistInner.js");
 const { getGamePage, searchGamePage } = require("./game.js");
 const { lowRateLimit, mediumRateLimit, highRateLimit } = require("./rateLimit.js");
 
@@ -61,7 +61,7 @@ app.delete('/api/wishlist/delete', isLoggedIn, mediumRateLimit, deleteWishlist);
 
 app.post('/api/wishlist/rename', isLoggedIn, mediumRateLimit, renameWishlist);
 
-app.post('/api/game/add', isLoggedIn, mediumRateLimit, addGameToWishlist);
+app.post('/api/game/add', isLoggedIn, mediumRateLimit, addGameToWishlists);
 
 app.delete('/api/game/remove', isLoggedIn, mediumRateLimit, removeGameFromWishlist);
 
