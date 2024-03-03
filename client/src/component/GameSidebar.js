@@ -205,7 +205,7 @@ const GameSidebar = () => {
                         <span>
                             {gameData[id] && gameData[id].categories !== undefined ? gameData[id].categories.map((tag, index) => {
                                 return <span key={index}><p>{tag.description}</p></span>
-                            }) : "No Tags"}
+                            }) : <p>No Tags</p>}
                         </span>
                     </div>
                     <div id="game-tag-more">
