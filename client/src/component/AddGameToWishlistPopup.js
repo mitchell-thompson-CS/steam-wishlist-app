@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import '../styles/AddGameToWishlistPopup.css';
-import { setAddGameToWishlist, setLoading } from "../actions/eventAction";
+import { setAddGameToWishlist, setEvent, setLoading } from "../actions/eventAction";
 import axios from "axios";
 import { addGameToWishlist, deleteGameFromWishlist, deleteWishlists } from "../actions/wishlistAction";
 
@@ -62,12 +62,12 @@ const AddGameToWishlistPopup = (props) => {
 
     async function saveWishlistChanges() {
         dispatch(setLoading(true));
+        let success = true;
         try {
             // need to send the changes to the server
             let add = Object.keys(wishlistsToAddTo);
             let remove = Object.keys(wishlistsToRemoveFrom);
             let gameId = props.trigger;
-            let success = true;
             if (add.length > 0) {
                 let res_add = await axios.post('/api/game/add', { game_id: gameId, wishlists: add });
                 if (res_add.status !== 200) {
@@ -103,8 +103,10 @@ const AddGameToWishlistPopup = (props) => {
             }
         } catch (err) {
             console.log(err);
+            dispatch(setEvent(false, "Error saving changes"));
             // if there was an error, need to reset the wishlists to see what changed
             dispatch(deleteWishlists());
+            success = false;
         }
 
         // after the operations, clear the lists (even if there was an error)
@@ -112,6 +114,13 @@ const AddGameToWishlistPopup = (props) => {
         setWishlistsToRemoveFrom({});
 
         dispatch(setLoading(false));
+
+        if (success) {
+            dispatch(setEvent(true, "Changes saved"));
+        }
+
+        // close the popup
+        dispatch(setAddGameToWishlist(null));
     }
 
     function selectWishlist(e) {
@@ -152,7 +161,7 @@ const AddGameToWishlistPopup = (props) => {
                     <h1>Add Game To Wishlist</h1>
                     <div className="addGameToWishlistPopupInnerContent">
                         <div className="addGameToWishlistEntries">
-                            <h2>Owned</h2>
+                            <h2>Your Wishlists</h2>
                             {wishlistItems.owned !== undefined ?
                                 Object.keys(wishlistItems.owned).map((key) => {
                                     return (
@@ -169,7 +178,7 @@ const AddGameToWishlistPopup = (props) => {
                         </div>
 
                         <div className="addGameToWishlistEntries">
-                            <h2>Shared</h2>
+                            <h2>Shared Wishlists</h2>
                             {wishlistItems.shared !== undefined ?
                                 Object.keys(wishlistItems.shared).map((key) => {
                                     return (
@@ -187,7 +196,7 @@ const AddGameToWishlistPopup = (props) => {
                     </div> {/* end of inner content */}
                     <div className="addGameToWishlistPopupInnerButtons">
                         <button id="close-wishlist-add-popup">Cancel</button>
-                        <button onClick={saveWishlistChanges}>Save</button>
+                        <button id="save-wishlist-add-popup" onClick={saveWishlistChanges}>Save</button>
                     </div>
                 </div> {/* end of inner */}
             </div> // end of popup

@@ -37,8 +37,8 @@
 }
 
 .addGameToWishlistPopupInnerContent {
-    height: calc(60vh - 100px);
-    min-height: 300px;
+    height: calc(60vh - 140px);
+    min-height: 260px;
     overflow: scroll;
     line-height: 25px;
 }
@@ -78,6 +78,36 @@
     height: 25px;
     text-align: center;
     float: right;
+}
+
+.addGameToWishlistPopupInnerButtons {
+    height: 60px;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+.addGameToWishlistPopupInnerButtons button {
+    width: 50%;
+    height: 100%;
+    border: none;
+    background-color: #444;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.addGameToWishlistPopupInnerButtons button:hover {
+    background-color: #666;
+}
+
+#close-wishlist-add-popup {
+    border-right: 2px solid #666;
+    border-bottom-left-radius: 25px;
+}
+
+#save-wishlist-add-popup {
+    border-left: 2px solid #666;
+    border-bottom-right-radius: 25px;
 }
 
 .clear {
