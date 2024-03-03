@@ -107,7 +107,7 @@ async function addGameToWishlists(req, res) {
     var post = JSON.parse(JSON.stringify(req.body));
     var game_id = post['game_id'];
     var wishlists = post['wishlists'];
-    if (!game_id || !wishlists || wishlists.length == 0) {
+    if (!game_id || !wishlists || wishlists.length === 0) {
         // no game id or wishlist id
         Logging.handleResponse(res, 400, null, function_name,
             "No game id or wishlists given by user " + req.user.id);
@@ -115,6 +115,14 @@ async function addGameToWishlists(req, res) {
     }
 
     try {
+        let gameData = await getGameData(game_id);
+        // game doesn't exist
+        if (!gameData || !gameData[game_id] || gameData[game_id]['success'] === false) {
+            Logging.handleResponse(res, 404, null, function_name,
+                "Game " + game_id + " doesn't exist");
+            return;
+        }
+
         for (let wishlist_id of wishlists) {
             let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get();
             if (!wishlistSnapshot.exists) {
@@ -129,15 +137,6 @@ async function addGameToWishlists(req, res) {
                 // user is not the owner or editor
                 Logging.handleResponse(res, 403, null, function_name,
                     "User " + req.user.id + " is not the owner or editor of wishlist " + wishlist_id);
-                return;
-            }
-
-            let gameData = await getGameData(game_id);
-
-            // game doesn't exist
-            if (!gameData || !gameData[game_id] || gameData[game_id]['success'] === false) {
-                Logging.handleResponse(res, 404, null, function_name,
-                    "Game " + game_id + " doesn't exist");
                 return;
             }
 
@@ -160,13 +159,13 @@ async function addGameToWishlists(req, res) {
  * @params request object with a game_id and wishlist_id in the body
  * @params response object
  */
-async function removeGameFromWishlist(req, res) {
-    let function_name = removeGameFromWishlist.name;
+async function removeGameFromWishlists(req, res) {
+    let function_name = removeGameFromWishlists.name;
     var post = JSON.parse(JSON.stringify(req.body));
     var game_id = post['game_id'];
-    var wishlist_id = post['wishlist_id'];
+    var wishlists = post['wishlists'];
     // TODO: add sanitization to the ids like this one that are inputted by user
-    if (!game_id || !wishlist_id) {
+    if (!game_id || !wishlists || wishlists.length === 0) {
         // no game id or wishlist id
         Logging.handleResponse(res, 400, null, function_name,
             "No game id or wishlist id given by user " + req.user.id);
@@ -174,36 +173,38 @@ async function removeGameFromWishlist(req, res) {
     }
 
     try {
-        let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get()
-        if (!wishlistSnapshot.exists) {
-            // wishlist doesn't exist
-            Logging.handleResponse(res, 404, null, function_name,
-                "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
-            return;
-        }
-        var data = wishlistSnapshot.data();
+        for (let wishlist_id of wishlists) {
+            let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get()
+            if (!wishlistSnapshot.exists) {
+                // wishlist doesn't exist
+                Logging.handleResponse(res, 404, null, function_name,
+                    "Wishlist " + wishlist_id + " doesn't exist by user " + req.user.id);
+                return;
+            }
+            var data = wishlistSnapshot.data();
 
-        // user is not the owner or editor
-        if (!data.editors[req.user.id] && data.owner.id != req.user.id) {
-            Logging.handleResponse(res, 403, null, function_name,
-                "User " + req.user.id + " is not the owner or editor of wishlist " + wishlist_id);
-            return;
-        }
+            // user is not the owner or editor
+            if (!data.editors[req.user.id] && data.owner.id != req.user.id) {
+                Logging.handleResponse(res, 403, null, function_name,
+                    "User " + req.user.id + " is not the owner or editor of wishlist " + wishlist_id);
+                return;
+            }
 
-        // game doesn't exist in the wishlist on firestore
-        if (!data.games[game_id]) {
-            // game doesn't exist
-            Logging.handleResponse(res, 404, null, function_name,
-                "Game " + game_id + " doesn't exist in wishlist " + wishlist_id);
-            return;
-        }
+            // game doesn't exist in the wishlist on firestore
+            if (!data.games[game_id]) {
+                // game doesn't exist
+                Logging.handleResponse(res, 404, null, function_name,
+                    "Game " + game_id + " doesn't exist in wishlist " + wishlist_id);
+                return;
+            }
 
-        await getDb().collection('wishlists').doc(wishlist_id).update({
-            [`games.${game_id}`]: FieldValue.delete()
-        });
+            await getDb().collection('wishlists').doc(wishlist_id).update({
+                [`games.${game_id}`]: FieldValue.delete()
+            });
+        }
 
         Logging.handleResponse(res, 200, null, function_name,
-            "Game " + game_id + " removed from wishlist " + wishlist_id + " by user " + req.user.id);
+            "Game " + game_id + " removed from wishlist " + wishlists + " by user " + req.user.id);
         return;
     } catch (error) {
         Logging.handleResponse(res, 500, null, function_name,
@@ -358,6 +359,6 @@ async function deleteEditorFromWishlist(req, res) {
 exports.renameWishlist = renameWishlist;
 exports.getWishlistInner = getWishlistInner;
 exports.addGameToWishlists = addGameToWishlists;
-exports.removeGameFromWishlist = removeGameFromWishlist;
+exports.removeGameFromWishlists = removeGameFromWishlists;
 exports.addEditorToWishlist = addEditorToWishlist;
 exports.deleteEditorFromWishlist = deleteEditorFromWishlist;

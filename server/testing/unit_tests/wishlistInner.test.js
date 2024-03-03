@@ -3,7 +3,7 @@ const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
 const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
-const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlist, addEditorToWishlist, deleteEditorFromWishlist } = require('../../modules/wishlistInner');
+const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlists, addEditorToWishlist, deleteEditorFromWishlist } = require('../../modules/wishlistInner');
 
 let res;
 let req;
@@ -560,7 +560,7 @@ describe("Wishlist Inner", () => {
         expect(wishlist.data().games).toEqual({});
     });
 
-    test("removeGameFromWishlist - success - owner", async () => {
+    test("removeGameFromWishlists - success - owner", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -596,19 +596,14 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        req.body = {
-            game_id: "400",
-            wishlist_id: wishlist_id
-        }
-
-        await removeGameFromWishlist(req, res);
+        await removeGameFromWishlists(req, res);
         expect(res.status).toBe(200);
 
         wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({});
     });
 
-    test("removeGameFromWishlist - success - editor", async () => {
+    test("removeGameFromWishlists - success - editor", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -652,18 +647,14 @@ describe("Wishlist Inner", () => {
         });
 
         req.user.id = "54321";
-        req.body = {
-            game_id: "400",
-            wishlist_id: wishlist_id
-        }
-        await removeGameFromWishlist(req, res);
+        await removeGameFromWishlists(req, res);
         expect(res.status).toBe(200);
 
         wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
         expect(wishlist.data().games).toEqual({});
     });
 
-    test("removeGameFromWishlist - failure - no game id or wishlist id", async () => {
+    test("removeGameFromWishlists - failure - no game id or wishlist id", async () => {
         await login(req, res);
 
         req.body = {
@@ -676,11 +667,11 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await removeGameFromWishlist(req, res);
+        await removeGameFromWishlists(req, res);
         expect(res.status).toBe(400);
     });
 
-    test("removeGameFromWishlist - failure - no game in wishlist", async () => {
+    test("removeGameFromWishlists - failure - no game in wishlist", async () => {
         await login(req, res);
 
         await createWishlist(req, res);
@@ -703,7 +694,7 @@ describe("Wishlist Inner", () => {
 
         req.body = {
             game_id: "400",
-            wishlist_id: wishlist_id
+            wishlists: [wishlist_id]
         }
 
         res.status = function (code) {
@@ -711,16 +702,16 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await removeGameFromWishlist(req, res);
+        await removeGameFromWishlists(req, res);
         expect(res.status).toBe(404);
     });
 
-    test("removeGameFromWishlist - failure - no wishlist", async () => {
+    test("removeGameFromWishlists - failure - no wishlist", async () => {
         await login(req, res);
 
         req.body = {
             game_id: "400",
-            wishlist_id: "12345"
+            wishlists: ["12345"]
         }
 
         res.status = function (code) {
@@ -728,11 +719,11 @@ describe("Wishlist Inner", () => {
             return this;
         }
 
-        await removeGameFromWishlist(req, res);
+        await removeGameFromWishlists(req, res);
         expect(res.status).toBe(404);
     });
 
-    test("removeGameFromWishlist - failure - not an editor or owner", async () => {
+    test("removeGameFromWishlists - failure - not an editor or owner", async () => {
         await login(req, res);
         await createWishlist(req, res);
 
@@ -765,11 +756,7 @@ describe("Wishlist Inner", () => {
         await addGameToWishlists(req, res);
 
         req.user.id = "543210";
-        req.body = {
-            game_id: "400",
-            wishlist_id: wishlist_id
-        }
-        await removeGameFromWishlist(req, res);
+        await removeGameFromWishlists(req, res);
         expect(res.status).toBe(403);
 
         let wishlist = await getDb().collection('wishlists').doc(wishlist_id).get();
