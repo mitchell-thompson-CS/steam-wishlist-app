@@ -1,16 +1,17 @@
 import './styles/App.css';
-// import Login from './component/Navbar';
-import { useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar';
 import axios from 'axios';
-import { CookiesProvider } from 'react-cookie';
 import WishlistView from './component/WishlistView';
 import EventPopup from './component/EventPopup';
 import LoadingPopup from './component/LoadingPopup';
 import Game from './component/Game';
 import AddGameToWishlistPopup from './component/AddGameToWishlistPopup';
 import { useEffect } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { deleteWishlists, setWishlists } from "./actions/wishlistAction";
+import { deleteUser, isUser } from "./actions/userAction";
+import { setEvent, setLoading } from "./actions/eventAction";
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';
@@ -19,6 +20,38 @@ function App() {
   const event = useSelector(state => state.eventReducer.event);
   const isLoading = useSelector(state => state.eventReducer.loading);
   const addingGame = useSelector(state => state.eventReducer.addingGame);
+
+  const dispatch = useDispatch();
+    const user = useSelector(state => state.userReducer.user);
+    const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
+
+    useEffect(() => {
+        if (isUser(user) && (!wishlistItems || (Object.keys(wishlistItems).length === 0))) {
+            console.log("fetching wishlists")
+            dispatch(setLoading(true));
+            fetch('/api/wishlists', { mode: 'cors', credentials: 'include' })
+                .then(function (response) {
+                    if (response.status === 200) {
+                        return response.json();
+                    } else if (response.status === 401) {
+                        // if we got 401 that means they somehow got logged out
+                        dispatch(deleteUser());
+                        dispatch(setEvent(false, response.statusText));
+                    } else if (response.status === 429) {
+                        // if we got 429 that means they are being rate limited
+                        dispatch(setEvent(false, response.statusText));
+                    }
+                }).then(function (data) {
+                    if (data) {
+                        dispatch(setWishlists(data));
+                    }
+                    dispatch(setLoading(false));
+                })
+        } else if (!isUser(user) && wishlistItems && Object.keys(wishlistItems).length > 0) {
+            console.log("deleting wishlists")
+            dispatch(deleteWishlists())
+        }
+    }, [wishlistItems, user, dispatch]);
 
   return (
       <div className="App">

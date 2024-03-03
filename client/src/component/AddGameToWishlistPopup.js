@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import '../styles/AddGameToWishlistPopup.css';
 import { setAddGameToWishlist, setLoading } from "../actions/eventAction";
+import axios from "axios";
+import { deleteWishlists } from "../actions/wishlistAction";
 
 const AddGameToWishlistPopup = (props) => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -65,22 +67,10 @@ const AddGameToWishlistPopup = (props) => {
             let remove = Object.keys(wishlistsToRemoveFrom);
             if (add.length > 0 || remove.length > 0) {
                 let gameId = props.trigger;
-                for (let key in add) {
-                    let data = {
-                        gameId: gameId,
-                        wishlistId: add[key]
-                    }
-                    console.log(data);
-                }
+                let res = await axios.post('/api/game/add', { game_id: gameId, wishlists: add });
+                console.log(res);
 
-                for (let key in remove) {
-                    let data = {
-                        gameId: gameId,
-                        wishlistId: remove[key]
-                    }
-                    console.log(data);
-                }
-                
+                dispatch(deleteWishlists())
             }
         } catch (err) {
             console.log(err);
