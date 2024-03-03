@@ -26,15 +26,18 @@ const WishlistInner = () => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
     const gameData = useSelector(state => state.gameReducer.games);
     const user = useSelector(state => state.userReducer.user);
+    const [gettingGameData, setGettingGameData] = useState(false)
+    const [gettingWishlistData, setGettingWishlistData] = useState(false)
     let { id } = useParams();
     const dispatch = useDispatch();
 
     useEffect(() => {
         async function fetchWishlistData() {
             let data;
-            let wishlistFound = (id && wishlistItems && wishlistItems.owned !== undefined && wishlistItems.shared !== undefined &&
+            let wishlistFound = (id && wishlistItems !== undefined && wishlistItems.owned !== undefined && wishlistItems.shared !== undefined &&
                 (wishlistItems.owned[id] !== undefined || wishlistItems.shared[id] !== undefined));
-            if (!wishlistFound) {
+            if (!wishlistFound && !gettingWishlistData) {
+                setGettingWishlistData(true);
                 dispatch(setLoading(true));
                 let response = await fetch('/api/wishlist/' + id, { mode: 'cors', credentials: 'include' });
                 dispatch(setLoading(false));
@@ -51,7 +54,7 @@ const WishlistInner = () => {
                         dispatch(createWishlist(data.id, data.name, "shared"));
                     }
                 }
-            } else {
+            } else if (!gettingWishlistData) {
                 if (wishlistItems.owned[id] !== undefined) {
                     data = wishlistItems.owned[id];
                 } else if (wishlistItems.shared[id] !== undefined) {
@@ -62,29 +65,34 @@ const WishlistInner = () => {
                 return;
             }
             setWishlistItem(data);
+            setGettingWishlistData(false);
             return data;
         }
 
-        function fetchGameData(data) {
-            for (const [key, value] of Object.entries(data.games)) {
-                if (gameData[key] === undefined) {
-                    try {
-                        dispatch(setLoading(true));
-                        fetch('/api/game/' + key, { mode: 'cors', credentials: 'include' })
-                            .then(function (response2) {
-                                if (response2.status === 200) {
-                                    return response2.json();
-                                }
-                            }).then(function (data2) {
-                                if (data2) {
-                                    dispatch(addGame(key, data2));
-                                    dispatch(setLoading(false))
-                                }
-                            })
-                    } catch (error) {
-                        console.error(error);
+        async function fetchGameData(data) {
+            if (!gettingGameData) {
+                setGettingGameData(true);
+                for (const [key, value] of Object.entries(data.games)) {
+                    // console.log(gameData[key]);
+                    if (gameData[key] === undefined) {
+                        try {
+                            dispatch(setLoading(true));
+                            await fetch('/api/game/' + key, { mode: 'cors', credentials: 'include' })
+                                .then(function (response2) {
+                                    if (response2.status === 200) {
+                                        return response2.json();
+                                    }
+                                }).then(function (data2) {
+                                    if (data2) {
+                                        dispatch(addGame(key, data2));
+                                    }
+                                })
+                        } catch (error) {
+                            console.error(error);
+                        }
                     }
                 }
+                dispatch(setLoading(false));
             }
         }
 
@@ -110,10 +118,16 @@ const WishlistInner = () => {
                             <div className="gamePrice">
                                 <p className="priceTitle">Price</p>
                                 <span className="price">
-                                    {gameData[key].price_overview.initial_formatted !== "" ?
-                                        <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
-                                        : null}
-                                    <p className="priceFinal">{gameData[key].price_overview.final_formatted}</p>
+                                    {gameData[key].price_overview ?
+                                        <>
+                                            {gameData[key].price_overview.initial_formatted !== "" ?
+                                                <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
+                                                : null
+                                            }
+                                            <p className="priceFinal">{gameData[key].price_overview.final_formatted}</p>
+                                        </>
+                                        : <p className="priceFinal">Free</p>
+                                    }
                                 </span>
                             </div>
                             <div className="gameLowestPrice">
@@ -133,7 +147,7 @@ const WishlistInner = () => {
             </ul>
             {/* </div> */}
             <button onClick={() => addGameToWishlist(id)}>Add Game to Wishlist</button>
-        </div>
+        </div >
     )
 }
 export default WishlistInner;
