@@ -158,7 +158,7 @@ const AddGameToWishlistPopup = (props) => {
         props.trigger ?
             <div className="addGameToWishlistPopup">
                 <div className="addGameToWishlistPopupInner">
-                    <h1>Add Game To Wishlist</h1>
+                    <h1>Select Wishlists</h1>
                     <div className="addGameToWishlistPopupInnerContent">
                         <div className="addGameToWishlistEntries">
                             <h2>Your Wishlists</h2>
