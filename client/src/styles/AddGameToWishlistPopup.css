@@ -61,7 +61,8 @@
 }
 
 .wishlistGamePopupWishlistName:hover {
-    background-color: #444;
+    background-color: #4e545b;
+    opacity: 0.6;
     cursor: pointer;
 }
 
