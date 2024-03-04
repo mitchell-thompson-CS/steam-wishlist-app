@@ -5,7 +5,7 @@ import GameContent from "./GameContent";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "../actions/eventAction";
+import { setEvent, setLoading } from "../actions/eventAction";
 import { addGame } from "../actions/gameAction";
 
 const Game = () => {
@@ -24,6 +24,8 @@ const Game = () => {
                 }).then(function (data) {
                     if (data) {
                         dispatch(addGame(id, data));
+                    } else {
+                        dispatch(setEvent(false, "Error fetching game data"));
                     }
                     dispatch(setLoading(false));
                 });

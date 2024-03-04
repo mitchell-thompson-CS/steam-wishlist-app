@@ -7,7 +7,7 @@
     z-index: 1000;
     border-radius: 10px;
     visibility: visible;
-    opacity: 0.95;
+    opacity: 0.9;
     transition: visibility 0s 2s, opacity 2s linear;
 }
 
