@@ -85,6 +85,7 @@
     height: 60px;
     border-bottom-left-radius: 25px;
     border-bottom-right-radius: 25px;
+    border-top: 2px solid #666;
 }
 
 .addGameToWishlistPopupInnerButtons button {
