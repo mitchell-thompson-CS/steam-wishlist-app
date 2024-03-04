@@ -166,7 +166,7 @@ const AddGameToWishlistPopup = (props) => {
                                 Object.keys(wishlistItems.owned).map((key) => {
                                     return (
                                         <div key={key} className="wishlistGamePopupWishlistName" id={key} onClick={selectWishlist}>
-                                            <h3 className="wishlist-popup-name">{wishlistItems.owned[key].name}</h3>
+                                            <h3 className="wishlist-popup-name" title={wishlistItems.owned[key].name}>{wishlistItems.owned[key].name}</h3>
                                             <h3 className="wishlist-popup-wishlist-status">
                                                 {wishlistItems.owned[key].games[props.trigger] !== undefined ? "-" : "+"}
                                             </h3>
@@ -183,7 +183,7 @@ const AddGameToWishlistPopup = (props) => {
                                 Object.keys(wishlistItems.shared).map((key) => {
                                     return (
                                         <div key={key} className="wishlistGamePopupWishlistName" id={key} onClick={selectWishlist}>
-                                            <h3 className="wishlist-popup-name">{wishlistItems.shared[key].name}</h3>
+                                            <h3 className="wishlist-popup-name" title={wishlistItems.shared[key].name}>{wishlistItems.shared[key].name}</h3>
                                             <h3 className="wishlist-popup-wishlist-status">
                                                 {wishlistItems.shared[key].games[props.trigger] !== undefined ? "-" : "+"}
                                             </h3>
