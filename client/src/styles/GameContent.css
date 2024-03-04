@@ -19,6 +19,11 @@
     margin-bottom: 20px;
 }
 
+.game-content-section * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .game-content-section-header {
     font-size: 25px;
     margin: 0;
