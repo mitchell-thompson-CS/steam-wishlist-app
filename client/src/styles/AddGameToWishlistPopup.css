@@ -41,6 +41,7 @@
     min-height: 260px;
     overflow: scroll;
     line-height: 25px;
+    padding-bottom: 10px;
 }
 
 .addGameToWishlistEntries h2 {
