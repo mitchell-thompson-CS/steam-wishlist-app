@@ -31,6 +31,7 @@
 #game-requirements-selector {
     width: 100%;
     user-select: none;
+    margin-bottom: 20px;
 }
 
 .platform-selector {
@@ -41,9 +42,45 @@
     background-color: #3e444b;
     border-radius: 20px;
     text-align: center;
+    box-shadow: 0 0 5px 0 #171a1d;
 }
 
 .platform-selector:hover {
     cursor: pointer;
     background-color: #4e545b;
+}
+
+#minimum-requirements, #recommended-requirements {
+    float: left;
+    width: 48%;
+    padding: 10px;
+    background-color: #3e444b;
+    border-radius: 5px;
+}
+
+#minimum-requirements {
+    margin-right: 2%;
+}
+
+#recommended-requirements {
+    margin-left: 2%;
+}
+
+#minimum-requirements *, #recommended-requirements * {
+    margin-bottom: 5px;
+}
+
+#minimum-requirements h2, #recommended-requirements h2 {
+    text-align: center;
+}
+
+.bb_ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    color: lightgrey;
+}
+
+.bb_ul li {
+    margin-bottom: 10px;
 }

@@ -17,27 +17,55 @@ const GameContent = () => {
                 let minimum_requirements = pc_requirements.minimum;
                 let recommended_requirements = pc_requirements.recommended;
                 let docMin = document.getElementById('minimum-requirements');
+                if (minimum_requirements !== null && minimum_requirements !== undefined && minimum_requirements !== '') {
+                    docMin.innerHTML = minimum_requirements;
+                } else {
+                    docMin.innerHTML = 'No minimum requirements';
+                }
+
                 let docRec = document.getElementById('recommended-requirements');
-                docMin.innerHTML = minimum_requirements;
-                docRec.innerHTML = recommended_requirements;
+                if (recommended_requirements !== null && recommended_requirements !== undefined && recommended_requirements !== '') {
+                    docRec.innerHTML = recommended_requirements;
+                } else {
+                    docRec.innerHTML = 'No recommended requirements';
+                }
             }
             if (selectedPlatform === 'mac' && platforms.mac === true) {
                 let mac_requirements = gameData[id].mac_requirements;
                 let minimum_requirements = mac_requirements.minimum;
                 let recommended_requirements = mac_requirements.recommended;
                 let docMin = document.getElementById('minimum-requirements');
+                if (minimum_requirements !== null && minimum_requirements !== undefined && minimum_requirements !== '') {
+                    docMin.innerHTML = minimum_requirements;
+                } else {
+                    docMin.innerHTML = 'No minimum requirements';
+                }
+
                 let docRec = document.getElementById('recommended-requirements');
-                docMin.innerHTML = minimum_requirements;
-                docRec.innerHTML = recommended_requirements;
+                if (recommended_requirements !== null && recommended_requirements !== undefined && recommended_requirements !== '') {
+                    docRec.innerHTML = recommended_requirements;
+                } else {
+                    docRec.innerHTML = 'No recommended requirements';
+                }
             }
             if (selectedPlatform === 'linux' && platforms.linux === true) {
                 let linux_requirements = gameData[id].linux_requirements;
                 let minimum_requirements = linux_requirements.minimum;
                 let recommended_requirements = linux_requirements.recommended;
+
                 let docMin = document.getElementById('minimum-requirements');
+                if (minimum_requirements !== null && minimum_requirements !== undefined && minimum_requirements !== '') {
+                    docMin.innerHTML = minimum_requirements;
+                } else {
+                    docMin.innerHTML = 'No minimum requirements';
+                }
+
                 let docRec = document.getElementById('recommended-requirements');
-                docMin.innerHTML = minimum_requirements;
-                docRec.innerHTML = recommended_requirements;
+                if (recommended_requirements !== null && recommended_requirements !== undefined && recommended_requirements !== '') {
+                    docRec.innerHTML = recommended_requirements;
+                } else {
+                    docRec.innerHTML = 'No recommended requirements';
+                }
             }
         }
     }, [gameData, id, selectedPlatform]);
@@ -62,13 +90,13 @@ const GameContent = () => {
     useEffect(() => {
         if (gameData && gameData[id] && gameData[id].platforms) {
             let platforms = gameData[id].platforms;
-            let windowsReq = document.getElementById('windows-req');
-            let macReq = document.getElementById('mac-req');
-            let linuxReq = document.getElementById('linux-req');
             // deselect all ones that are valid
             if ((selectedPlatform === 'windows' && platforms.windows === true) ||
                 (selectedPlatform === 'mac' && platforms.mac === true) ||
                 (selectedPlatform === 'linux' && platforms.linux === true)) {
+                let windowsReq = document.getElementById('windows-req');
+                let macReq = document.getElementById('mac-req');
+                let linuxReq = document.getElementById('linux-req');
                 if (platforms.windows === true) {
                     deselectPlatformElement(windowsReq);
                 }
@@ -153,16 +181,8 @@ const GameContent = () => {
                         </div>
                         <div id="recommended-requirements">
                         </div>
+                        <div className="clear"></div>
                     </div>
-                </div>
-            </div>
-
-            <div className="game-content-section">
-                <div className="game-content-section-header">
-                    <h2>Game Content</h2>
-                </div>
-                <div className="game-content-section-body">
-                    <p>Game Content</p>
                 </div>
             </div>
         </div>
