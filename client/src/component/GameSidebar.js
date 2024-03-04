@@ -18,6 +18,7 @@ const GameSidebar = () => {
     const user = useSelector(state => state.userReducer.user);
 
     useEffect(() => {
+        //  set the add to wishlist button styling based on login status
         let wishlistButton = document.getElementById("add-to-wishlist");
         if (wishlistButton !== undefined && wishlistButton !== null) {
             if (user && Object.keys(user).length > 0) {
@@ -35,6 +36,7 @@ const GameSidebar = () => {
     }, [user]);
 
     useEffect(() => {
+        // set the review percent and color
         if (gameData && gameData[id] && gameData[id].reviews !== undefined &&
             gameData[id].reviews.total_positive !== undefined &&
             gameData[id].reviews.total_reviews !== undefined) {
@@ -45,6 +47,16 @@ const GameSidebar = () => {
 
             setCurReviewPercent((Math.round(((gameData[id].reviews.total_positive / gameData[id].reviews.total_reviews) * 100) * 100) / 100).toFixed(2))
 
+        }
+    }, [gameData, id]);
+
+    useEffect(() => {
+        // set the game description
+        if (gameData && gameData[id] && gameData[id].short_description !== undefined) {
+            let description = document.getElementById("game-info-description");
+            if (description !== undefined && description !== null) {
+                description.innerHTML = gameData[id].short_description;
+            }
         }
     }, [gameData, id]);
 
@@ -120,7 +132,7 @@ const GameSidebar = () => {
             <div className="game-info-body">
                 <h1>{gameData[id] ? gameData[id].name : "Game Title"}</h1>
                 <div className="game-info-section"> {/* game description section */}
-                    <p>{gameData[id] ? gameData[id].short_description : "Game Description"}</p>
+                    <p id="game-info-description">{gameData[id] ? gameData[id].short_description : "Game Description"}</p>
                 </div> {/* end of game-info-section */}
                 <div className="game-info-section">
                     <div className="game-quick-info no-top-padding"> {/* release date, dev, and pub section */}
