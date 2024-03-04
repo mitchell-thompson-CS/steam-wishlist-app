@@ -59,7 +59,7 @@
     color: white;
 }
 
-.wishlistGamePopupWishlistName:hover, .wishlistGamePopupWishlistName:focus {
+.wishlistGamePopupWishlistName:hover {
     background-color: #444;
     cursor: pointer;
 }
