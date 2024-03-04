@@ -2,7 +2,7 @@
     width: 70%;
     max-width: calc(100% - 300px);
     float: right;
-    padding: 10px 10px 10px 20px;
+    padding: 0 10px 0 20px;
 }
 
 @media (min-width: calc(500px * (10 / 3) + 50px)) {
