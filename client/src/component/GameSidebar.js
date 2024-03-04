@@ -18,24 +18,6 @@ const GameSidebar = () => {
     const user = useSelector(state => state.userReducer.user);
 
     useEffect(() => {
-        if (!gameData[id]) {
-            dispatch(setLoading(true));
-            fetch('/api/game/' + id, { mode: 'cors', credentials: 'include' })
-                .then(function (response) {
-                    if (response.status === 200) {
-                        return response.json();
-                    }
-                }).then(function (data) {
-                    if (data) {
-                        dispatch(addGame(id, data));
-                    }
-                    dispatch(setLoading(false));
-                });
-
-        }
-    }, [id, gameData, dispatch]);
-
-    useEffect(() => {
         let wishlistButton = document.getElementById("add-to-wishlist");
         if (wishlistButton !== undefined && wishlistButton !== null) {
             if (user && Object.keys(user).length > 0) {
@@ -130,7 +112,7 @@ const GameSidebar = () => {
     }
 
     return (
-        <div className="game-info">
+        <div id="game-info">
             {gameData[id] ?
                 <img src={gameData[id].header_image} alt="game header" />
                 : <img src={loadingImage} alt="loading" className="loading-header" />

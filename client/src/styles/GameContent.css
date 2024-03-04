@@ -1,0 +1,49 @@
+#game-content {
+    width: 70%;
+    max-width: calc(100% - 300px);
+    float: right;
+    padding: 10px 10px 10px 20px;
+}
+
+@media (min-width: calc(500px * (10 / 3) + 50px)) {
+    #game-content {
+        width: calc(100% - 500px);
+    }
+}
+
+.game-content-section {
+    background-color: #282e35;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 #000;
+    margin-bottom: 20px;
+}
+
+.game-content-section-header {
+    font-size: 25px;
+    margin: 0;
+    margin-bottom: 15px;
+    padding: 0;
+    text-align: center;
+    user-select: none;
+}
+
+#game-requirements-selector {
+    width: 100%;
+    user-select: none;
+}
+
+.platform-selector {
+    width: calc(33% - 10px);
+    float: left;
+    padding: 10px;
+    margin: 5px;
+    background-color: #3e444b;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.platform-selector:hover {
+    cursor: pointer;
+    background-color: #4e545b;
+}
