@@ -39,7 +39,7 @@
 .addGameToWishlistPopupInnerContent {
     height: calc(60vh - 140px);
     min-height: 260px;
-    overflow: scroll;
+    overflow: auto;
     line-height: 25px;
     padding-bottom: 10px;
 }
