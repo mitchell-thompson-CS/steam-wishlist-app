@@ -7,20 +7,6 @@ import { useParams } from "react-router-dom";
 import { setLoading } from "../actions/eventAction";
 import { addGame, removeGame } from "../actions/gameAction";
 
-
-async function addGameToWishlist(wishlist, game = "1676840") {
-    try {
-        let res = await axios.post('/api/game/add', {
-            wishlist_id: wishlist,
-            game_id: game
-        });
-        console.log(res);
-    } catch (error) {
-        console.log("error")
-        console.error(error);
-    }
-}
-
 const WishlistInner = () => {
     const [wishlistItem, setWishlistItem] = useState([]);
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -66,7 +52,6 @@ const WishlistInner = () => {
             }
             setWishlistItem(data);
             setGettingWishlistData(false);
-            return data;
         }
 
         async function fetchGameData(data) {
@@ -92,16 +77,18 @@ const WishlistInner = () => {
                         }
                     }
                 }
+                setGettingGameData(false);
                 dispatch(setLoading(false));
             }
         }
 
-        fetchWishlistData().then((data) => {
-            if (data) {
-                fetchGameData(data);
+        fetchWishlistData().then(() => {
+            console.log(wishlistItem);
+            if (wishlistItem.games !== undefined && Object.keys(wishlistItem.games).length > 0){
+                fetchGameData(wishlistItem);
             }
         });
-    }, [id, wishlistItems, user, dispatch, gameData]);
+    }, [id, wishlistItems, user, dispatch, gameData, gettingGameData, gettingWishlistData, wishlistItem]);
 
     return (
         <div className="wishlistInner">
