@@ -1,0 +1,13 @@
+.wishlistView {
+    display: flex;
+    height: calc(100vh - 75px);
+}
+
+#wishlistMainContent {
+    width: calc(100% - 260px);
+    overflow: scroll;
+}
+
+.clear {
+    clear: both;
+}

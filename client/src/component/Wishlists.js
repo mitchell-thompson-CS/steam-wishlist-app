@@ -84,64 +84,6 @@ const Wishlists = () => {
         }
         dispatch(setLoading(false));
     }
-    
-    async function addGameToWishlist() {
-        try {
-            let res = await axios.post('/api/game/add', {
-                wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
-                game_id: "105600"
-            });
-            console.log(res);
-        } catch (error) {
-            console.log("error")
-            console.error(error);
-        }
-    }
-    
-    async function removeGameFromWishlist() {
-        try {
-            let res = await axios.delete('/api/game/remove', {
-                data: {
-                    wishlist_id: "58152a82-e9a5-4bf2-b89d-f073ca7b6891",
-                    game_id: "105600"
-                }
-            });
-            console.log(res);
-        } catch (error) {
-            console.log("error")
-            console.error(error);
-        }
-    }
-    
-    async function addEditorToWishlist() {
-        try {
-            let res = await axios.post('/api/wishlist/add-editor', {
-                wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
-                editor_id: "76561198012386061"
-            });
-            console.log(res);
-        } catch (error) {
-            console.log("error")
-            console.error(error);
-        }
-    
-    }
-    
-    async function deleteEditorFromWishlist() {
-        try {
-            let res = await axios.delete('/api/wishlist/delete-editor', {
-                data: {
-                    wishlist_id: "1a048b1c-3112-4fd0-9465-adfa1b5ae0b7",
-                    editor_id: "76561198012386061"
-                }
-            });
-            console.log(res);
-        } catch (error) {
-            console.log("error")
-            console.error(error);
-        }
-    
-    }
 
     return (
         <div className="wishlist">
@@ -161,13 +103,6 @@ const Wishlists = () => {
                     </div>
                 ))}
             </div>
-            <button onClick={createWishlistPost}>Create Wishlist Post</button>
-            <button onClick={addGameToWishlist}>Add Game to Wishlist</button>
-            <button onClick={deleteWishlistPost}>Delete Wishlist Post</button>
-            <button onClick={removeGameFromWishlist}>Remove Game from Wishlist</button>
-            <button onClick={addEditorToWishlist}>Add Editor to Wishlist</button>
-            <button onClick={deleteEditorFromWishlist}>Delete Editor from Wishlist</button>
-            <button onClick={() => setButtonPopup(true)}>Open Popup</button>
             <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
                 <div className="popupInputContainer">
                     <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
