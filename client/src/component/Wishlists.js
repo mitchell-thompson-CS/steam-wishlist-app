@@ -89,16 +89,28 @@ const Wishlists = () => {
         <div className="wishlist">
             <WishlistGridHeader />
             <div className="gridContainer">
-                <button onClick={() => {setButtonPopup(true); setInputText("");}} className="gridItem" id="createWishlistButton">+</button>
+                <button onClick={() => {setButtonPopup(true); setInputText("");}} className="gridItemContainer" id="createWishlistButton">+</button>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
-                    <div key={key} className="gridItemContainer">
-                        <Link className="gridItem" to={"/wishlists/" + key}>{value.name}</Link>
+                    <div key={key} className="gridItemContainer" title={value.name} >
+                        <Link className="gridItem" to={"/wishlists/" + key}>
+                            <h2>{value.name}</h2>
+                            <p>
+                                {value.games ? Object.keys(value.games).length : 0}
+                                {value.games && Object.keys(value.games).length === 1 ? " Game" : " Games"}
+                            </p>
+                        </Link>
                         <div className="contextMenu" onClick={() => {setContextPopup(key); setInputText(value.name);}}>...</div>
                     </div>
                 ))}
                 {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
-                    <div key={key} className="gridItemContainer">
-                        <Link className="gridItem" to={"/wishlists/" + key}>{value.name}</Link>
+                    <div key={key} className="gridItemContainer" title={value.name}>
+                        <Link className="gridItem" to={"/wishlists/" + key}>
+                            <h2>{value.name}</h2>
+                            <p>
+                                {value.games ? Object.keys(value.games).length : 0}
+                                {value.games && Object.keys(value.games).length === 1 ? " Game" : " Games"}
+                            </p>
+                        </Link>
                         <div className="sharedTag">(shared)</div>
                     </div>
                 ))}

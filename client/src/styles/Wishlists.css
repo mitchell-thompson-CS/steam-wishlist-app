@@ -1,33 +1,56 @@
 #createWishlistButton {
   font-size: 50px;
+  cursor: pointer;
+  border: none;
+  color: white;
+}
+
+#createWishlistButton:hover {
+  background-color: #393f46;
 }
 
 .gridContainer {
   padding: 50px;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 50px;
+  grid-template-columns: repeat(auto-fill, 200px);
+  /* gap: 5em; */
+  row-gap: 20px;
+  justify-content: space-between;
 }
 
 .gridItem {
-  width: 160px;
-  height: 160px;
-  line-height: 160px;
+  width: 100%;
+  height: 100%;
   text-align: center;
   display: inline-block;
   vertical-align: middle;
   border: 1px gray;
-  border-radius: 10%;
-  color: white;
-  background-color: #282e35;
-  box-shadow: 10px white;
   text-decoration: none;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  padding: 0px 5px;
+  padding: 0px 10px;
   font-size: 16px;
   transition: 0.2s;
+  color: white;
+  border-radius: 15px;
+  padding-top: 50px;
+}
+
+.gridItem h2 {
+  text-decoration: underline;
+  font-size: 20px;
+}
+
+.gridItem p {
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.gridItem * {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .gridItem:hover {
@@ -36,6 +59,11 @@
 
 .gridItemContainer {
   position: relative;
+  width: 160px;
+  height: 160px;
+  background-color: #282e35;
+  border-radius: 15px;
+  box-shadow: 10px white;
 }
 
 .contextMenu {
@@ -51,6 +79,11 @@
   text-align: center;
   line-height: 30px;
   cursor: pointer;
+  border-top-right-radius: 15px;
+}
+
+.contextMenu:hover {
+  background-color: #5a6470;
 }
 
 .sharedTag {
@@ -96,7 +129,7 @@
 }
 
 .popupButton {
-  background-color: #393f46;
+  background-color: #444;
   color: white;
   padding: 10px 20px;
   font-size: 16px;
@@ -110,7 +143,7 @@
 }
 
 .popupButton:hover {
-  background-color: rgb(35, 39, 77);
+  background-color: #666;
 }
 
 .popupButton:focus {
