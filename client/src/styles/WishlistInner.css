@@ -16,6 +16,7 @@
     padding: 15px 45px;
     justify-content: space-between;
     margin-bottom: 20px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
 }
 
 .gameLink {
