@@ -37,20 +37,34 @@
 .wishlistItem {
   width: 256px;
   background-color: #393f46;
-  margin-top: 1px;
+  margin-top: 3px;
   list-style: none;
   padding-left: 5px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  height: 25px;
+  width: 100%;
 }
 
 .wishlistItem a {
     text-decoration: none;
     color: white;
     transition: 0.2s;
+    display: inline-block;
+    width: 100%;
+    line-height: 25px;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: nowrap;
 }
 
 .wishlistItem a:hover {
     color: lightskyblue;
+}
+
+.wishlistItem:hover {
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2);
+  background-color: #4d545c;
 }
