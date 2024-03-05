@@ -1,0 +1,53 @@
+/* .homeView {
+    display: flex;
+    justify-content: center;
+}
+
+.gridContainer {
+    width: 1110px;
+    height: 210px;
+    padding: 50px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+    overflow: hidden;
+    gap: 10px;
+}
+
+.gridItem {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    border: 1px gray;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0px 5px;
+    font-size: 16px;
+    transition: 0.2s;
+    color: white;
+    border-radius: 15px;
+    padding-top: 50px;
+}
+
+.gridItem * {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.gridItem:hover {
+    background-color: #393f46;
+}
+
+.gridItemContainer {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    background-color: #282e35;
+    border-radius: 15px;
+    box-shadow: 10px white;
+} */

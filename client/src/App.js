@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar';
 import axios from 'axios';
 import WishlistView from './component/WishlistView';
+import HomeView from './component/HomeView';
 import EventPopup from './component/EventPopup';
 import LoadingPopup from './component/LoadingPopup';
 import Game from './component/Game';
@@ -62,6 +63,7 @@ function App() {
       <LoadingPopup trigger={isLoading} />
       <AddGameToWishlistPopup trigger={addingGame} />
       <Routes>
+        <Route path="/" element={<HomeView />} />
         <Route path="/wishlists/*" element={<WishlistView />} />
         <Route path="/game/:id" element={<Game />} />
         {/* <Route path ="/login" element={<Login />} /> */}
