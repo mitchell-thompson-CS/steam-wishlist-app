@@ -17,10 +17,10 @@ const WishlistSidebar = () => {
                     </form>
                 </li>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
-                    <li key={key} className="wishlistItem"><Link to={"/wishlists/" + key}>{value.name}</Link></li>
+                    <li key={key} className="wishlistItem" title={value.name}><Link to={"/wishlists/" + key}>{value.name}</Link></li>
                 ))}
                 {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
-                    <li key={key} className="wishlistItem"><Link to={"/wishlists/" + key}>{value.name}</Link></li>
+                    <li key={key} className="wishlistItem" title={value.name}><Link to={"/wishlists/" + key}>{value.name}</Link></li>
                 ))}
             </ul>
         </div>
