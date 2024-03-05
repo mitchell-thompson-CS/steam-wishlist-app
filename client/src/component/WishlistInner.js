@@ -83,7 +83,6 @@ const WishlistInner = () => {
         }
 
         fetchWishlistData().then(() => {
-            console.log(wishlistItem);
             if (wishlistItem.games !== undefined && Object.keys(wishlistItem.games).length > 0){
                 fetchGameData(wishlistItem);
             }
