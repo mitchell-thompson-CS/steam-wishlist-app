@@ -3,6 +3,7 @@
     background-color: #282e35;
     font-size: 20px;
     justify-content: center;
+    overflow: scroll;
 }
 
 #wishlistSearchArea {
