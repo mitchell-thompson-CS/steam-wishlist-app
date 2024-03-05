@@ -132,6 +132,7 @@ const GameContent = () => {
     function selectPlatformElement(element) {
         try {
             element.style.backgroundColor = 'grey';
+            element.style.boxShadow = '0 0 10px 5px rgba(0, 0, 0, 0.2)';
         } catch (e) {
             console.log(e);
         }
@@ -140,6 +141,7 @@ const GameContent = () => {
     function deselectPlatformElement(element) {
         try {
             element.style.backgroundColor = '';
+            element.style.boxShadow = '';
         } catch (e) {
             console.log(e);
         }
