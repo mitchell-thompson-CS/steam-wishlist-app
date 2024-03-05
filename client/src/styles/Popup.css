@@ -16,7 +16,9 @@
     padding: 32px;
     width: 100%;
     max-width: 640px;
-    background-color: #171d25;
+    background-color: #282e35;
+    border-radius: 25px;
+    box-shadow: 0 0 10px 5px #171d25;
 }
 
 .popup-inner .close-button {
@@ -24,7 +26,8 @@
     top: 16px;
     right: 16px;
 
-    background-color: #393f46;
+    
+    background-color: #444;
     color: white;
     padding: 10px 15px;
     font-size: 16px;
@@ -38,5 +41,5 @@
 }
 
 .popup-inner .close-button:hover {
-    background-color: rgb(35, 39, 77);
+    background-color: #666;
 }

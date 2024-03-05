@@ -112,7 +112,7 @@ const WishlistInner = () => {
                         <li key={key} className="gameItem">
                             {/* <div className="gameContainer"> */}
                             <div className="gameTitle">
-                                <a href={"/game/" + key} className="gameLink">{gameData[key].name}</a>
+                                <a href={"/game/" + key} className="gameLink" title={gameData[key].name}>{gameData[key].name}</a>
                                 <img src={gameData[key].header_image} alt="game thumbnail" />
                             </div>
                             <div className="gamePrice">
@@ -137,8 +137,13 @@ const WishlistInner = () => {
                                 <p className="playingNowTitle">Playing Now</p>
                             </div>
                             <div className="gamePercent">
-                                <p className="reviewPercentTitle">Positive Review %</p>
-                                <p className="reviewPercent">{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</p>
+                                <p className="reviewPercentTitle">Rating</p>
+                                <p className="reviewPercent">
+                                    {isNaN((Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)) === false
+                                        ? <>{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</>
+                                        : "No Reviews"
+                                    }
+                                </p>
                             </div>
                             {/* </div> */}
                         </li>
@@ -146,7 +151,7 @@ const WishlistInner = () => {
                 ))}
             </ul>
             {/* </div> */}
-            <button onClick={() => addGameToWishlist(id)}>Add Game to Wishlist</button>
+            {/* <button onClick={() => addGameToWishlist(id)}>Add Game to Wishlist</button> */}
         </div >
     )
 }
