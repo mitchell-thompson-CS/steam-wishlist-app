@@ -54,6 +54,7 @@
 
 .gridItem:hover {
   background-color: #393f46;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
 }
 
 .gridItemContainer {
@@ -62,7 +63,7 @@
   height: 160px;
   background-color: #282e35;
   border-radius: 15px;
-  box-shadow: 10px white;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 }
 
 .contextMenu {
