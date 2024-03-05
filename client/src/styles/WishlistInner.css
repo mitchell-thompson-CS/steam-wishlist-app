@@ -17,6 +17,12 @@
     justify-content: space-between;
     margin-bottom: 20px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+    user-select: none;
+}
+
+.gameItem:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
+    background-color: #4d545c;
 }
 
 .gameLink {
@@ -39,8 +45,9 @@
     align-self: center;
 }
 
-.gameTitle a {
+.gameTitle h1 {
     height: 22px;
+    font-size: 22px;
     max-width: 100%;
     margin-bottom: 10px;
     text-overflow: ellipsis;
@@ -93,5 +100,21 @@
 }
 
 .reviewPercent {
+    margin: auto;
+}
+
+#wishlistInner-addgame {
+    cursor: pointer;
+    height: 60px;
+    background-color: #3e4e69;
+}
+
+#wishlistInner-addgame:hover {
+    background-color: #586f96;
+}
+
+#wishlistInner-addgame h2 {
+    width: 100%;
+    text-align: center;
     margin: auto;
 }

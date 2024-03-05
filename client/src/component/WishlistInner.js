@@ -93,12 +93,17 @@ const WishlistInner = () => {
         <div className="wishlistInner">
             {/* <div className="listContainer"> */}
             <ul className="gameList">
+                <li className="gameItem" id="wishlistInner-addgame">
+                    <h2>Add Game To Wishlist</h2>
+                </li>
                 {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
                     gameData[key] ?
+                    <a href={"/game/" + key} className="gameLink" title={gameData[key].name}>
                         <li key={key} className="gameItem">
                             {/* <div className="gameContainer"> */}
+                            
                             <div className="gameTitle">
-                                <a href={"/game/" + key} className="gameLink" title={gameData[key].name}>{gameData[key].name}</a>
+                                <h1 className="gameName">{gameData[key].name}</h1>
                                 <img src={gameData[key].header_image} alt="game thumbnail" />
                             </div>
                             <div className="gamePrice">
@@ -133,6 +138,7 @@ const WishlistInner = () => {
                             </div>
                             {/* </div> */}
                         </li>
+                        </a>
                         : null
                 ))}
             </ul>
