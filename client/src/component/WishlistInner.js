@@ -4,7 +4,7 @@ import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import '../styles/WishlistInner.css';
 import { useParams } from "react-router-dom";
-import { setLoading } from "../actions/eventAction";
+import { setLoading, setSearchPopup } from "../actions/eventAction";
 import { addGame, removeGame } from "../actions/gameAction";
 
 const WishlistInner = () => {
@@ -89,11 +89,15 @@ const WishlistInner = () => {
         });
     }, [id, wishlistItems, user, dispatch, gameData, gettingGameData, gettingWishlistData, wishlistItem]);
 
+    function enableSearchPopup() {
+        dispatch(setSearchPopup(true, id));
+    }
+
     return (
         <div className="wishlistInner">
             {/* <div className="listContainer"> */}
             <ul className="gameList">
-                <li className="gameItem" id="wishlistInner-addgame">
+                <li className="gameItem" id="wishlistInner-addgame" onClick={enableSearchPopup}>
                     <h2>Add Game To Wishlist</h2>
                 </li>
                 {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (

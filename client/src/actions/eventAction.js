@@ -1,4 +1,4 @@
-import { SET_EVENT, RESET_EVENT, SET_LOADING, SET_ADD_GAME_TO_WISHLIST } from "../actionTypes/actionTypes";
+import { SET_EVENT, RESET_EVENT, SET_LOADING, SET_ADD_GAME_TO_WISHLIST, SET_SEARCH_POPUP } from "../actionTypes/actionTypes";
 
 const setEvent = (postive, inputEvent) => {
     return {
@@ -32,7 +32,16 @@ const setAddGameToWishlist = (input) => {
             addingGame: input,
         }
     };
-
 }
 
-export { setEvent, resetEvent, setLoading, setAddGameToWishlist };
+const setSearchPopup = (inputState, inputAdding=null) => {
+    return {
+        type: SET_SEARCH_POPUP,
+        payload: {
+            searchPopup: inputState,
+            addingGame: inputAdding,
+        }
+    };
+}
+
+export { setEvent, resetEvent, setLoading, setAddGameToWishlist, setSearchPopup };

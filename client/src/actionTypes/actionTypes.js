@@ -19,3 +19,5 @@ export const SET_EVENT = "SET_EVENT";
 export const RESET_EVENT = "RESET_EVENT";
 // this is for setting the state of loading in the app
 export const SET_LOADING = "SET_LOADING";
+// this is for setting the state of the wishlist popup
+export const SET_SEARCH_POPUP = "SET_SEARCH_POPUP";

@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteWishlists, setWishlists } from "./actions/wishlistAction";
 import { deleteUser, isUser } from "./actions/userAction";
 import { setEvent, setLoading } from "./actions/eventAction";
+import SearchForGamePopup from './component/SearchForGamePopup';
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';
@@ -21,6 +22,7 @@ function App() {
   const event = useSelector(state => state.eventReducer.event);
   const isLoading = useSelector(state => state.eventReducer.loading);
   const addingGame = useSelector(state => state.eventReducer.addingGame);
+  const searchPopup = useSelector(state => state.eventReducer.searchPopup);
 
   const dispatch = useDispatch();
   const user = useSelector(state => state.userReducer.user);
@@ -62,6 +64,7 @@ function App() {
       <EventPopup trigger={event} />
       <LoadingPopup trigger={isLoading} />
       <AddGameToWishlistPopup trigger={addingGame} />
+      <SearchForGamePopup trigger={!!searchPopup} />
       <Routes>
         <Route path="/" element={<HomeView />} />
         <Route path="/wishlists/*" element={<WishlistView />} />

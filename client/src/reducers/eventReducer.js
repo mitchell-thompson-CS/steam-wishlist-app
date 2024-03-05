@@ -1,4 +1,4 @@
-import { RESET_EVENT, SET_ADD_GAME_TO_WISHLIST, SET_EVENT, SET_LOADING } from "../actionTypes/actionTypes";
+import { RESET_EVENT, SET_ADD_GAME_TO_WISHLIST, SET_EVENT, SET_LOADING, SET_SEARCH_POPUP } from "../actionTypes/actionTypes";
 
 
 const initialState = {
@@ -33,6 +33,21 @@ const eventReducer = (state = initialState, action) => {
             return {
                 ...state,
                 addingGame: action.payload.addingGame,
+            };
+        case SET_SEARCH_POPUP:
+            if(action.payload.searchPopup === false) {
+                return {
+                    ...state,
+                    searchPopup: null,
+                };
+            }
+            
+            return {
+                ...state,
+                searchPopup: {
+                    popupState: action.payload.searchPopup,
+                    addingGame: action.payload.addingGame,
+                }
             };
         default:
             return state;
