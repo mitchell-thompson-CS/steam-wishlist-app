@@ -5,7 +5,7 @@
 
 #wishlistMainContent {
     width: calc(100% - 260px);
-    overflow: scroll;
+    overflow: auto;
 }
 
 .clear {
