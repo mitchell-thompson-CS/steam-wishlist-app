@@ -15,7 +15,7 @@
     background-color: #282e35;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px 0 #000;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.7);
     margin-bottom: 20px;
 }
 
@@ -47,12 +47,13 @@
     background-color: #3e444b;
     border-radius: 20px;
     text-align: center;
-    box-shadow: 0 0 5px 0 #171a1d;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
 }
 
 .platform-selector:hover {
     cursor: pointer;
     background-color: #4e545b;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.8);
 }
 
 #minimum-requirements, #recommended-requirements {
