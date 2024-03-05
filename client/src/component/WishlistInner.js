@@ -98,8 +98,8 @@ const WishlistInner = () => {
                 </li>
                 {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
                     gameData[key] ?
-                    <a href={"/game/" + key} className="gameLink" title={gameData[key].name}>
-                        <li key={key} className="gameItem">
+                    <a href={"/game/" + key} key={key} className="gameLink" title={gameData[key].name}>
+                        <li className="gameItem">
                             {/* <div className="gameContainer"> */}
                             
                             <div className="gameTitle">
