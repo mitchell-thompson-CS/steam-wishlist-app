@@ -30,9 +30,11 @@ const SearchForGamePopup = (props) => {
         if (props.trigger) {
             document.addEventListener('click', closePopup);
             document.addEventListener('keydown', closePopup);
+            document.body.style.overflow = 'hidden';
         } else {
             document.removeEventListener('click', closePopup);
             document.removeEventListener('keydown', closePopup);
+            document.body.style.overflow = 'unset';
             searchPosition.current = 0;
             setSearchTerm(""); 
         }
@@ -108,8 +110,17 @@ const SearchForGamePopup = (props) => {
     }, []);
 
     useEffect(() => {
+        let searchResults = document.getElementById("popup-search-results");
+        let searchGameInner = document.getElementById("search-for-game-popup-inner");
         // setup delay for the search bar
         const delayDebounce = setTimeout(() => {
+            if (searchResults) {
+                searchResults.style.height = "";
+            }
+            if (searchGameInner) {
+                searchGameInner.style.maxHeight = "600px";
+                searchGameInner.style.minHeight = "400px";
+            }
             if (searchTerm && searchTerm !== "") {
                 fetch('/api/game/search/' + searchTerm, { mode: 'cors', credentials: 'include' })
                     .then(function (response) {
@@ -177,6 +188,16 @@ const SearchForGamePopup = (props) => {
                         // reset the search position after getting new data (or failing to)
                         searchPosition.current = 0;
                     });
+            } else {
+                // set the height of the search results to 0 if there's no search term
+                if (searchResults) {
+                    searchResults.style.height = "0px";
+                    searchResults.innerHTML = "";
+                }
+                if (searchGameInner) {
+                    searchGameInner.style.maxHeight = "";
+                    searchGameInner.style.minHeight = "";
+                }
             }
         }, searchDelay);
 
@@ -195,7 +216,7 @@ const SearchForGamePopup = (props) => {
                 backdropFilter: props.trigger ? "blur(5px) opacity(1)" : "blur(0px) opacity(0)"
             }}></div>
             
-                <div className="search-for-game-popup-inner" style={{
+                <div id="search-for-game-popup-inner" style={{
                     opacity: props.trigger ? 1 : 0,
                 }}>
                     <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off' onKeyDown={handleSearchKeyDown}
