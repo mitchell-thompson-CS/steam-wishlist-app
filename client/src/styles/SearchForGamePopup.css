@@ -71,6 +71,12 @@
     cursor: pointer;
 }
 
+.popup-search-result:focus {
+    outline: none;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
+    background-color: #4d545c;
+}
+
 .popup-search-result li {
     width: calc(100%);
     height: 100%;

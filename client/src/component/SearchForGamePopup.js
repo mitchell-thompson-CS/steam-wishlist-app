@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import '../styles/SearchForGamePopup.css';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAddGameToWishlist, setEvent, setLoading, setSearchPopup } from '../actions/eventAction';
 import axios from 'axios';
@@ -14,11 +14,12 @@ const SearchForGamePopup = (props) => {
     const searchPopup = useSelector(state => state.eventReducer.searchPopup);
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
     const [searchTerm, setSearchTerm] = useState("");
+    const searchPosition = useRef(0);
 
     const closePopup = useCallback((e) => {
-        if (e.target.className === "search-for-game-popup" 
-        || e.target.id === "search-for-game-popup-blur"
-        || e.key === "Escape") {
+        if (e.target.className === "search-for-game-popup"
+            || e.target.id === "search-for-game-popup-blur"
+            || e.key === "Escape") {
             dispatch(setSearchPopup(false));
             document.removeEventListener('click', closePopup);
             document.removeEventListener('keydown', closePopup);
@@ -32,19 +33,69 @@ const SearchForGamePopup = (props) => {
         } else {
             document.removeEventListener('click', closePopup);
             document.removeEventListener('keydown', closePopup);
+            searchPosition.current = 0;
             setSearchTerm("");
         }
     }, [props.trigger, closePopup]);
 
     useEffect(() => {
         // focus on the search bar when the popup is opened
-        if(props.trigger) {
+        if (props.trigger) {
             let search = document.getElementById("popup-game-search");
             if (search) {
                 search.focus();
             }
         }
     }, [props.trigger, searchPopup]);
+
+    const handleSearchKeyDown = useCallback((e) => {
+        if (e.key === "ArrowDown" || (e.key === "Tab" && e.shiftKey === false)) {
+            e.preventDefault();
+            let searchResults = document.getElementById("popup-search-results");
+            if (searchResults) {
+                if (searchPosition.current < searchResults.children.length) {
+                    searchPosition.current = (searchPosition.current + 1) % (searchResults.children.length + 1);
+                    searchResults.children[searchPosition.current - 1].focus();
+                } else if (searchPosition.current === searchResults.children.length) {
+                    searchPosition.current = 0;
+                    let search = document.getElementById("popup-game-search");
+                    if (search) {
+                        search.focus();
+                    }
+                }
+            }
+        } else if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey === true)) {
+            e.preventDefault();
+            let searchResults = document.getElementById("popup-search-results");
+            if (searchResults) {
+                if (searchPosition.current > 1) {
+                    searchPosition.current -= 1;
+                    searchResults.children[searchPosition.current - 1].focus();
+                } else if (searchPosition.current === 1) {
+                    searchPosition.current = 0;
+                    let search = document.getElementById("popup-game-search");
+                    if (search) {
+                        search.focus();
+                    }
+                } else if(searchPosition.current === 0) {
+                    searchPosition.current = searchResults.children.length;
+                    searchResults.children[searchPosition.current - 1].focus();
+                }
+            }
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            let searchResults = document.getElementById("popup-search-results");
+            if (searchResults && searchPosition.current > 0) {
+                searchResults.children[searchPosition.current - 1].click();
+            }
+        } else if (e.key !== "Shift") {
+            searchPosition.current = 0;
+            let search = document.getElementById("popup-game-search");
+            if (search) {
+                search.focus();
+            }
+        }
+    }, []);
 
     useEffect(() => {
         // setup delay for the search bar
@@ -103,34 +154,33 @@ const SearchForGamePopup = (props) => {
                                         new_el.id = "popup-search-result" + i;
                                         new_el.title = cur_data.name;
                                         new_el.onmouseover = function (event) {
-                                            for (let j = 0; j < searchResults.children.length; j++) {
-                                                searchResults.children[j].style.backgroundColor = null;
-                                            }
-                                            event.currentTarget.style.backgroundColor = "#282e35";
-                                            // searchPosition.current = i;
+                                            event.currentTarget.focus();
                                         };
-                                        new_el.onmouseout = function (event) {
-                                            event.target.style.backgroundColor = null;
-                                        }
+
+                                        new_el.tabIndex = -1;
+
+                                        new_el.onkeydown = handleSearchKeyDown;
                                         searchResults.appendChild(new_el);
                                     }
                                 }
                             }
                         }
+                        // reset the search position after getting new data (or failing to)
+                        searchPosition.current = 0;
                     });
             }
         }, searchDelay);
 
         // clear the timeout every time the input changes
         return () => clearTimeout(delayDebounce);
-    }, [searchTerm, searchPopup, dispatch, wishlistItems]);
+    }, [searchTerm, searchPopup, dispatch, wishlistItems, handleSearchKeyDown]);
 
     return (
         props.trigger ?
             <div className="search-for-game-popup">
                 <div id="search-for-game-popup-blur"></div>
                 <div className="search-for-game-popup-inner">
-                    <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off'
+                    <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off' onKeyDown={handleSearchKeyDown}
                         onChange={(e) => {
                             if (e.target.value !== searchTerm) {
                                 setSearchTerm(e.target.value);
