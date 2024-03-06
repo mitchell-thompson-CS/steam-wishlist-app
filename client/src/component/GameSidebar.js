@@ -30,7 +30,7 @@ const GameSidebar = () => {
                 wishlistButton.style.fontSize = "14px";
                 wishlistButton.style.backgroundColor = "#888888";
                 wishlistButton.style.color = "#aaaaaa";
-                wishlistButton.style.cursor = "auto"
+                wishlistButton.style.cursor = "not-allowed"
             }
         }
     }, [user]);
