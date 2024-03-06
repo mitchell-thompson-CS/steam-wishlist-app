@@ -37,6 +37,7 @@ const SearchForGamePopup = (props) => {
     }, [props.trigger, closePopup]);
 
     useEffect(() => {
+        // focus on the search bar when the popup is opened
         if(props.trigger) {
             let search = document.getElementById("popup-game-search");
             if (search) {
