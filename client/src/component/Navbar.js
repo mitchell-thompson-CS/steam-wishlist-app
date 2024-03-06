@@ -4,7 +4,7 @@ import '../styles/Navbar.css'
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteUser, isUser, setUser } from "../actions/userAction";
-import { setLoading } from "../actions/eventAction";
+import { setLoading, setSearchPopup } from "../actions/eventAction";
 
 const searchDelay = 500;
 
@@ -114,7 +114,8 @@ const Navbar = () => {
     }
 
     function focusSearch(event) {
-        document.getElementById("gameSearchResults").style.display = "block";
+        // document.getElementById("gameSearchResults").style.display = "block";
+        dispatch(setSearchPopup(true));
     }
 
     function handleSearchKeyDown(event) {
