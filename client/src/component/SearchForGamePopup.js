@@ -45,8 +45,6 @@ const SearchForGamePopup = (props) => {
             if (search) {
                 search.focus();
             }
-        } else if (searchPopup === null) {
-            console.log("searchPopup is null");
         }
     }, [props.trigger, searchPopup]);
 
