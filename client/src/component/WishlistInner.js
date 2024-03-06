@@ -97,7 +97,7 @@ const WishlistInner = () => {
             <div id="wishlistInner-header">
                 {wishlistItem && wishlistItem.name
                     ? <h1 id="wishlistInner-title" title={wishlistItem.name}>{wishlistItem.name}</h1>
-                    : <h1 id="wishlistInner-title">Wishlist Name</h1>
+                    : null
                 }
                 {wishlistItem && wishlistItem.games ?
                     <h3 id="wishlistInner-count">
