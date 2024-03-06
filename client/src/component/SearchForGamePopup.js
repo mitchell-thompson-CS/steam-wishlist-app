@@ -40,11 +40,13 @@ const SearchForGamePopup = (props) => {
 
     useEffect(() => {
         // focus on the search bar when the popup is opened
-        if (props.trigger) {
+        if (searchPopup && searchPopup.popupState) {
             let search = document.getElementById("popup-game-search");
             if (search) {
                 search.focus();
             }
+        } else if (searchPopup === null) {
+            console.log("searchPopup is null");
         }
     }, [props.trigger, searchPopup]);
 
@@ -77,7 +79,7 @@ const SearchForGamePopup = (props) => {
                     if (search) {
                         search.focus();
                     }
-                } else if(searchPosition.current === 0) {
+                } else if (searchPosition.current === 0) {
                     searchPosition.current = searchResults.children.length;
                     searchResults.children[searchPosition.current - 1].focus();
                 }
@@ -175,9 +177,16 @@ const SearchForGamePopup = (props) => {
     }, [searchTerm, searchPopup, dispatch, wishlistItems, handleSearchKeyDown]);
 
     return (
-        props.trigger ?
-            <div className="search-for-game-popup">
-                <div id="search-for-game-popup-blur"></div>
+        <div className="search-for-game-popup" style={{
+            opacity: props.trigger ? 1 : 0,
+            visibility: props.trigger ? "visible" : "hidden",
+        }}>
+            <div id="search-for-game-popup-blur" style={{
+                opacity: props.trigger ? 1 : 0,
+                visibility: props.trigger ? "visible" : "hidden",
+                backdropFilter: props.trigger ? "blur(5px) opacity(1)" : "blur(0px) opacity(0)"
+            }}></div>
+            {props.trigger ?
                 <div className="search-for-game-popup-inner">
                     <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off' onKeyDown={handleSearchKeyDown}
                         onChange={(e) => {
@@ -187,9 +196,8 @@ const SearchForGamePopup = (props) => {
                         }}
                     />
                     <ul id="popup-search-results"></ul>
-                </div>
-            </div>
-            : null
+                </div> : null}
+        </div>
     );
 }
 
