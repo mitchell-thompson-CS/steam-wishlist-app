@@ -34,16 +34,21 @@ const SearchForGamePopup = (props) => {
             document.removeEventListener('click', closePopup);
             document.removeEventListener('keydown', closePopup);
             searchPosition.current = 0;
-            setSearchTerm("");
+            setSearchTerm(""); 
         }
     }, [props.trigger, closePopup]);
 
     useEffect(() => {
+        let search = document.getElementById("popup-game-search");
         // focus on the search bar when the popup is opened
-        if (searchPopup && searchPopup.popupState) {
-            let search = document.getElementById("popup-game-search");
+        if (props.trigger) {
             if (search) {
                 search.focus();
+            }
+        } else {
+            // clear the value in the search box
+            if (search) {
+                search.value = "";
             }
         }
     }, [props.trigger, searchPopup]);
@@ -52,7 +57,7 @@ const SearchForGamePopup = (props) => {
         if (e.key === "ArrowDown" || (e.key === "Tab" && e.shiftKey === false)) {
             e.preventDefault();
             let searchResults = document.getElementById("popup-search-results");
-            if (searchResults) {
+            if (searchResults && searchResults.children.length > 0) {
                 if (searchPosition.current < searchResults.children.length) {
                     searchPosition.current = (searchPosition.current + 1) % (searchResults.children.length + 1);
                     searchResults.children[searchPosition.current - 1].focus();
@@ -61,13 +66,14 @@ const SearchForGamePopup = (props) => {
                     let search = document.getElementById("popup-game-search");
                     if (search) {
                         search.focus();
+                        search.select();
                     }
                 }
             }
         } else if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey === true)) {
             e.preventDefault();
             let searchResults = document.getElementById("popup-search-results");
-            if (searchResults) {
+            if (searchResults && searchResults.children.length > 0) {
                 if (searchPosition.current > 1) {
                     searchPosition.current -= 1;
                     searchResults.children[searchPosition.current - 1].focus();
@@ -76,6 +82,7 @@ const SearchForGamePopup = (props) => {
                     let search = document.getElementById("popup-game-search");
                     if (search) {
                         search.focus();
+                        search.select();
                     }
                 } else if (searchPosition.current === 0) {
                     searchPosition.current = searchResults.children.length;
@@ -87,6 +94,9 @@ const SearchForGamePopup = (props) => {
             let searchResults = document.getElementById("popup-search-results");
             if (searchResults && searchPosition.current > 0) {
                 searchResults.children[searchPosition.current - 1].click();
+            } else if (searchResults && searchResults.children.length > 0 && searchPosition.current === 0) {
+                // click first thing in list if currently selecting search bar
+                searchResults.children[0].click();
             }
         } else if (e.key !== "Shift") {
             searchPosition.current = 0;
@@ -177,15 +187,17 @@ const SearchForGamePopup = (props) => {
     return (
         <div className="search-for-game-popup" style={{
             opacity: props.trigger ? 1 : 0,
-            visibility: props.trigger ? "visible" : "hidden",
+            zIndex: props.trigger ? 100 : -1,
         }}>
             <div id="search-for-game-popup-blur" style={{
                 opacity: props.trigger ? 1 : 0,
                 visibility: props.trigger ? "visible" : "hidden",
                 backdropFilter: props.trigger ? "blur(5px) opacity(1)" : "blur(0px) opacity(0)"
             }}></div>
-            {props.trigger ?
-                <div className="search-for-game-popup-inner">
+            
+                <div className="search-for-game-popup-inner" style={{
+                    opacity: props.trigger ? 1 : 0,
+                }}>
                     <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off' onKeyDown={handleSearchKeyDown}
                         onChange={(e) => {
                             if (e.target.value !== searchTerm) {
@@ -193,8 +205,10 @@ const SearchForGamePopup = (props) => {
                             }
                         }}
                     />
+                    {props.trigger ?
                     <ul id="popup-search-results"></ul>
-                </div> : null}
+                    : null}
+                </div> 
         </div>
     );
 }
