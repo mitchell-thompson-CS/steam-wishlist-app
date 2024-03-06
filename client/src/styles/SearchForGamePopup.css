@@ -2,10 +2,18 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     height: 100vh;
-    background-color: rgba(50, 50, 80, 0.5);
     z-index: 9999;
+}
+
+#search-for-game-popup-blur {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(50, 50, 80, 0.5);
+    backdrop-filter: blur(7px);
+
 }
 
 .search-for-game-popup-inner {
@@ -16,11 +24,58 @@
     transform: translateY(-50%);
     margin-left: auto; 
     margin-right: auto; 
-    width: 400px;
+    width: 80%;
+    /* min-width: 300px; */
+    max-width: 800px;
     height: 60vh;
     min-height: 400px;
-    background-color: #282e35;
+    max-height: 600px;
     border-radius: 25px;
-    box-shadow: 0 0 10px 5px #171d25;
     user-select: none;
+    font-size: 25px;
+}
+
+#popup-game-search {
+    width: 100%;
+    height: 50px;
+    padding: 5px 25px;
+    border-radius: 25px;
+    border: 1px solid #3e444b;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+    background-color: transparent;
+    color: white;
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+#popup-game-search:focus {
+    outline: none;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.8);
+    border: 1px solid #444b52;
+}
+
+#popup-search-results {
+    width: calc(100%);
+    height: calc(100% - 60px);
+    list-style: none;
+}
+
+.popup-search-result {
+    width: calc(100%);
+    height: 20%;
+    display: table;
+    padding: 2% 5%;
+    border-radius: 25px;
+    table-layout: fixed;
+}
+
+.popup-search-result li {
+    width: calc(100%);
+    height: 100%;
+    display: table-cell;
+    cursor: pointer;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
