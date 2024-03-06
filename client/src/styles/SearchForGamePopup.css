@@ -78,7 +78,7 @@
     cursor: pointer;
 }
 
-.popup-search-result:focus {
+.popup-search-result:focus, .popup-search-result:hover {
     outline: none;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
     background-color: #4d545c;

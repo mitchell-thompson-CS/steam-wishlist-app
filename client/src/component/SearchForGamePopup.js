@@ -171,12 +171,7 @@ const SearchForGamePopup = (props) => {
                                         new_el.className = "popup-search-result";
                                         new_el.id = "popup-search-result" + i;
                                         new_el.title = cur_data.name;
-                                        new_el.onmouseover = function (event) {
-                                            event.currentTarget.focus();
-                                        };
-
                                         new_el.tabIndex = -1;
-
                                         new_el.onkeydown = handleSearchKeyDown;
                                         searchResults.appendChild(new_el);
                                     }
