@@ -58,7 +58,6 @@ const WishlistInner = () => {
             if (!gettingGameData) {
                 setGettingGameData(true);
                 for (const [key, value] of Object.entries(data.games)) {
-                    // console.log(gameData[key]);
                     if (gameData[key] === undefined) {
                         try {
                             dispatch(setLoading(true));

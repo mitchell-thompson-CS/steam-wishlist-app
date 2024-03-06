@@ -55,7 +55,6 @@ const Wishlists = () => {
                     wishlist_id: id
                 }
             });
-            console.log(res);
             if (handleResponse(res)) {
                 dispatch(deleteWishlist(id));
             }
