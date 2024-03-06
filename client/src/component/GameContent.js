@@ -124,6 +124,7 @@ const GameContent = () => {
             element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
             element.style.cursor = 'not-allowed';
             element.style.hover = 'not-allowed';
+            element.style.boxShadow = 'none';
         } catch (e) {
             console.log(e);
         }
