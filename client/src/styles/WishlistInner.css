@@ -1,9 +1,63 @@
+.wishlistInner { 
+    width: 100%;
+}
+
+#wishlistInner-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    height: 110px;
+    position: relative;
+    align-items: end;
+    padding-bottom: 10px;
+    flex-direction: row;
+    margin-bottom: 30px;
+}
+
+#wishlistInner-title {
+    font-size: 50px;
+    margin-left: 50px;
+    width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#wishlistInner-count {
+    flex-grow: 1;
+    padding-left: 5%;
+    font-size: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #9f9fa1;
+}
+
+@media (max-width: 1300px){
+    #wishlistInner-count {
+        display: none;
+    }
+
+    #wishlistInner-title {
+        width: 100%;
+        margin-right: 50px;
+    }
+}
+
+#wishlistInner-header-border {
+    width: 90%;
+    border: 1px solid #3e4e69;
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+}
+
 .gameList {
     width: 100%;
     min-width: 1000px;
-    padding: 50px 50px 0px 50px;
     display: inline-block;
     font-size: 20px;
+    padding: 10px 50px;
 }
 
 .gameItem {

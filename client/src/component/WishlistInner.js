@@ -94,7 +94,20 @@ const WishlistInner = () => {
 
     return (
         <div className="wishlistInner">
-            {/* <div className="listContainer"> */}
+            <div id="wishlistInner-header">
+                {wishlistItem && wishlistItem.name
+                    ? <h1 id="wishlistInner-title" title={wishlistItem.name}>{wishlistItem.name}</h1>
+                    : <h1 id="wishlistInner-title">Wishlist Name</h1>
+                }
+                {wishlistItem && wishlistItem.games ?
+                    <h3 id="wishlistInner-count">
+                        {Object.keys(wishlistItem.games).length} game{Object.keys(wishlistItem.games).length === 1 ? "" : "s"}
+                    </h3>
+                    : <h3 id="wishlistInner-count">0 games</h3>
+                }
+
+                <div id="wishlistInner-header-border"></div>
+            </div>
             <ul className="gameList">
                 <li className="gameItem" id="wishlistInner-addgame" onClick={enableSearchPopup}>
                     <h2>Add Game To Wishlist</h2>
@@ -142,8 +155,6 @@ const WishlistInner = () => {
                         : null
                 ))}
             </ul>
-            {/* </div> */}
-            {/* <button onClick={() => addGameToWishlist(id)}>Add Game to Wishlist</button> */}
         </div >
     )
 }
