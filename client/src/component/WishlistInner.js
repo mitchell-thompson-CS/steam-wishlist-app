@@ -82,7 +82,7 @@ const WishlistInner = () => {
         }
 
         fetchWishlistData().then(() => {
-            if (wishlistItem.games !== undefined && Object.keys(wishlistItem.games).length > 0){
+            if (wishlistItem.games !== undefined && Object.keys(wishlistItem.games).length > 0) {
                 fetchGameData(wishlistItem);
             }
         });
@@ -101,46 +101,43 @@ const WishlistInner = () => {
                 </li>
                 {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
                     gameData[key] ?
-                    <a href={"/game/" + key} key={key} className="gameLink" title={gameData[key].name}>
-                        <li className="gameItem">
-                            {/* <div className="gameContainer"> */}
-                            
-                            <div className="gameTitle">
-                                <h1 className="gameName">{gameData[key].name}</h1>
-                                <img src={gameData[key].header_image} alt="game thumbnail" />
-                            </div>
-                            <div className="gamePrice">
-                                <p className="priceTitle">Price</p>
-                                <span className="price">
-                                    {gameData[key].price_overview ?
-                                        <>
-                                            {gameData[key].price_overview.initial_formatted !== "" ?
-                                                <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
-                                                : null
-                                            }
-                                            <p className="priceFinal">{gameData[key].price_overview.final_formatted}</p>
-                                        </>
-                                        : <p className="priceFinal">Free</p>
-                                    }
-                                </span>
-                            </div>
-                            <div className="gameLowestPrice">
-                                <p className="lowestPriceTitle">Lowest Price</p>
-                            </div>
-                            <div className="gamePlayingNow">
-                                <p className="playingNowTitle">Playing Now</p>
-                            </div>
-                            <div className="gamePercent">
-                                <p className="reviewPercentTitle">Rating</p>
-                                <p className="reviewPercent">
-                                    {isNaN((Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)) === false
-                                        ? <>{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</>
-                                        : "No Reviews"
-                                    }
-                                </p>
-                            </div>
-                            {/* </div> */}
-                        </li>
+                        <a href={"/game/" + key} key={key} className="gameLink" title={gameData[key].name}>
+                            <li className="gameItem">
+                                <div className="gameTitle">
+                                    <h1 className="gameName">{gameData[key].name}</h1>
+                                    <img src={gameData[key].header_image} alt="game thumbnail" />
+                                </div>
+                                <div className="gamePrice">
+                                    <p className="priceTitle">Price</p>
+                                    <span className="price">
+                                        {gameData[key].price_overview ?
+                                            <>
+                                                {gameData[key].price_overview.initial_formatted !== "" ?
+                                                    <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
+                                                    : null
+                                                }
+                                                <p className="priceFinal">{gameData[key].price_overview.final_formatted}</p>
+                                            </>
+                                            : <p className="priceFinal">Free</p>
+                                        }
+                                    </span>
+                                </div>
+                                <div className="gameLowestPrice">
+                                    <p className="lowestPriceTitle">Lowest Price</p>
+                                </div>
+                                <div className="gamePlayingNow">
+                                    <p className="playingNowTitle">Playing Now</p>
+                                </div>
+                                <div className="gamePercent">
+                                    <p className="reviewPercentTitle">Rating</p>
+                                    <p className="reviewPercent">
+                                        {isNaN((Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)) === false
+                                            ? <>{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</>
+                                            : "No Reviews"
+                                        }
+                                    </p>
+                                </div>
+                            </li>
                         </a>
                         : null
                 ))}

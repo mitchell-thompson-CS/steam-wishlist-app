@@ -126,7 +126,6 @@ const SearchForGamePopup = (props) => {
                                             // add the game to the wishlist then close the popup
                                             dispatch(setLoading(true));
                                             try {
-                                                console.log(cur_data.appid, searchPopup.addingGame)
                                                 let res_add = await axios.post('/api/game/add', { game_id: cur_data.appid, wishlists: [searchPopup.addingGame] });
                                                 if (res_add.status === 200) {
                                                     dispatch(setEvent(true, "Game added to wishlist"));
