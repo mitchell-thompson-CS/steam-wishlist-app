@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setAddGameToWishlist, setEvent, setLoading, setSearchPopup } from '../actions/eventAction';
 import axios from 'axios';
 import { addGameToWishlist } from '../actions/wishlistAction';
+import LoadingImage from '../resources/rolling-loading.apng';
 
 const searchDelay = 500;
 
@@ -36,7 +37,7 @@ const SearchForGamePopup = (props) => {
             document.removeEventListener('keydown', closePopup);
             document.body.style.overflow = 'unset';
             searchPosition.current = 0;
-            setSearchTerm(""); 
+            setSearchTerm("");
         }
     }, [props.trigger, closePopup]);
 
@@ -113,16 +114,13 @@ const SearchForGamePopup = (props) => {
         let searchResults = document.getElementById("popup-search-results");
         let searchGameInner = document.getElementById("search-for-game-popup-inner");
         // setup delay for the search bar
-        const delayDebounce = setTimeout(() => {
-            if (searchResults) {
-                searchResults.style.height = "";
-            }
-            if (searchGameInner) {
-                searchGameInner.style.maxHeight = "600px";
-                searchGameInner.style.minHeight = "400px";
-            }
+        const delayDebounce = setTimeout(async () => {
             if (searchTerm && searchTerm !== "") {
-                fetch('/api/game/search/' + searchTerm, { mode: 'cors', credentials: 'include' })
+                let searchBar = document.getElementById("popup-game-search");
+                if (searchBar) {
+                    searchBar.style.background = 'url(' + LoadingImage + ') no-repeat right 15px center/50px';
+                }
+                await fetch('/api/game/search/' + searchTerm, { mode: 'cors', credentials: 'include' })
                     .then(function (response) {
                         if (response.status === 200) {
                             return response.json();
@@ -187,6 +185,20 @@ const SearchForGamePopup = (props) => {
                         }
                         // reset the search position after getting new data (or failing to)
                         searchPosition.current = 0;
+
+                        // reset the stylings changed
+                        if (searchResults) {
+                            searchResults.style.height = "";
+                        }
+                        if (searchGameInner) {
+                            searchGameInner.style.maxHeight = "600px";
+                            searchGameInner.style.minHeight = "400px";
+                        }
+
+                        // unset loading image
+                        if (searchBar) {
+                            searchBar.style.background = '';
+                        }
                     });
             } else {
                 // set the height of the search results to 0 if there's no search term
@@ -215,21 +227,21 @@ const SearchForGamePopup = (props) => {
                 visibility: props.trigger ? "visible" : "hidden",
                 backdropFilter: props.trigger ? "blur(5px) opacity(1)" : "blur(0px) opacity(0)"
             }}></div>
-            
-                <div id="search-for-game-popup-inner" style={{
-                    opacity: props.trigger ? 1 : 0,
-                }}>
-                    <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off' onKeyDown={handleSearchKeyDown}
-                        onChange={(e) => {
-                            if (e.target.value !== searchTerm) {
-                                setSearchTerm(e.target.value);
-                            }
-                        }}
-                    />
-                    {props.trigger ?
+
+            <div id="search-for-game-popup-inner" style={{
+                opacity: props.trigger ? 1 : 0,
+            }}>
+                <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off' onKeyDown={handleSearchKeyDown}
+                    onChange={(e) => {
+                        if (e.target.value !== searchTerm) {
+                            setSearchTerm(e.target.value);
+                        }
+                    }}
+                />
+                {props.trigger ?
                     <ul id="popup-search-results"></ul>
                     : null}
-                </div> 
+            </div>
         </div>
     );
 }

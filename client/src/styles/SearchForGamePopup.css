@@ -46,12 +46,18 @@
     color: white;
     font-size: 25px;
     margin-bottom: 5px;
+    /* this padding is for the loading image that appears from SearchForGamePopup.js */
+    padding-right: 65px;
 }
 
 #popup-game-search:focus {
     outline: none;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.8);
     border: 1px solid #444b52;
+}
+
+#popup-game-search::selection {
+    background: #707a86;
 }
 
 #popup-search-results {
