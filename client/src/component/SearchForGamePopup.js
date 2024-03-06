@@ -37,8 +37,13 @@ const SearchForGamePopup = (props) => {
     }, [props.trigger, closePopup]);
 
     useEffect(() => {
-        // console.log(searchPopup);
-    }, [searchPopup]);
+        if(props.trigger) {
+            let search = document.getElementById("popup-game-search");
+            if (search) {
+                search.focus();
+            }
+        }
+    }, [props.trigger, searchPopup]);
 
     useEffect(() => {
         // setup delay for the search bar
@@ -124,7 +129,7 @@ const SearchForGamePopup = (props) => {
             <div className="search-for-game-popup">
                 <div id="search-for-game-popup-blur"></div>
                 <div className="search-for-game-popup-inner">
-                    <input type="text" id="popup-game-search" placeholder="Enter a game name" autoComplete='off'
+                    <input type="text" id="popup-game-search" placeholder="Enter game name" autoComplete='off'
                         onChange={(e) => {
                             if (e.target.value !== searchTerm) {
                                 setSearchTerm(e.target.value);
