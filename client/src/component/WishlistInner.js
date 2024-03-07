@@ -139,14 +139,16 @@ const WishlistInner = () => {
     }, [navBarScroll]);
 
     useEffect(() => {
-        document.onkeydown = function (e) {
-            if (e.key === "Escape") {
-                setRemoveGameList({
-                    list: []
-                });
-            }
-        }
+        document.onkeydown = cancelRemoveGame;
     }, []);
+
+    function cancelRemoveGame(e) {
+        if (e.key === "Escape") {
+            setRemoveGameList({
+                list: []
+            });
+        }
+    }
 
     return (
         <div className="wishlistInner">
