@@ -25,6 +25,7 @@
     "express-session": "^1.17.3",
     "firebase": "^10.7.2",
     "firebase-admin": "^12.0.0",
+    "node-schedule": "^2.1.1",
     "passport": "^0.7.0",
     "passport-steam": "^1.0.18",
     "steam-user": "^5.0.7",

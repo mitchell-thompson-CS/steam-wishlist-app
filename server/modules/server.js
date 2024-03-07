@@ -7,6 +7,7 @@ const { getWishlists, createWishlist, deleteWishlist } = require("./wishlists.js
 const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlists, addEditorToWishlist, deleteEditorFromWishlist } = require("./wishlistInner.js");
 const { getGamePage, searchGamePage } = require("./game.js");
 const { lowRateLimit, mediumRateLimit, highRateLimit } = require("./rateLimit.js");
+const { getFeatured } = require("./home.js");
 
 const app = express()
 
@@ -69,5 +70,8 @@ app.delete('/api/game/remove', isLoggedIn, mediumRateLimit, removeGameFromWishli
 app.get('/api/game/search/:query', mediumRateLimit, searchGamePage);
 
 app.get('/api/game/:game_id', mediumRateLimit, getGamePage);
+
+// home paths
+app.get('/api/home/featured', getFeatured);
 
 exports.app = app;

@@ -20,6 +20,8 @@
 }
 .wishlist-header-left {
     justify-content: flex-start;
+    font-size: 12px;
+    color: gray;
 }
 
 .wishlist-header-right {

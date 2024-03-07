@@ -12,7 +12,7 @@ const WishlistGridHeader = () => {
     return (
         <div id="wishlist-header">
             <div className="wishlist-header-left">
-                <h1>WISHLISTS</h1>
+                <h1>YOUR WISHLISTS</h1>
             </div>
             {/* <div class="wishlist-header-left">
                 <h1>test</h1>

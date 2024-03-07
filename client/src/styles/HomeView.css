@@ -1,20 +1,46 @@
-/* .homeView {
+.homeView {
     display: flex;
+    flex-direction: column;
     justify-content: center;
 }
 
-.gridContainer {
-    width: 1110px;
-    height: 210px;
-    padding: 50px;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(1, 1fr);
-    overflow: hidden;
-    gap: 10px;
+#homeWishlistHeader {
+    padding-top: 20px;
+    padding-bottom: 5px;
+    margin: 0 50px;
+    display: flex;
+    border-bottom: 3px solid #393f46;
+    border-radius: 3px;
 }
 
-.gridItem {
+.homeHeaderLeft {
+    align-items: center;
+    padding-left: 50px;
+    padding-right: 50px;
+    height: 50px;
+    line-height: 50px;
+    justify-content: flex-start;
+    font-size: 12px;
+    color: gray;
+}
+
+.homeHeaderLeft * {
+    height: 100%;
+}
+
+.wishlistRow {
+    width: 100%;
+    height: 180px;
+    padding: 20px 50px 50px 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 160px);
+    overflow: hidden;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.rowItem {
     width: 100%;
     height: 100%;
     text-align: center;
@@ -25,7 +51,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    padding: 0px 5px;
+    padding: 0px 10px;
     font-size: 16px;
     transition: 0.2s;
     color: white;
@@ -33,21 +59,40 @@
     padding-top: 50px;
 }
 
-.gridItem * {
+.rowItem h2 {
+    text-decoration: underline;
+    font-size: 20px;
+}
+
+.rowItem p {
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.rowItem * {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 
-.gridItem:hover {
+.rowItem:hover {
     background-color: #393f46;
 }
 
-.gridItemContainer {
+.rowItemContainer {
     position: relative;
     width: 160px;
     height: 160px;
     background-color: #282e35;
     border-radius: 15px;
     box-shadow: 10px white;
-} */
+}
+
+#homePopularHeader {
+    padding-top: 20px;
+    padding-bottom: 5px;
+    margin: 0 50px;
+    display: flex;
+    border-bottom: 3px solid #393f46;
+    border-radius: 3px;
+}
