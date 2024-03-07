@@ -1,4 +1,4 @@
-import { ADD_GAME_TO_WISHLIST, CREATE_WISHLIST, DELETE_GAME_FROM_WISHLIST, DELETE_WISHLIST, DELETE_WISHLISTS, RENAME_WISHLIST, SET_WISHLISTS } from "../actionTypes/actionTypes";
+import { ADD_GAME_TO_WISHLIST, CREATE_WISHLIST, DELETE_GAME_FROM_WISHLIST, DELETE_WISHLIST, DELETE_WISHLISTS, RENAME_WISHLIST, SET_WISHLIST, SET_WISHLISTS } from "../actionTypes/actionTypes";
 
 const initialState = {
     wishlists: {},
@@ -44,6 +44,12 @@ const wishlistReducer = (state = initialState, action) => {
                 return {
                     ...state,
                     wishlists: action.payload.wishlists,
+                };
+            case SET_WISHLIST:
+                newState[action.payload.wishlistType][action.payload.wishlistID] = action.payload.wishlist;
+                return {
+                    ...state,
+                    wishlists: newState,
                 };
             case DELETE_WISHLISTS:
                 return {

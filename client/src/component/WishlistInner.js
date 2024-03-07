@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { createWishlist, deleteWishlist } from "../actions/wishlistAction";
+import { createWishlist, deleteGameFromWishlist, deleteWishlist, setWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import '../styles/WishlistInner.css';
 import { useParams } from "react-router-dom";
-import { setLoading, setSearchPopup } from "../actions/eventAction";
+import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
 import { addGame, removeGame } from "../actions/gameAction";
 
 const WishlistInner = () => {
@@ -13,7 +13,7 @@ const WishlistInner = () => {
     const gameData = useSelector(state => state.gameReducer.games);
     const user = useSelector(state => state.userReducer.user);
     const [gettingGameData, setGettingGameData] = useState(false)
-    const [gettingWishlistData, setGettingWishlistData] = useState(false)
+    const gettingWishlistData = useRef(false);
     const [navBarScroll, setNavBarScroll] = useState(false)
     const [removeGameList, setRemoveGameList] = useState({
         list: [],
@@ -22,12 +22,14 @@ const WishlistInner = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        // fetches the wishlist data for the current wishlist
         async function fetchWishlistData() {
             let data;
             let wishlistFound = (id && wishlistItems !== undefined && wishlistItems.owned !== undefined && wishlistItems.shared !== undefined &&
                 (wishlistItems.owned[id] !== undefined || wishlistItems.shared[id] !== undefined));
-            if (!wishlistFound && !gettingWishlistData) {
-                setGettingWishlistData(true);
+            if (!wishlistFound && !gettingWishlistData.current) {
+                console.log("getting wishlist");
+                gettingWishlistData.current = true;
                 dispatch(setLoading(true));
                 let response = await fetch('/api/wishlist/' + id, { mode: 'cors', credentials: 'include' });
                 dispatch(setLoading(false));
@@ -39,15 +41,16 @@ const WishlistInner = () => {
                 // now need to update redux store with this new wishlist in the correct spot
                 if (data !== null && user !== undefined && user.id !== undefined) {
                     if (user.id === data.owner) {
-                        dispatch(createWishlist(data.id, data.name, "owned"));
+                        dispatch(setWishlist(id, "owned", data));
                     } else if (data.editors[user.id] !== undefined) {
-                        dispatch(createWishlist(data.id, data.name, "shared"));
+                        dispatch(setWishlist(id, "shared", data));
                     }
                 }
-            } else if (!gettingWishlistData) {
-                if (wishlistItems.owned[id] !== undefined) {
+            } else if (!gettingWishlistData.current) {
+                // update the data with the current wishlist if it already exists
+                if (wishlistItems.owned && wishlistItems.owned[id] !== undefined) {
                     data = wishlistItems.owned[id];
-                } else if (wishlistItems.shared[id] !== undefined) {
+                } else if (wishlistItems.shared && wishlistItems.shared[id] !== undefined) {
                     data = wishlistItems.shared[id];
                 }
             }
@@ -55,11 +58,16 @@ const WishlistInner = () => {
                 return;
             }
             setWishlistItem(data);
-            setGettingWishlistData(false);
+            gettingWishlistData.current = false;
         }
+        // if the wishlistItem is not already set, we want to fetch the wishlist data
+        fetchWishlistData();
+    }, [id, wishlistItems, user, dispatch]);
 
+    useEffect(() => {
+        // fetches the game data for each game in the wishlist
         async function fetchGameData(data) {
-            if (!gettingGameData) {
+            if (!gettingGameData && data && data.games && gameData !== undefined) {
                 setGettingGameData(true);
                 for (const [key, value] of Object.entries(data.games)) {
                     if (gameData[key] === undefined) {
@@ -74,6 +82,7 @@ const WishlistInner = () => {
                                     if (data2) {
                                         dispatch(addGame(key, data2));
                                     }
+                                    dispatch(setLoading(false));
                                 })
                         } catch (error) {
                             console.error(error);
@@ -81,21 +90,18 @@ const WishlistInner = () => {
                     }
                 }
                 setGettingGameData(false);
-                dispatch(setLoading(false));
             }
         }
+        fetchGameData(wishlistItem);
+    }, [wishlistItem, gettingGameData, dispatch, gameData]);
 
-        fetchWishlistData().then(() => {
-            if (wishlistItem.games !== undefined && Object.keys(wishlistItem.games).length > 0) {
-                fetchGameData(wishlistItem);
-            }
-        });
-    }, [id, wishlistItems, user, dispatch, gameData, gettingGameData, gettingWishlistData, wishlistItem]);
-
+    // enables the search popup with the current wishlists id
     function enableSearchPopup() {
         dispatch(setSearchPopup(true, id));
     }
 
+    // if the user scrolls the page, we want to show the mini header if the user is not at the top of the page
+    // sets the state of navBarScroll and changes visibility of the mini header (for on first load)
     useEffect(() => {
         let wishlistInner = document.getElementById("wishlistMainContent");
         let wishlistHeaderMini = document.getElementById("wishlistInner-header-mini");
@@ -121,37 +127,102 @@ const WishlistInner = () => {
         }
     }, []);
 
+    // if the user scrolls the page, we want to hide the mini header if the user is at the top of the page
+    // sets the transitionend and transitionstart events for the mini header
     useEffect(() => {
         let wishlistHeaderMini = document.getElementById("wishlistInner-header-mini");
         if (wishlistHeaderMini) {
             wishlistHeaderMini.ontransitionend = function () {
-                if (!navBarScroll) {
+                if (!navBarScroll && removeGameList.list && removeGameList.list.length === 0) {
                     wishlistHeaderMini.style.visibility = "hidden";
                 }
             }
 
             wishlistHeaderMini.ontransitionstart = function () {
-                if (navBarScroll) {
+                if (navBarScroll || (removeGameList.list && removeGameList.list.length > 0)) {
                     wishlistHeaderMini.style.visibility = "visible";
                 }
             }
         }
-    }, [navBarScroll]);
+    }, [navBarScroll, removeGameList]);
 
-    useEffect(() => {
-        document.onkeydown = cancelRemoveGame;
+    // add event listener for escape key
+    const cancelRemoveGame = useCallback((e) => {
+        if (e.key === "Escape") {
+            deselectSelectedGames();
+        }
     }, []);
 
-    function cancelRemoveGame(e) {
-        if (e.key === "Escape") {
-            setRemoveGameList({
-                list: []
-            });
+    // add event listener for escape key
+    useEffect(() => {
+        document.onkeydown = cancelRemoveGame;
+    }, [cancelRemoveGame]);
+
+    // deselects all the games that are currently selected
+    function deselectSelectedGames() {
+        setRemoveGameList({
+            list: []
+        });
+        let checkboxes = document.getElementsByClassName("gameSelect");
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
+        }
+    }
+
+    // attempts to delete all the games in the current list of selected games
+    async function deleteSelectedGames() {
+        dispatch(setLoading(true));
+        let success = true;
+        try {
+            for (let i = 0; i < removeGameList.list.length; i++) {
+                let data = {
+                    wishlists: [id],
+                    game_id: removeGameList.list[i]
+                }
+                try {
+                    let res = await axios.delete('/api/game/remove', {
+                        data: data
+                    });
+                    if (res.status === 200) {
+                        console.log("deleting game " + removeGameList.list[i])
+                        if (wishlistItems.owned && wishlistItems.owned[id] !== undefined) {
+                            dispatch(deleteGameFromWishlist(id, "owned", removeGameList.list[i]));
+                        } else if (wishlistItems.shared && wishlistItems.shared[id] !== undefined) {
+                            dispatch(deleteGameFromWishlist(id, "shared", removeGameList.list[i]));
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
+                    success = false;
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+
+        if (!success) {
+            dispatch(setEvent(false, "Error deleting games"));
+            // clear the wishlist data and reload it
+            // setting the wishlist to undefined will cause the useEffect to fetch the wishlist data again
+            // using set instead of delete because we don't want to reorder map if possible
+            if (wishlistItems.owned && wishlistItems.owned[id] !== undefined) {
+                dispatch(setWishlist(id, "owned", undefined));
+            } else if (wishlistItems.shared && wishlistItems.shared[id] !== undefined) {
+                dispatch(setWishlist(id, "shared", undefined));
+            }
+            deselectSelectedGames();
+            dispatch(setLoading(false));
+        } else {
+            dispatch(setEvent(true, "Games deleted successfully"));
+            deselectSelectedGames();
+            dispatch(setLoading(false));
         }
     }
 
     return (
         <div className="wishlistInner">
+            {/* main header */}
             <div id="wishlistInner-header">
                 {wishlistItem && wishlistItem.name
                     ? <h1 id="wishlistInner-title" title={wishlistItem.name}>{wishlistItem.name}</h1>
@@ -166,8 +237,9 @@ const WishlistInner = () => {
 
                 <div id="wishlistInner-header-border"></div>
             </div>
+            {/* mini header for when below regular header */}
             <div id="wishlistInner-header-mini" style={{
-                top: navBarScroll ? 75 : 75 - 50
+                top: navBarScroll || (removeGameList.list && removeGameList.list.length > 0) ? 75 : 75 - 50
             }}>
                 <div id="wishlistInner-header-main">
                     {removeGameList.list && removeGameList.list.length > 0 ?
@@ -178,13 +250,11 @@ const WishlistInner = () => {
                             }
                             <h3 className="button-mini-header" id="remove-game-mini" style={{
                                 display: removeGameList.list && removeGameList.list.length > 0 ? "inline-block" : "none"
-                            }}>Delete Game{removeGameList.list && removeGameList.list.length > 1 ? "s" : ""} </h3>
+                            }}
+                                onClick={deleteSelectedGames}
+                            >Delete Game{removeGameList.list && removeGameList.list.length > 1 ? "s" : ""} </h3>
 
-                            <h3 className="button-mini-header" id="cancel-remove-mini" onClick={() => {
-                                setRemoveGameList({
-                                    list: []
-                                })
-                            }}>Deselect All</h3>
+                            <h3 className="button-mini-header" id="cancel-remove-mini" onClick={deselectSelectedGames}>Deselect All</h3>
                         </>
                         :
                         <>
@@ -197,23 +267,43 @@ const WishlistInner = () => {
                     }
                 </div>
             </div>
+            {/* actual main content of this page, listing the games */}
             <ul className="gameList">
-                <button onClick={() => {
-                    setRemoveGameList({
-                        list: [...removeGameList.list, "test"]
-                    })
-                }}>TEST</button>
                 <li className="gameItem" id="wishlistInner-addgame" onClick={enableSearchPopup}>
                     <h2>Add Game To Wishlist</h2>
                 </li>
                 {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
                     gameData[key] ?
-                        <a href={"/game/" + key} key={key} className="gameLink" title={gameData[key].name}>
-                            <li className="gameItem">
+                        <li key={key} className="gameItem" title={gameData[key].name}>
+                            {/* selecting the game for deletion */}
+                            <div className="gameSelectSection">
+                                <input type="checkbox" className="gameSelect" id={"gameSelect" + key}
+                                    onChange={(e) => {
+                                        if (removeGameList.list.includes(key)) {
+                                            let newList = removeGameList.list.filter((item) => item !== key);
+                                            setRemoveGameList({
+                                                list: newList
+                                            });
+                                            e.target.checked = false;
+                                        } else {
+                                            setRemoveGameList({
+                                                list: [...removeGameList.list, key]
+                                            });
+                                            e.target.checked = true;
+                                        }
+                                    }}
+                                />
+                                <label htmlFor={"gameSelect" + key}></label>
+                            </div>
+                            {/* rest of the game information */}
+                            <a href={"/game/" + key} className="gameLink">
+                                {/* title */}
                                 <div className="gameTitle">
                                     <h1 className="gameName">{gameData[key].name}</h1>
                                     <img src={gameData[key].header_image} alt="game thumbnail" />
                                 </div>
+
+                                {/* price */}
                                 <div className="gamePrice">
                                     <p className="priceTitle">Price</p>
                                     <span className="price">
@@ -229,12 +319,18 @@ const WishlistInner = () => {
                                         }
                                     </span>
                                 </div>
+
+                                {/* lowest price */}
                                 <div className="gameLowestPrice">
                                     <p className="lowestPriceTitle">Lowest Price</p>
                                 </div>
+
+                                {/* playing the game now */}
                                 <div className="gamePlayingNow">
                                     <p className="playingNowTitle">Playing Now</p>
                                 </div>
+
+                                {/* game review percentage */}
                                 <div className="gamePercent">
                                     <p className="reviewPercentTitle">Rating</p>
                                     <p className="reviewPercent">
@@ -250,8 +346,8 @@ const WishlistInner = () => {
                                         }
                                     </p>
                                 </div>
-                            </li>
-                        </a>
+                            </a>
+                        </li>
                         : null
                 ))}
             </ul>

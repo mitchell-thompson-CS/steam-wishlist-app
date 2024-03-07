@@ -24,16 +24,20 @@ const WishlistSidebar = () => {
                     </Link>
                 </li>
                 {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
+                    value ?
                     <li key={key} className="wishlistItem" title={value.name}>
                             <Link to={"/wishlists/" + key}>
                                 {value.name}
                             </Link>
                     </li>
+                    : null
                 ))}
                 {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
+                    value ?
                     <li key={key} className="wishlistItem" title={value.name}>
                         <Link to={"/wishlists/" + key}>{value.name}</Link>
                     </li>
+                    : null
                 ))}
             </ul>
         </div>
