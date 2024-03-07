@@ -14,6 +14,10 @@ const WishlistInner = () => {
     const user = useSelector(state => state.userReducer.user);
     const [gettingGameData, setGettingGameData] = useState(false)
     const [gettingWishlistData, setGettingWishlistData] = useState(false)
+    const [navBarScroll, setNavBarScroll] = useState(false)
+    const [removeGameList, setRemoveGameList] = useState({
+        list: [],
+    });
     let { id } = useParams();
     const dispatch = useDispatch();
 
@@ -92,6 +96,58 @@ const WishlistInner = () => {
         dispatch(setSearchPopup(true, id));
     }
 
+    useEffect(() => {
+        let wishlistInner = document.getElementById("wishlistMainContent");
+        let wishlistHeaderMini = document.getElementById("wishlistInner-header-mini");
+        if (wishlistInner) {
+            if (wishlistInner.scrollTop > 110) {
+                setNavBarScroll(true);
+                if (wishlistHeaderMini) {
+                    wishlistHeaderMini.style.visibility = "visible";
+                }
+            } else {
+                setNavBarScroll(false);
+                if (wishlistHeaderMini) {
+                    wishlistHeaderMini.style.visibility = "hidden";
+                }
+            }
+            wishlistInner.onscroll = function () {
+                if (wishlistInner.scrollTop > 110) {
+                    setNavBarScroll(true);
+                } else {
+                    setNavBarScroll(false);
+                }
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        let wishlistHeaderMini = document.getElementById("wishlistInner-header-mini");
+        if (wishlistHeaderMini) {
+            wishlistHeaderMini.ontransitionend = function () {
+                if (!navBarScroll) {
+                    wishlistHeaderMini.style.visibility = "hidden";
+                }
+            }
+
+            wishlistHeaderMini.ontransitionstart = function () {
+                if (navBarScroll) {
+                    wishlistHeaderMini.style.visibility = "visible";
+                }
+            }
+        }
+    }, [navBarScroll]);
+
+    useEffect(() => {
+        document.onkeydown = function (e) {
+            if (e.key === "Escape") {
+                setRemoveGameList({
+                    list: []
+                });
+            }
+        }
+    }, []);
+
     return (
         <div className="wishlistInner">
             <div id="wishlistInner-header">
@@ -108,7 +164,43 @@ const WishlistInner = () => {
 
                 <div id="wishlistInner-header-border"></div>
             </div>
+            <div id="wishlistInner-header-mini" style={{
+                top: navBarScroll ? 75 : 75 - 50
+            }}>
+                <div id="wishlistInner-header-main">
+                    {removeGameList.list && removeGameList.list.length > 0 ?
+                        <>
+                            {removeGameList.list && removeGameList.list.length > 0 ?
+                                <p>{removeGameList.list.length} selected</p>
+                                : null
+                            }
+                            <h3 className="button-mini-header" id="remove-game-mini" style={{
+                                display: removeGameList.list && removeGameList.list.length > 0 ? "inline-block" : "none"
+                            }}>Delete Game{removeGameList.list && removeGameList.list.length > 1 ? "s" : ""} </h3>
+
+                            <h3 className="button-mini-header" id="cancel-remove-mini" onClick={() => {
+                                setRemoveGameList({
+                                    list: []
+                                })
+                            }}>Deselect All</h3>
+                        </>
+                        :
+                        <>
+                            <h3 className="button-mini-header" id="add-game-mini" onClick={enableSearchPopup}>Add Game</h3>
+
+                            {wishlistItem && wishlistItem.name
+                                ? <h1 id="wishlistInner-title-mini" title={wishlistItem.name}>{wishlistItem.name}</h1>
+                                : null}
+                        </>
+                    }
+                </div>
+            </div>
             <ul className="gameList">
+                <button onClick={() => {
+                    setRemoveGameList({
+                        list: [...removeGameList.list, "test"]
+                    })
+                }}>TEST</button>
                 <li className="gameItem" id="wishlistInner-addgame" onClick={enableSearchPopup}>
                     <h2>Add Game To Wishlist</h2>
                 </li>
@@ -147,6 +239,12 @@ const WishlistInner = () => {
                                         {isNaN((Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)) === false
                                             ? <>{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</>
                                             : "No Reviews"
+                                        }
+                                    </p>
+                                    <p className="reviewTotal">
+                                        {gameData[key].reviews.total_reviews !== 0
+                                            ? <>{gameData[key].reviews.total_reviews} Reviews</>
+                                            : null
                                         }
                                     </p>
                                 </div>

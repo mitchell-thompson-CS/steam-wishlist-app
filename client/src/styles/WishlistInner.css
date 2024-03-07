@@ -52,6 +52,85 @@
     left: 5%;
 }
 
+#wishlistInner-header-mini {
+    position: fixed;
+    width: calc(100% - 260px);
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.6);
+    background: rgba(41, 45, 53, 0.9);
+    transition: top 0.3s;
+    padding: 0 20px;
+}
+
+#wishlistInner-header-main {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    height: 50px;
+    line-height: 50px;
+}
+
+#wishlistInner-header-mini * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.button-mini-header {
+    flex-shrink: 0;
+    min-width: fit-content;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+    transition: padding 0.3s;
+    transition: font-size 0.3s;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+}
+
+.button-mini-header:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 1300px){
+    .button-mini-header {
+        font-size: 14px;
+        padding: 0 5px;
+    }
+}
+
+#add-game-mini {
+    background-color: rgba(27, 190, 62, 0.7);
+}
+
+#add-game-mini:hover {
+    background-color: rgb(27, 190, 62)
+}
+
+#remove-game-mini {
+    background-color: rgb(193, 11, 11, 0.7);
+    line-height: 30px;
+    height: 30px;
+}
+
+#remove-game-mini:hover {
+    background-color: rgb(193, 11, 11);
+}
+
+#cancel-remove-mini {
+    background-color: rgba(77, 84, 92, 0.6);
+    line-height: 30px;
+    height: 30px;
+}
+
+#cancel-remove-mini:hover {
+    background-color: rgb(77, 84, 92);
+}
+
 .gameList {
     width: 100%;
     min-width: 1000px;
@@ -154,7 +233,13 @@
 }
 
 .reviewPercent {
-    margin: auto;
+    margin: auto auto 0px auto;
+}
+
+.reviewTotal {
+    font-size: 14px;
+    margin: 0px auto auto auto;
+    color: #88929c;
 }
 
 #wishlistInner-addgame {
