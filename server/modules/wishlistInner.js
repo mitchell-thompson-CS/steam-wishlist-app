@@ -73,7 +73,6 @@ async function getWishlistInner(req, res) {
         }
 
         let data = wishlistSnapshot.data();
-        data['id'] = req.params.id;
         if (!data.editors[req.user.id] && data.owner.id != req.user.id) {
             Logging.handleResponse(res, 403, null, function_name,
                 "User " + req.user.id + " is not the owner or editor of wishlist " + req.params.id);
