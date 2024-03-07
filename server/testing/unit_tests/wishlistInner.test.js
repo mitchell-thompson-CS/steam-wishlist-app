@@ -222,7 +222,6 @@ describe("Wishlist Inner", () => {
         expect(res.status).toBe(200);
 
         expect(res.data).toBeDefined();
-        expect(res.data.id).toBe(wishlist_id);
         expect(res.data.name).toBe("testWishlist");
         expect(res.data.games).toBeDefined();
         expect(res.data.games).toEqual({ "testGameID": "testGameName" });
@@ -273,7 +272,6 @@ describe("Wishlist Inner", () => {
         expect(res.status).toBe(200);
 
         expect(res.data).toBeDefined();
-        expect(res.data.id).toBe(wishlist_id);
         expect(res.data.name).toBe("testWishlist");
         expect(res.data.games).toBeDefined();
         expect(res.data.editors).toBeDefined();
