@@ -7,7 +7,6 @@ import gameReducer from './reducers/gameReducer';
 function loadFromSessionStorage() {
     try {
         const serializedState = sessionStorage.getItem("state");
-        if (serializedState === null) return undefined;
         let state = JSON.parse(serializedState);
         const serializedState2 = localStorage.getItem("state");
         let state2 = JSON.parse(serializedState2);
