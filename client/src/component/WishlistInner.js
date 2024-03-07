@@ -184,7 +184,6 @@ const WishlistInner = () => {
                         data: data
                     });
                     if (res.status === 200) {
-                        console.log("deleting game " + removeGameList.list[i])
                         if (wishlistItems.owned && wishlistItems.owned[id] !== undefined) {
                             dispatch(deleteGameFromWishlist(id, "owned", removeGameList.list[i]));
                         } else if (wishlistItems.shared && wishlistItems.shared[id] !== undefined) {
