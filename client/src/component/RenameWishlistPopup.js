@@ -76,7 +76,6 @@ const RenameWishlistPopup = (props) => {
                         <button id="renameWishlistConfirm" onClick={
                             () => {
                                 let newName = document.getElementById('renameWishlistName').value;
-                                console.log(newName, props.id);
                                 renameWishlistPost(props.id, newName);
                             }
 
