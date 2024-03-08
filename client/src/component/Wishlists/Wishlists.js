@@ -115,18 +115,23 @@ const Wishlists = () => {
                 ))}
             </div>
             <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
-                <div className="popupInputContainer">
-                    <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
+                <h2>Create Wishlist</h2>
+                <div className="popup-section">
+                    <input type="text" placeholder="Enter Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)}/>
+                </div>
+                <div className="popup-section" style={{marginBottom: 0}}>
                     {/* .THEN STATE CHANGE SUCKS. FIND ANOTHER WAY TO GET COMPONENT TO RERENDER */}
-                    <button onClick={() => {createWishlistPost(inputText).then(() => {setButtonPopup(false)})}} className="popupButton">Create Wishlist</button>
+                    <button onClick={() => {createWishlistPost(inputText).then(() => {setButtonPopup(false)})}}>
+                        Create
+                    </button>
                 </div>
             </Popup>
             <Popup trigger={contextPopup} setTrigger={setContextPopup}>
-                <div className="popupInputContainer">
+                <div className="popup-section">
                     <input type="text" placeholder="Enter New Wishlist Name..." value={inputText} onChange={(e) => setInputText(e.target.value)} className="popupInput"/>
                     <button onClick={() => {renameWishlistPost(contextPopup, inputText); setContextPopup("")}} className="popupButton">Rename</button>
                 </div>
-                <div className="popupButtonContainer">
+                <div className="popup-section" style={{marginBottom: 0}}>
                     <button onClick={() => {deleteWishlistPost(contextPopup); setContextPopup("")}} className="popupButton">Delete Wishlist</button>
                 </div>
             </Popup>

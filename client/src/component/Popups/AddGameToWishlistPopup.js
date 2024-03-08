@@ -4,6 +4,7 @@ import '../../styles/AddGameToWishlistPopup.css';
 import { setAddGameToWishlist, setEvent, setLoading } from "../../actions/eventAction";
 import axios from "axios";
 import { addGameToWishlist, deleteGameFromWishlist, deleteWishlists } from "../../actions/wishlistAction";
+import Popup from "./Popup";
 
 const AddGameToWishlistPopup = (props) => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -14,13 +15,8 @@ const AddGameToWishlistPopup = (props) => {
     const [wishlistsToRemoveFrom, setWishlistsToRemoveFrom] = useState({});
 
     // close the popup when clicking outside of it
-    const closePopup = useCallback((e) => {
-        if (e.target.className === "addGameToWishlistPopup" || e.key === "Escape"
-            || e.target.id === "close-wishlist-add-popup") {
-            dispatch(setAddGameToWishlist(null));
-            document.removeEventListener('click', closePopup);
-            document.removeEventListener('keydown', closePopup);
-        }
+    const closePopup = useCallback(() => {
+        dispatch(setAddGameToWishlist(null));
     }, [dispatch])
 
     useEffect(() => {
@@ -39,14 +35,6 @@ const AddGameToWishlistPopup = (props) => {
             document.body.style.overflow = 'unset';
         }
     }, [props.trigger]);
-
-    useEffect(() => {
-        // add event listeners to close the popup when active
-        if (props.trigger) {
-            document.addEventListener('click', closePopup);
-            document.addEventListener('keydown', closePopup);
-        }
-    }, [dispatch, props.trigger, closePopup]);
 
     useEffect(() => {
         // need to trigger the hover effect to all wishlists with the game already
@@ -120,7 +108,7 @@ const AddGameToWishlistPopup = (props) => {
         }
 
         // close the popup
-        dispatch(setAddGameToWishlist(null));
+        closePopup();
     }
 
     function selectWishlist(e) {
@@ -155,52 +143,51 @@ const AddGameToWishlistPopup = (props) => {
     }
 
     return (
-        props.trigger ?
-            <div className="addGameToWishlistPopup">
-                <div className="addGameToWishlistPopupInner">
-                    <h1>Select Wishlists</h1>
-                    <div className="addGameToWishlistPopupInnerContent">
-                        <div className="addGameToWishlistEntries">
-                            <h2>Your Wishlists</h2>
-                            {wishlistItems.owned !== undefined ?
-                                Object.keys(wishlistItems.owned).map((key) => {
-                                    return (
-                                        <div key={key} className="wishlistGamePopupWishlistName" id={key} onClick={selectWishlist}>
-                                            <h3 className="wishlist-popup-name" title={wishlistItems.owned[key].name}>{wishlistItems.owned[key].name}</h3>
-                                            <h3 className="wishlist-popup-wishlist-status">
-                                                {wishlistItems.owned[key].games[props.trigger] !== undefined ? "-" : "+"}
-                                            </h3>
-                                            <div className="clear"></div>
-                                        </div>
-                                    )
-                                })
-                                : null}
-                        </div>
+        <Popup trigger={props.trigger} setTrigger={closePopup}>
+            <h2>Select Wishlists</h2>
+            <div className="addGameToWishlistPopupInnerContent">
+                <div className="addGameToWishlistEntries">
+                    <h3>Your Wishlists</h3>
+                    {wishlistItems.owned !== undefined ?
+                        Object.keys(wishlistItems.owned).map((key) => {
+                            return (
+                                <div key={key} className="wishlistGamePopupWishlistName" id={key} onClick={selectWishlist}>
+                                    <h4 className="wishlist-popup-name" title={wishlistItems.owned[key].name}>
+                                        {wishlistItems.owned[key].name}
+                                    </h4>
+                                    <h4 className="wishlist-popup-wishlist-status">
+                                        {wishlistItems.owned[key].games[props.trigger] !== undefined ? "-" : "+"}
+                                    </h4>
+                                    <div className="clear"></div>
+                                </div>
+                            )
+                        })
+                        : null}
+                </div>
 
-                        <div className="addGameToWishlistEntries">
-                            <h2>Shared Wishlists</h2>
-                            {wishlistItems.shared !== undefined ?
-                                Object.keys(wishlistItems.shared).map((key) => {
-                                    return (
-                                        <div key={key} className="wishlistGamePopupWishlistName" id={key} onClick={selectWishlist}>
-                                            <h3 className="wishlist-popup-name" title={wishlistItems.shared[key].name}>{wishlistItems.shared[key].name}</h3>
-                                            <h3 className="wishlist-popup-wishlist-status">
-                                                {wishlistItems.shared[key].games[props.trigger] !== undefined ? "-" : "+"}
-                                            </h3>
-                                            <div className="clear"></div>
-                                        </div>
-                                    )
-                                })
-                                : null}
-                        </div> {/* end of shared */}
-                    </div> {/* end of inner content */}
-                    <div className="addGameToWishlistPopupInnerButtons">
-                        <button id="close-wishlist-add-popup">Cancel</button>
-                        <button id="save-wishlist-add-popup" onClick={saveWishlistChanges}>Save</button>
-                    </div>
-                </div> {/* end of inner */}
-            </div> // end of popup
-            : null
+                <div className="addGameToWishlistEntries">
+                    <h3>Shared Wishlists</h3>
+                    {wishlistItems.shared !== undefined ?
+                        Object.keys(wishlistItems.shared).map((key) => {
+                            return (
+                                <div key={key} className="wishlistGamePopupWishlistName" id={key} onClick={selectWishlist}>
+                                    <h4 className="wishlist-popup-name" title={wishlistItems.shared[key].name}>
+                                        {wishlistItems.shared[key].name}
+                                    </h4>
+                                    <h4 className="wishlist-popup-wishlist-status">
+                                        {wishlistItems.shared[key].games[props.trigger] !== undefined ? "-" : "+"}
+                                    </h4>
+                                    <div className="clear"></div>
+                                </div>
+                            )
+                        })
+                        : null}
+                </div> {/* end of shared */}
+            </div> {/* end of inner content */}
+            <div className="addGameToWishlistPopupInnerButtons">
+                <button id="save-wishlist-add-popup" onClick={saveWishlistChanges}>Save</button>
+            </div>
+        </Popup>
     )
 }
 

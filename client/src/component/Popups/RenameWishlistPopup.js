@@ -47,7 +47,7 @@ const RenameWishlistPopup = (props) => {
     return (
         <Popup trigger={props.trigger} setTrigger={props.setTrigger}>
             <h2>Rename Wishlist</h2>
-            <div className="renameWishlist-section">
+            <div className="popup-section">
                 <input type="text" id="renameWishlistName"
                     placeholder={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
                     title={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}

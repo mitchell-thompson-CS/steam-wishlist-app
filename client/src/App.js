@@ -21,7 +21,6 @@ function App() {
 
   const event = useSelector(state => state.eventReducer.event);
   const isLoading = useSelector(state => state.eventReducer.loading);
-  const addingGame = useSelector(state => state.eventReducer.addingGame);
   const searchPopup = useSelector(state => state.eventReducer.searchPopup);
 
   const dispatch = useDispatch();
@@ -63,7 +62,6 @@ function App() {
       </header>
       <EventPopup trigger={event} />
       <LoadingPopup trigger={isLoading} />
-      <AddGameToWishlistPopup trigger={addingGame} />
       <SearchForGamePopup trigger={!!searchPopup} />
       <Routes>
         <Route path="/" element={<HomeView />} />

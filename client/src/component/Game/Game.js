@@ -7,10 +7,12 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setEvent, setLoading } from "../../actions/eventAction";
 import { addGame } from "../../actions/gameAction";
+import AddGameToWishlistPopup from "../Popups/AddGameToWishlistPopup";
 
 const Game = () => {
     let { id } = useParams();
     const gameData = useSelector(state => state.gameReducer.games);
+    const addingGame = useSelector(state => state.eventReducer.addingGame);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -34,11 +36,14 @@ const Game = () => {
     }, [id, gameData, dispatch]);
 
     return (
+        <>
+        <AddGameToWishlistPopup trigger={addingGame} />
         <div className="game">
             <GameSidebar />
             <GameContent />
             <div className="clear"></div>
         </div>
+        </>
     )
 }
 

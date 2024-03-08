@@ -57,7 +57,7 @@ const DeleteWishlistPopup = (props) => {
                 <p title={props.wishlist.name}><i>{props.wishlist.name}</i></p> :
                 null
             }
-            <div className="deleteWishlist-section" style={{ marginBottom: 0 }}>
+            <div className="popup-section" style={{ marginBottom: 0 }}>
                 <button id="deleteWishlistConfirm" onClick={
                     () => {
                         deleteWishlistPost(props.id);
