@@ -19,7 +19,7 @@
 
 .popup-inner {
     position: absolute;
-    min-width: 400px;
+    min-width: 275px;
     max-width: 500px;
     width: 30%;
     top: 50%;
@@ -53,6 +53,11 @@
 
 .popup-inner h2, .popup-inner p {
     margin-bottom: 20px;
+    max-height: 200px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
 }
 
 .popup-inner button {
@@ -96,6 +101,10 @@
     outline: none;
     background-color: #23262e;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.popup-inner input[type=text]::placeholder {
+    color: #7a7c7d9f;
 }
 
 .popup-section {
