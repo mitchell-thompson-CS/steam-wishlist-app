@@ -101,24 +101,16 @@ const WishlistInner = () => {
     }
 
     // if the user scrolls the page, we want to show the mini header if the user is not at the top of the page
-    // sets the state of navBarScroll and changes visibility of the mini header (for on first load)
     useEffect(() => {
         let wishlistInner = document.getElementById("wishlistMainContent");
-        let wishlistHeaderMini = document.getElementById("wishlistInner-header-mini");
         if (wishlistInner) {
-            if (wishlistInner.scrollTop > 110) {
+            if (wishlistInner.scrollTop >= 100) {
                 setNavBarScroll(true);
-                if (wishlistHeaderMini) {
-                    wishlistHeaderMini.style.visibility = "visible";
-                }
             } else {
                 setNavBarScroll(false);
-                if (wishlistHeaderMini) {
-                    wishlistHeaderMini.style.visibility = "hidden";
-                }
             }
             wishlistInner.onscroll = function () {
-                if (wishlistInner.scrollTop > 110) {
+                if (wishlistInner.scrollTop >= 100) {
                     setNavBarScroll(true);
                 } else {
                     setNavBarScroll(false);
@@ -127,24 +119,10 @@ const WishlistInner = () => {
         }
     }, []);
 
-    // if the user scrolls the page, we want to hide the mini header if the user is at the top of the page
-    // sets the transitionend and transitionstart events for the mini header
+    // every time we navigate to a page with a new id we want to deselect anything that was selected
     useEffect(() => {
-        let wishlistHeaderMini = document.getElementById("wishlistInner-header-mini");
-        if (wishlistHeaderMini) {
-            wishlistHeaderMini.ontransitionend = function () {
-                if (!navBarScroll && removeGameList.list && removeGameList.list.length === 0) {
-                    wishlistHeaderMini.style.visibility = "hidden";
-                }
-            }
-
-            wishlistHeaderMini.ontransitionstart = function () {
-                if (navBarScroll || (removeGameList.list && removeGameList.list.length > 0)) {
-                    wishlistHeaderMini.style.visibility = "visible";
-                }
-            }
-        }
-    }, [navBarScroll, removeGameList]);
+        deselectSelectedGames();
+    }, [id]);
 
     // add event listener for escape key
     const cancelRemoveGame = useCallback((e) => {
@@ -233,13 +211,9 @@ const WishlistInner = () => {
                     </h3>
                     : <h3 id="wishlistInner-count">0 games</h3>
                 }
-
-                <div id="wishlistInner-header-border"></div>
             </div>
             {/* mini header for when below regular header */}
-            <div id="wishlistInner-header-mini" style={{
-                top: navBarScroll || (removeGameList.list && removeGameList.list.length > 0) ? 75 : 75 - 50
-            }}>
+            <div id="wishlistInner-header-mini">
                 <div id="wishlistInner-header-main">
                     {removeGameList.list && removeGameList.list.length > 0 ?
                         <>
@@ -258,19 +232,18 @@ const WishlistInner = () => {
                         :
                         <>
                             <h3 className="button-mini-header" id="add-game-mini" onClick={enableSearchPopup}>Add Game</h3>
-
-                            {wishlistItem && wishlistItem.name
-                                ? <h1 id="wishlistInner-title-mini" title={wishlistItem.name}>{wishlistItem.name}</h1>
-                                : null}
                         </>
                     }
+
+                    {wishlistItem && wishlistItem.name && navBarScroll
+                        ? <h1 id="wishlistInner-title-mini" title={wishlistItem.name}>{wishlistItem.name}</h1>
+                        : null}
+
+
                 </div>
             </div>
             {/* actual main content of this page, listing the games */}
             <ul className="gameList">
-                <li className="gameItem" id="wishlistInner-addgame" onClick={enableSearchPopup}>
-                    <h2>Add Game To Wishlist</h2>
-                </li>
                 {wishlistItem.games && Object.entries(wishlistItem.games).map(([key, value]) => (
                     gameData[key] ?
                         <li key={key} className="gameItem" title={gameData[key].name}>
