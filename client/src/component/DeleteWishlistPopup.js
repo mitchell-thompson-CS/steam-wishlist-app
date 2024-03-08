@@ -4,14 +4,17 @@ import { useDispatch } from 'react-redux';
 import { setEvent, setLoading } from '../actions/eventAction';
 import { deleteWishlist, renameWishlist } from '../actions/wishlistAction';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteWishlistPopup = (props) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const disablePopupEvent = useCallback((e) => {
         if (e.target.id === 'deleteWishlistBlur' || e.key === 'Escape') {
             props.setTrigger(false);
         }
+        console.log(props);
     }, [props]);
 
     useEffect(() => {
@@ -49,8 +52,11 @@ const DeleteWishlistPopup = (props) => {
                 }
             });
             if (handleResponse(res)) {
+                props.disableGettingData.current = true;
+                navigate("/wishlists");
                 dispatch(deleteWishlist(id));
                 props.setTrigger(false);
+
             }
         } catch (error) {
             handleResponse(error.response)
@@ -73,12 +79,11 @@ const DeleteWishlistPopup = (props) => {
                         <p title={props.wishlist.name}><i>{props.wishlist.name}</i></p> :
                         null
                     }
-                    <div className="deleteWishlist-section">
+                    <div className="deleteWishlist-section" style={{marginBottom: 0}}>
                         <button id="deleteWishlistConfirm" onClick={
                             () => {
                                 deleteWishlistPost(props.id);
                             }
-
                         }>Confirm</button>
                     </div>
                 </div>

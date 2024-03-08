@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { createWishlist, deleteGameFromWishlist, deleteWishlist, setWishlist } from "../actions/wishlistAction";
 import axios from "axios";
 import '../styles/WishlistInner.css';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
 import { addGame, removeGame } from "../actions/gameAction";
 import RenameWishlistPopup from "./RenameWishlistPopup";
@@ -25,6 +25,7 @@ const WishlistInner = () => {
     const [deletePopup, setDeletePopup] = useState(false);
     let { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         // fetches the wishlist data for the current wishlist
@@ -39,7 +40,7 @@ const WishlistInner = () => {
                 let response = await fetch('/api/wishlist/' + id, { mode: 'cors', credentials: 'include' });
                 dispatch(setLoading(false));
                 if (response.status !== 200) {
-                    return;
+                    return false;
                 }
                 data = await response.json();
 
@@ -59,15 +60,31 @@ const WishlistInner = () => {
                     data = wishlistItems.shared[id];
                 }
             }
-            if (!data) {
-                return;
+            
+            if(gettingWishlistData.current){
+                return true;
             }
+
+            if (!data) {
+                return false;
+            }
+
             setWishlistItem(data);
             gettingWishlistData.current = false;
+            return true;
+        }
+
+        async function handleWishlistData() {
+            let success = await fetchWishlistData();
+            if (!success) {
+                dispatch(setEvent(false, "Error fetching wishlist data"));
+                navigate("/wishlists");
+            }
         }
         // if the wishlistItem is not already set, we want to fetch the wishlist data
-        fetchWishlistData();
-    }, [id, wishlistItems, user, dispatch]);
+        // fetchWishlistData();
+        handleWishlistData();
+    }, [id, wishlistItems, user, dispatch, navigate]);
 
     useEffect(() => {
         // fetches the game data for each game in the wishlist
@@ -223,8 +240,8 @@ const WishlistInner = () => {
 
     return (
         <div className="wishlistInner">
-            <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id} wishlist={wishlistItem}/>
-            <DeleteWishlistPopup trigger={deletePopup} setTrigger={setDeletePopup} id={id} wishlist={wishlistItem}/>
+            <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id} wishlist={wishlistItem} />
+            <DeleteWishlistPopup trigger={deletePopup} setTrigger={setDeletePopup} id={id} wishlist={wishlistItem} disableGettingData={gettingWishlistData} />
             {/* main header */}
             <div id="wishlistInner-header">
                 {wishlistItem && wishlistItem.name
@@ -284,7 +301,7 @@ const WishlistInner = () => {
                                             setRenamePopup(true);
                                             closeSettingsPopup();
                                         }}>Rename Wishlist</li>
-                                        <li onClick={()=> {
+                                        <li onClick={() => {
                                             setDeletePopup(true);
                                             closeSettingsPopup();
                                         }}>Delete Wishlist</li>
@@ -322,7 +339,7 @@ const WishlistInner = () => {
                                         }
                                     }
                                 }
-                            
+
                             }>
                                 <input type="checkbox" className="gameSelect" id={"gameSelect" + key}
                                     onChange={(e) => {
