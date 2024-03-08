@@ -72,6 +72,12 @@ const RenameWishlistPopup = (props) => {
                         <input type="text" id="renameWishlistName"
                             placeholder={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
                             title={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    let newName = document.getElementById('renameWishlistName').value;
+                                    renameWishlistPost(props.id, newName);
+                                }
+                            }}
                         />
                         <button id="renameWishlistConfirm" onClick={
                             () => {
