@@ -18,7 +18,6 @@ const SearchForGamePopup = (props) => {
     const searchPosition = useRef(0);
 
     const closePopup = useCallback((e) => {
-        console.log(e);
         if (e.target.className === "search-for-game-popup"
             || e.target.id === "search-for-game-popup-blur"
             || e.key === "Escape") {
