@@ -221,7 +221,7 @@ const WishlistInner = () => {
 
     return (
         <div className="wishlistInner">
-            <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} />
+            <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id}/>
             {/* main header */}
             <div id="wishlistInner-header">
                 {wishlistItem && wishlistItem.name
