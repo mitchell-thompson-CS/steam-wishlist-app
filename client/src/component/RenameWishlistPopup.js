@@ -19,13 +19,18 @@ const RenameWishlistPopup = (props) => {
         }
     }, [props, disablePopupEvent]);
 
-
+    const renameWishlist = () => {
+        
+    }
 
     return (
         props.trigger ?
             <div id="renameWishlistPopup">
                 <div id="renameWishlistBlur"></div>
                 <div id="renameWishlistPopupContent">
+                    <div className="renameWishlistTop">
+                        <p id="renameWishlistClose" onClick={() => props.setTrigger(false)}>X</p>
+                    </div>
                     <h2>Rename Wishlist</h2>
                     <div className="renameWishlist-section">
                         <input type="text" id="renameWishlistName" placeholder="Enter new wishlist name" />

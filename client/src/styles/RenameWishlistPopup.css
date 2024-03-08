@@ -20,7 +20,6 @@
     position: absolute;
     min-width: 400px;
     max-width: 500px;
-    min-height: 200px;
     width: 30%;
     top: 50%;
     left: 50%;
@@ -37,7 +36,7 @@
 
 .renameWishlist-section {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     color: #dfe3e6;
     margin-bottom: 20px;
     width: 100%;
@@ -52,6 +51,7 @@
     background-color: #2a2e36;
     color: white;
     font-size: 20px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 #renameWishlistName:hover {
@@ -61,6 +61,7 @@
 #renameWishlistName:focus {
     outline: none;
     background-color: #23262e;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 #renameWishlistConfirm {
@@ -69,4 +70,35 @@
     color: #dfe3e6;
     padding: 15px 10px;
     border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+#renameWishlistConfirm:hover {
+    background-color: #474d58;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
+}
+
+#renameWishlistConfirm:active {
+    box-shadow: none;
+}
+
+.renameWishlistTop {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 24px;
+    user-select: none;
+    cursor: pointer;
+    line-height: 24px;
+}
+
+#renameWishlistClose {
+    padding: 5px 10px;
+    border-top-right-radius: 5px;
+}
+
+#renameWishlistClose:hover {
+    background-color: #da251d;
 }
