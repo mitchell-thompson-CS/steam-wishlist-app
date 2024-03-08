@@ -14,7 +14,6 @@ const DeleteWishlistPopup = (props) => {
         if (e.target.id === 'deleteWishlistBlur' || e.key === 'Escape') {
             props.setTrigger(false);
         }
-        console.log(props);
     }, [props]);
 
     useEffect(() => {
