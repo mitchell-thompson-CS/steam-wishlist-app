@@ -60,7 +60,7 @@ const WishlistInner = () => {
                     data = wishlistItems.shared[id];
                 }
             }
-            
+
             if(gettingWishlistData.current){
                 return true;
             }
@@ -261,7 +261,7 @@ const WishlistInner = () => {
                     {removeGameList.list && removeGameList.list.length > 0 ?
                         <>
                             {removeGameList.list && removeGameList.list.length > 0 ?
-                                <p>{removeGameList.list.length} selected</p>
+                                <p id="num-selected-mini">{removeGameList.list.length} selected</p>
                                 : null
                             }
                             <h3 className="button-mini-header" id="remove-game-mini" style={{

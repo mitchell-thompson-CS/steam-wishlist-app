@@ -127,6 +127,10 @@
     background-color: rgb(77, 84, 92);
 }
 
+#num-selected-mini {
+    white-space: nowrap;
+}
+
 #wishlistInner-title-mini {
     color: #b8b4af;
     user-select: none;
