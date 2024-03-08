@@ -4,25 +4,10 @@ import { useDispatch } from 'react-redux';
 import { setEvent, setLoading } from '../../actions/eventAction';
 import { renameWishlist } from '../../actions/wishlistAction';
 import axios from 'axios';
+import Popup from './Popup';
 
 const RenameWishlistPopup = (props) => {
     const dispatch = useDispatch();
-
-    const disablePopupEvent = useCallback((e) => {
-        if (e.target.id === 'renameWishlistBlur' || e.key === 'Escape') {
-            props.setTrigger(false);
-        }
-    }, [props]);
-
-    useEffect(() => {
-        if (!props.trigger) return;
-        document.addEventListener('keyup', disablePopupEvent);
-        document.addEventListener('click', disablePopupEvent);
-        return () => {
-            document.removeEventListener('click', disablePopupEvent);
-            document.removeEventListener('keyup', disablePopupEvent);
-        }
-    }, [props, disablePopupEvent]);
 
     function handleResponse(response) {
         try {
@@ -60,36 +45,28 @@ const RenameWishlistPopup = (props) => {
     }
 
     return (
-        props.trigger ?
-            <div id="renameWishlistPopup">
-                <div id="renameWishlistBlur"></div>
-                <div id="renameWishlistPopupContent">
-                    <div className="renameWishlistTop">
-                        <p id="renameWishlistClose" onClick={() => props.setTrigger(false)}>X</p>
-                    </div>
-                    <h2>Rename Wishlist</h2>
-                    <div className="renameWishlist-section">
-                        <input type="text" id="renameWishlistName"
-                            placeholder={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
-                            title={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    let newName = document.getElementById('renameWishlistName').value;
-                                    renameWishlistPost(props.id, newName);
-                                }
-                            }}
-                        />
-                        <button id="renameWishlistConfirm" onClick={
-                            () => {
-                                let newName = document.getElementById('renameWishlistName').value;
-                                renameWishlistPost(props.id, newName);
-                            }
+        <Popup trigger={props.trigger} setTrigger={props.setTrigger}>
+            <h2>Rename Wishlist</h2>
+            <div className="renameWishlist-section">
+                <input type="text" id="renameWishlistName"
+                    placeholder={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
+                    title={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            let newName = document.getElementById('renameWishlistName').value;
+                            renameWishlistPost(props.id, newName);
+                        }
+                    }}
+                />
+                <button id="renameWishlistConfirm" onClick={
+                    () => {
+                        let newName = document.getElementById('renameWishlistName').value;
+                        renameWishlistPost(props.id, newName);
+                    }
 
-                        }>Rename</button>
-                    </div>
-                </div>
+                }>Rename</button>
             </div>
-            : null
+        </Popup>
     )
 }
 

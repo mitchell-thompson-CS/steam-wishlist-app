@@ -5,26 +5,11 @@ import { setEvent, setLoading } from '../../actions/eventAction';
 import { deleteWishlist, renameWishlist } from '../../actions/wishlistAction';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Popup from './Popup';
 
 const DeleteWishlistPopup = (props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const disablePopupEvent = useCallback((e) => {
-        if (e.target.id === 'deleteWishlistBlur' || e.key === 'Escape') {
-            props.setTrigger(false);
-        }
-    }, [props]);
-
-    useEffect(() => {
-        if (!props.trigger) return;
-        document.addEventListener('keyup', disablePopupEvent);
-        document.addEventListener('click', disablePopupEvent);
-        return () => {
-            document.removeEventListener('click', disablePopupEvent);
-            document.removeEventListener('keyup', disablePopupEvent);
-        }
-    }, [props, disablePopupEvent]);
 
     function handleResponse(response) {
         try {
@@ -66,28 +51,20 @@ const DeleteWishlistPopup = (props) => {
     }
 
     return (
-        props.trigger ?
-            <div id="deleteWishlistPopup">
-                <div id="deleteWishlistBlur"></div>
-                <div id="deleteWishlistPopupContent">
-                    <div className="deleteWishlistTop">
-                        <p id="deleteWishlistClose" onClick={() => props.setTrigger(false)}>X</p>
-                    </div>
-                    <h2>Delete this wishlist?</h2>
-                    {props && props.wishlist && props.wishlist.name ?
-                        <p title={props.wishlist.name}><i>{props.wishlist.name}</i></p> :
-                        null
+        <Popup trigger={props.trigger} setTrigger={props.setTrigger}>
+            <h2>Delete this wishlist?</h2>
+            {props && props.wishlist && props.wishlist.name ?
+                <p title={props.wishlist.name}><i>{props.wishlist.name}</i></p> :
+                null
+            }
+            <div className="deleteWishlist-section" style={{ marginBottom: 0 }}>
+                <button id="deleteWishlistConfirm" onClick={
+                    () => {
+                        deleteWishlistPost(props.id);
                     }
-                    <div className="deleteWishlist-section" style={{marginBottom: 0}}>
-                        <button id="deleteWishlistConfirm" onClick={
-                            () => {
-                                deleteWishlistPost(props.id);
-                            }
-                        }>Confirm</button>
-                    </div>
-                </div>
+                }>Confirm</button>
             </div>
-            : null
+        </Popup >
     )
 }
 
