@@ -4,7 +4,7 @@
 }
 
 #wishlistMainContent {
-    width: calc(100% - 260px);
+    width: 100%;
     overflow: auto;
 }
 
