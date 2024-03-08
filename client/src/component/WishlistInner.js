@@ -21,6 +21,7 @@ const WishlistInner = () => {
     });
     const [settingsPopup, setSettingsPopup] = useState(false);
     const [renamePopup, setRenamePopup] = useState(false);
+    const [deletePopup, setDeletePopup] = useState(false);
     let { id } = useParams();
     const dispatch = useDispatch();
 
@@ -221,7 +222,7 @@ const WishlistInner = () => {
 
     return (
         <div className="wishlistInner">
-            <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id}/>
+            <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id} wishlist={wishlistItem}/>
             {/* main header */}
             <div id="wishlistInner-header">
                 {wishlistItem && wishlistItem.name

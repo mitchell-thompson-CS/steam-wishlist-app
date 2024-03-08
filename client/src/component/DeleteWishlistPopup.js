@@ -2,14 +2,14 @@ import { useCallback, useEffect } from 'react';
 import '../styles/RenameWishlistPopup.css'
 import { useDispatch } from 'react-redux';
 import { setEvent, setLoading } from '../actions/eventAction';
-import { renameWishlist } from '../actions/wishlistAction';
+import { deleteWishlist, renameWishlist } from '../actions/wishlistAction';
 import axios from 'axios';
 
-const RenameWishlistPopup = (props) => {
+const DeleteWishlistPopup = (props) => {
     const dispatch = useDispatch();
 
     const disablePopupEvent = useCallback((e) => {
-        if (e.target.id === 'renameWishlistBlur' || e.key === 'Escape') {
+        if (e.target.id === 'deleteWishlistBlur' || e.key === 'Escape') {
             props.setTrigger(false);
         }
     }, [props]);
@@ -26,7 +26,7 @@ const RenameWishlistPopup = (props) => {
 
     function handleResponse(response) {
         try {
-            if (response.status === 200) {
+            if(response.status === 200){
                 dispatch(setEvent(true, "Operation Successful"));
                 return true;
             } else {
@@ -40,46 +40,43 @@ const RenameWishlistPopup = (props) => {
         return false;
     }
 
-    async function renameWishlistPost(id, name) {
+    async function deleteWishlistPost(id) {
         try {
             dispatch(setLoading(true));
-            let res = await axios.post('/api/wishlist/rename', {
-                wishlist_id: id,
-                wishlist_name: name
+            let res = await axios.delete('/api/wishlist/delete', {
+                data: {
+                    wishlist_id: id
+                }
             });
-            // only on success we want to change the wishlist
             if (handleResponse(res)) {
-                dispatch(renameWishlist(id, name));
-                props.setTrigger(false);
+                dispatch(deleteWishlist(id));
             }
         } catch (error) {
             handleResponse(error.response)
             console.error(error);
         }
         dispatch(setLoading(false));
+    
     }
 
     return (
         props.trigger ?
-            <div id="renameWishlistPopup">
-                <div id="renameWishlistBlur"></div>
-                <div id="renameWishlistPopupContent">
-                    <div className="renameWishlistTop">
-                        <p id="renameWishlistClose" onClick={() => props.setTrigger(false)}>X</p>
+            <div id="deleteWishlistPopup">
+                <div id="deleteWishlistBlur"></div>
+                <div id="deleteWishlistPopupContent">
+                    <div className="deleteWishlistTop">
+                        <p id="deleteWishlistClose" onClick={() => props.setTrigger(false)}>X</p>
                     </div>
                     <h2>Rename Wishlist</h2>
-                    <div className="renameWishlist-section">
-                        <input type="text" id="renameWishlistName"
-                            placeholder={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
-                            title={props.wishlist && props.wishlist.name ? props.wishlist.name : "Enter Wishlist Name"}
-                        />
-                        <button id="renameWishlistConfirm" onClick={
+                    <div className="deleteWishlist-section">
+                        <input type="text" id="deleteWishlistName" placeholder="Enter new wishlist name" />
+                        <button id="deleteWishlistConfirm" onClick={
                             () => {
-                                let newName = document.getElementById('renameWishlistName').value;
+                                let newName = document.getElementById('deleteWishlistName').value;
                                 console.log(newName, props.id);
-                                renameWishlistPost(props.id, newName);
+                                deleteWishlistPost(props.id, newName);
                             }
-
+                        
                         }>Rename</button>
                     </div>
                 </div>
@@ -88,4 +85,4 @@ const RenameWishlistPopup = (props) => {
     )
 }
 
-export default RenameWishlistPopup;
+export default DeleteWishlistPopup;
