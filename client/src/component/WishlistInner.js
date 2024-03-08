@@ -298,7 +298,26 @@ const WishlistInner = () => {
                     gameData[key] ?
                         <li key={key} className="gameItem" title={gameData[key].name}>
                             {/* selecting the game for deletion */}
-                            <div className="gameSelectSection">
+                            <div className="gameSelectSection" onClick={
+                                (e) => {
+                                    let checkbox = document.getElementById("gameSelect" + key);
+                                    if (checkbox) {
+                                        if (removeGameList.list.includes(key)) {
+                                            let newList = removeGameList.list.filter((item) => item !== key);
+                                            setRemoveGameList({
+                                                list: newList
+                                            });
+                                            checkbox.checked = false;
+                                        } else {
+                                            setRemoveGameList({
+                                                list: [...removeGameList.list, key]
+                                            });
+                                            checkbox.checked = true;
+                                        }
+                                    }
+                                }
+                            
+                            }>
                                 <input type="checkbox" className="gameSelect" id={"gameSelect" + key}
                                     onChange={(e) => {
                                         if (removeGameList.list.includes(key)) {
