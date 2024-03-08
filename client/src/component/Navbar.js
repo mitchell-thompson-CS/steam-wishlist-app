@@ -166,7 +166,9 @@ const Navbar = () => {
                                 if (e.target.value !== searchTerm) {
                                     setSearchTerm(e.target.value)
                                 }
-                            }} />
+                            }} 
+                            tabIndex={"-1"}
+                        />
                     </form>
                     <ul id="gameSearchResults"></ul>
                 </li>

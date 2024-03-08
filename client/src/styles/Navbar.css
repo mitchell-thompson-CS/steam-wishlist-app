@@ -79,17 +79,6 @@
     margin-bottom: 25px; */
   }
   
-  #gameSearchArea {
-    vertical-align: top;
-  }
-  
-  #gameSearchArea form{
-    /* line-height: 51px; */
-    height: 51px;
-    display: flex;
-    align-items: center;
-  }
-  
   #gameSearch {
     position: relative;
     height: 29px;
