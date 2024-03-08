@@ -129,6 +129,7 @@
 
 #wishlistInner-title-mini {
     color: #b8b4af;
+    user-select: none;
 }
 
 #wishlistInner-options-mini {
