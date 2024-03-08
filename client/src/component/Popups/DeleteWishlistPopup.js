@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react';
-import '../styles/DeleteWishlistPopup.css'
+import '../../styles/DeleteWishlistPopup.css'
 import { useDispatch } from 'react-redux';
-import { setEvent, setLoading } from '../actions/eventAction';
-import { deleteWishlist, renameWishlist } from '../actions/wishlistAction';
+import { setEvent, setLoading } from '../../actions/eventAction';
+import { deleteWishlist, renameWishlist } from '../../actions/wishlistAction';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 

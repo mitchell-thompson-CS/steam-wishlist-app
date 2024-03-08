@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
-import '../styles/WishlistGridHeader.css';
-import { deleteWishlists } from '../actions/wishlistAction';
+import '../../styles/WishlistGridHeader.css';
+import { deleteWishlists } from '../../actions/wishlistAction';
 
 const WishlistGridHeader = () => {
     const dispatch = useDispatch();

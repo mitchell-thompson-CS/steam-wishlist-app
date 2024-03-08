@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { addGame } from "../actions/gameAction";
+import { addGame } from "../../actions/gameAction";
 
-import '../styles/GameSidebar.css';
-import { setLoading } from "../actions/eventAction";
-import loadingImage from '../resources/rolling-loading.apng';
-import { setAddGameToWishlist } from "../actions/eventAction";
+import '../../styles/GameSidebar.css';
+import { setLoading } from "../../actions/eventAction";
+import loadingImage from '../../resources/rolling-loading.apng';
+import { setAddGameToWishlist } from "../../actions/eventAction";
 
 const GameSidebar = () => {
     let { id } = useParams();

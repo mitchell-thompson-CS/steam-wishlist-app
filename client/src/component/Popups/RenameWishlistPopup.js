@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react';
-import '../styles/RenameWishlistPopup.css'
+import '../../styles/RenameWishlistPopup.css'
 import { useDispatch } from 'react-redux';
-import { setEvent, setLoading } from '../actions/eventAction';
-import { renameWishlist } from '../actions/wishlistAction';
+import { setEvent, setLoading } from '../../actions/eventAction';
+import { renameWishlist } from '../../actions/wishlistAction';
 import axios from 'axios';
 
 const RenameWishlistPopup = (props) => {

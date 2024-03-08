@@ -1,11 +1,11 @@
 import { useParams } from 'react-router-dom';
-import '../styles/SearchForGamePopup.css';
+import '../../styles/SearchForGamePopup.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAddGameToWishlist, setEvent, setLoading, setSearchPopup } from '../actions/eventAction';
+import { setAddGameToWishlist, setEvent, setLoading, setSearchPopup } from '../../actions/eventAction';
 import axios from 'axios';
-import { addGameToWishlist } from '../actions/wishlistAction';
-import LoadingImage from '../resources/rolling-loading.apng';
+import { addGameToWishlist } from '../../actions/wishlistAction';
+import LoadingImage from '../../resources/rolling-loading.apng';
 
 const searchDelay = 500;
 

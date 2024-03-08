@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import '../styles/GameContent.css';
+import '../../styles/GameContent.css';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 

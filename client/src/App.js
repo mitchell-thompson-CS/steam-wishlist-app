@@ -2,18 +2,18 @@ import './styles/App.css';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar';
 import axios from 'axios';
-import WishlistView from './component/WishlistView';
+import WishlistView from './component/Wishlists/WishlistView';
 import HomeView from './component/HomeView';
-import EventPopup from './component/EventPopup';
-import LoadingPopup from './component/LoadingPopup';
-import Game from './component/Game';
-import AddGameToWishlistPopup from './component/AddGameToWishlistPopup';
+import EventPopup from './component/Popups/EventPopup';
+import LoadingPopup from './component/Popups/LoadingPopup';
+import Game from './component/Game/Game';
+import AddGameToWishlistPopup from './component/Popups/AddGameToWishlistPopup';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteWishlists, setWishlists } from "./actions/wishlistAction";
 import { deleteUser, isUser } from "./actions/userAction";
 import { setEvent, setLoading } from "./actions/eventAction";
-import SearchForGamePopup from './component/SearchForGamePopup';
+import SearchForGamePopup from './component/Popups/SearchForGamePopup';
 
 function App() {
   // axios.defaults.baseURL = 'http://localhost:3001';

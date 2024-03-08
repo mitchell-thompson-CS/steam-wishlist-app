@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import WishlistSidebar from "./WishlistSidebar";
 import Wishlists from "./Wishlists";
 import WishlistInner from "./WishlistInner";
-import "../styles/WishlistView.css";
+import "../../styles/WishlistView.css";
 
 const WishlistView = () => {
     return (

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import '../styles/AddGameToWishlistPopup.css';
-import { setAddGameToWishlist, setEvent, setLoading } from "../actions/eventAction";
+import '../../styles/AddGameToWishlistPopup.css';
+import { setAddGameToWishlist, setEvent, setLoading } from "../../actions/eventAction";
 import axios from "axios";
-import { addGameToWishlist, deleteGameFromWishlist, deleteWishlists } from "../actions/wishlistAction";
+import { addGameToWishlist, deleteGameFromWishlist, deleteWishlists } from "../../actions/wishlistAction";
 
 const AddGameToWishlistPopup = (props) => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);

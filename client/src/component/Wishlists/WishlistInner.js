@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { createWishlist, deleteGameFromWishlist, deleteWishlist, setWishlist } from "../actions/wishlistAction";
+import { createWishlist, deleteGameFromWishlist, deleteWishlist, setWishlist } from "../../actions/wishlistAction";
 import axios from "axios";
-import '../styles/WishlistInner.css';
+import '../../styles/WishlistInner.css';
 import { useNavigate, useParams } from "react-router-dom";
-import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
-import { addGame, removeGame } from "../actions/gameAction";
-import RenameWishlistPopup from "./RenameWishlistPopup";
-import DeleteWishlistPopup from "./DeleteWishlistPopup";
+import { setEvent, setLoading, setSearchPopup } from "../../actions/eventAction";
+import { addGame, removeGame } from "../../actions/gameAction";
+import RenameWishlistPopup from "../Popups/RenameWishlistPopup";
+import DeleteWishlistPopup from "../Popups/DeleteWishlistPopup";
 
 const WishlistInner = () => {
     const [wishlistItem, setWishlistItem] = useState([]);

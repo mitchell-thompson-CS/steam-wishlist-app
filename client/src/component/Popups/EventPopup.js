@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import '../styles/EventPopup.css'
+import '../../styles/EventPopup.css'
 import { useDispatch, useSelector } from 'react-redux';
-import { resetEvent } from '../actions/eventAction';
+import { resetEvent } from '../../actions/eventAction';
 
 const EventPopup = (props) => {
     const event = useSelector(state => state.eventReducer.event);

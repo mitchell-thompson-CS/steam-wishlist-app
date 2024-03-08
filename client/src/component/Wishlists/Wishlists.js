@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { createWishlist, deleteWishlist, renameWishlist, setWishlists } from "../actions/wishlistAction";
+import { createWishlist, deleteWishlist, renameWishlist, setWishlists } from "../../actions/wishlistAction";
 import axios from "axios";
-import Popup from './Popup';
-import '../styles/Wishlists.css';
+import Popup from '../Popups/Popup';
+import '../../styles/Wishlists.css';
 import { Link } from "react-router-dom";
-import { setEvent, setLoading } from "../actions/eventAction";
+import { setEvent, setLoading } from "../../actions/eventAction";
 import WishlistGridHeader from "./WishlistGridHeader";
 
 const Wishlists = () => {

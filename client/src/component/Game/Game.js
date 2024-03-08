@@ -1,12 +1,12 @@
 import GameSidebar from "./GameSidebar"
 
-import '../styles/Game.css';
+import '../../styles/Game.css';
 import GameContent from "./GameContent";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setEvent, setLoading } from "../actions/eventAction";
-import { addGame } from "../actions/gameAction";
+import { setEvent, setLoading } from "../../actions/eventAction";
+import { addGame } from "../../actions/gameAction";
 
 const Game = () => {
     let { id } = useParams();

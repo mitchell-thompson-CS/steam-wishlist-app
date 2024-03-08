@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import '../styles/WishlistSidebar.css';
+import '../../styles/WishlistSidebar.css';
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 

@@ -1,5 +1,5 @@
-import loadingImage from '../resources/rolling-loading.apng';
-import '../styles/LoadingPopup.css';
+import loadingImage from '../../resources/rolling-loading.apng';
+import '../../styles/LoadingPopup.css';
 
 const LoadingPopup = (props) => {
 
