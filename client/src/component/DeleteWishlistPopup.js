@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import '../styles/RenameWishlistPopup.css'
+import '../styles/DeleteWishlistPopup.css'
 import { useDispatch } from 'react-redux';
 import { setEvent, setLoading } from '../actions/eventAction';
 import { deleteWishlist, renameWishlist } from '../actions/wishlistAction';
@@ -26,7 +26,7 @@ const DeleteWishlistPopup = (props) => {
 
     function handleResponse(response) {
         try {
-            if(response.status === 200){
+            if (response.status === 200) {
                 dispatch(setEvent(true, "Operation Successful"));
                 return true;
             } else {
@@ -50,13 +50,14 @@ const DeleteWishlistPopup = (props) => {
             });
             if (handleResponse(res)) {
                 dispatch(deleteWishlist(id));
+                props.setTrigger(false);
             }
         } catch (error) {
             handleResponse(error.response)
             console.error(error);
         }
         dispatch(setLoading(false));
-    
+
     }
 
     return (
@@ -67,17 +68,18 @@ const DeleteWishlistPopup = (props) => {
                     <div className="deleteWishlistTop">
                         <p id="deleteWishlistClose" onClick={() => props.setTrigger(false)}>X</p>
                     </div>
-                    <h2>Rename Wishlist</h2>
+                    <h2>Delete this wishlist?</h2>
+                    {props && props.wishlist && props.wishlist.name ?
+                        <p title={props.wishlist.name}><i>{props.wishlist.name}</i></p> :
+                        null
+                    }
                     <div className="deleteWishlist-section">
-                        <input type="text" id="deleteWishlistName" placeholder="Enter new wishlist name" />
                         <button id="deleteWishlistConfirm" onClick={
                             () => {
-                                let newName = document.getElementById('deleteWishlistName').value;
-                                console.log(newName, props.id);
-                                deleteWishlistPost(props.id, newName);
+                                deleteWishlistPost(props.id);
                             }
-                        
-                        }>Rename</button>
+
+                        }>Confirm</button>
                     </div>
                 </div>
             </div>

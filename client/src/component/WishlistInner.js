@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
 import { addGame, removeGame } from "../actions/gameAction";
 import RenameWishlistPopup from "./RenameWishlistPopup";
+import DeleteWishlistPopup from "./DeleteWishlistPopup";
 
 const WishlistInner = () => {
     const [wishlistItem, setWishlistItem] = useState([]);
@@ -223,6 +224,7 @@ const WishlistInner = () => {
     return (
         <div className="wishlistInner">
             <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id} wishlist={wishlistItem}/>
+            <DeleteWishlistPopup trigger={deletePopup} setTrigger={setDeletePopup} id={id} wishlist={wishlistItem}/>
             {/* main header */}
             <div id="wishlistInner-header">
                 {wishlistItem && wishlistItem.name
@@ -282,7 +284,10 @@ const WishlistInner = () => {
                                             setRenamePopup(true);
                                             closeSettingsPopup();
                                         }}>Rename Wishlist</li>
-                                        <li>Delete Wishlist</li>
+                                        <li onClick={()=> {
+                                            setDeletePopup(true);
+                                            closeSettingsPopup();
+                                        }}>Delete Wishlist</li>
                                     </ul>
                                 </div>
                                 <div id="options-mini-dropdown-bkg" style={{

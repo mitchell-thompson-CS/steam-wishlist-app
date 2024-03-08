@@ -1,4 +1,4 @@
-#renameWishlistPopup {
+#deleteWishlistPopup {
     position: fixed;
     width: 100vw;
     height: 100vh;
@@ -7,7 +7,7 @@
     z-index: 100;
 }
 
-#renameWishlistBlur {
+#deleteWishlistBlur {
     position: relative;
     width: 100%;
     height: 100%;
@@ -16,7 +16,7 @@
     backdrop-filter: blur(5px);
 }
 
-#renameWishlistPopupContent {
+#deleteWishlistPopupContent {
     position: absolute;
     min-width: 400px;
     max-width: 500px;
@@ -28,14 +28,18 @@
     border-radius: 5px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
     padding: 20px;
-    padding-top: 30px;
+    padding-top: 36px;
 }
 
-#renameWishlistPopupContent h2 {
+#deleteWishlistPopupContent h2 {
     margin-bottom: 20px;
 }
 
-.renameWishlist-section {
+#deleteWishlistPopupContent p {
+    margin-bottom: 20px;
+}
+
+.deleteWishlist-section {
     display: flex;
     gap: 10px;
     color: #dfe3e6;
@@ -44,7 +48,7 @@
     align-items: center;
 }
 
-#renameWishlistName {
+#deleteWishlistName {
     width: 100%;
     padding: 15px 10px;
     border-radius: 5px;
@@ -55,17 +59,17 @@
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
-#renameWishlistName:hover {
+#deleteWishlistName:hover {
     background-color: #333841;
 }
 
-#renameWishlistName:focus {
+#deleteWishlistName:focus {
     outline: none;
     background-color: #23262e;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
-#renameWishlistConfirm {
+#deleteWishlistConfirm {
     background-color: #2a2e36;
     border: none;
     color: #dfe3e6;
@@ -74,18 +78,19 @@
     cursor: pointer;
     font-size: 16px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    margin: auto;
 }
 
-#renameWishlistConfirm:hover {
+#deleteWishlistConfirm:hover {
     background-color: #474d58;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
 }
 
-#renameWishlistConfirm:active {
+#deleteWishlistConfirm:active {
     box-shadow: none;
 }
 
-.renameWishlistTop {
+.deleteWishlistTop {
     position: absolute;
     right: 0;
     top: 0;
@@ -95,11 +100,11 @@
     line-height: 24px;
 }
 
-#renameWishlistClose {
+#deleteWishlistClose {
     padding: 5px 10px;
     border-top-right-radius: 5px;
 }
 
-#renameWishlistClose:hover {
+#deleteWishlistClose:hover {
     background-color: #da251d;
 }
