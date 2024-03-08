@@ -18,23 +18,24 @@ const SearchForGamePopup = (props) => {
     const searchPosition = useRef(0);
 
     const closePopup = useCallback((e) => {
+        console.log(e);
         if (e.target.className === "search-for-game-popup"
             || e.target.id === "search-for-game-popup-blur"
             || e.key === "Escape") {
             dispatch(setSearchPopup(false));
             document.removeEventListener('click', closePopup);
-            document.removeEventListener('keydown', closePopup);
+            document.removeEventListener('keyup', closePopup);
         }
     }, [dispatch])
 
     useEffect(() => {
         if (props.trigger) {
             document.addEventListener('click', closePopup);
-            document.addEventListener('keydown', closePopup);
+            document.addEventListener('keyup', closePopup);
             document.body.style.overflow = 'hidden';
         } else {
             document.removeEventListener('click', closePopup);
-            document.removeEventListener('keydown', closePopup);
+            document.removeEventListener('keyup', closePopup);
             document.body.style.overflow = 'unset';
             searchPosition.current = 0;
             setSearchTerm("");
