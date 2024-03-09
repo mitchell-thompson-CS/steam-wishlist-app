@@ -19,17 +19,40 @@ const WishlistSidebar = () => {
                 element.style.width = "0";
                 element.style.minWidth = "0";
             } else {
-                element.style.width = "20%";
-                element.style.minWidth = "175px";
+                element.style.width = "";
+                element.style.minWidth = "";
             }
         }
     }
 
+    function resizeSidebar(e) {
+        const size = `${e.x}px`;
+        let sidebar = document.getElementsByClassName("sidebar");
+        for (let element of sidebar) {
+            element.style.width = size;
+        }
+    }
+
+    useEffect(() => {
+        let sidebar = document.getElementById("sidebar-right");
+        let sidebarMain = document.getElementsByClassName("sidebar")[0];
+        sidebar.addEventListener("mousedown", (e) => {
+            if (e.target.id !== "sidebar-expand") {
+                sidebarMain.style.transition = "none";
+                document.addEventListener("mousemove", resizeSidebar, false);
+                document.addEventListener("mouseup", () => {
+                    document.removeEventListener("mousemove", resizeSidebar, false);
+                    sidebarMain.style.transition = "";
+                });
+            }
+        });
+    }, []);
+
     return (
         <div className="sidebar">
             <div id="sidebar-right">
-                <div id="sidebar-right-content" onClick={() => {toggleHideSidebar();}}>
-                    <div>|||</div>
+                <div id="sidebar-right-content" onClick={() => { toggleHideSidebar(); }}>
+                    <div id="sidebar-expand">|||</div>
                     {/* <img src={collapseLeft} alt="left" id="collapse-side-image"/> */}
                 </div>
             </div>
@@ -67,6 +90,7 @@ const WishlistSidebar = () => {
                     ))}
                 </ul>
             </div>
+            <div className="clear"></div>
         </div>
     );
 };
