@@ -209,7 +209,8 @@
 
 .gameList {
     width: 100%;
-    min-width: 1000px;
+    /* min-width: 1000px; */
+    /* max-width: 3000px; */
     display: inline-block;
     font-size: 20px;
     padding: 40px 50px 10px 50px;
@@ -221,8 +222,7 @@
     border: 1px gray;
     border-radius: 20px;
     background-color: #393f46;
-    display: flex;
-    
+    display: flex;    
     justify-content: flex-start;
     margin-bottom: 20px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
@@ -237,68 +237,49 @@
 .gameLink {
     color: white;
     text-decoration: none;
-    display: flex;
-    flex: auto;
-    padding: 15px 30px 15px 15px;
-}
-
-.gameSelectSection {
-    display: flex;
-    align-items: center;
-    padding: 15px 30px 15px 30px;
-}
-
-.gameSelect {
-    appearance: none;
-    background-color: #1a1c22;
-	border: 2px solid #1a1c22;
-    border-right: 5px solid #1a1c22;
-    border-left: 5px solid #1a1c22;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
-	padding: 14px 10px;
-	border-radius: 2px;
-	display: inline-block;
-    cursor: pointer;
-}
-
-.gameSelect:hover {
-    background-color: #1e1f23;
-}
-
-.gameSelect:checked {
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNDM5N2ZlIiBkPSJNMTczLjg5OCA0MzkuNDA0bC0xNjYuNC0xNjYuNGMtOS45OTctOS45OTctOS45OTctMjYuMjA2IDAtMzYuMjA0bDM2LjIwMy0zNi4yMDRjOS45OTctOS45OTggMjYuMjA3LTkuOTk4IDM2LjIwNCAwTDE5MiAzMTIuNjkgNDMyLjA5NSA3Mi41OTZjOS45OTctOS45OTcgMjYuMjA3LTkuOTk3IDM2LjIwNCAwbDM2LjIwMyAzNi4yMDRjOS45OTcgOS45OTcgOS45OTcgMjYuMjA2IDAgMzYuMjA0bC0yOTQuNCAyOTQuNDAxYy05Ljk5OCA5Ljk5Ny0yNi4yMDcgOS45OTctMzYuMjA0LS4wMDF6Ii8+PC9zdmc+");
-}
-
-.gameTitle {
-    width: 20%;
-    min-width: 183px;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
     height: 100%;
-    /* justify-content: center; */
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    column-gap: 10px;
+
+    /* auto removes columns as it shrinks */
+    flex-wrap: wrap;
+    overflow: hidden;
+
+    /* allows you to still view content if its too big */
+    /* flex-wrap: nowrap;
+    overflow: auto; */
+}
+
+.gameLink div {
+    box-sizing: border-box;
+    height: 100%;
+    max-width: 250px;
+    padding: 15px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .gameTitle img {
-    /* scale: 33%; */
-    height: 66%;
-    align-self: center;
+    object-fit: contain;
+    height: 100%;
+    max-width: 170px;
 }
 
 .gameTitle h1 {
-    height: 22px;
-    font-size: 22px;
-    max-width: 100%;
-    margin-bottom: 10px;
-    text-overflow: ellipsis;
     overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+    min-height: 30px;
+    font-size: 20px;
+    vertical-align: middle;
 }
 
 .gamePrice {
-    width: 20%;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -316,21 +297,18 @@
 }
 
 .gameLowestPrice {
-    width: 20%;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
 }
 
 .gamePlayingNow {
-    width: 20%;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
 }
 
 .gamePercent {
-    width: 20%;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -351,18 +329,34 @@
     color: #88929c;
 }
 
-#wishlistInner-addgame {
-    cursor: pointer;
-    height: 60px;
-    background-color: #3e4e69;
+.gameSelectSection {
+    display: flex;
+    align-items: center;
+    width: 7%;
+    min-width: 70px;
+    max-width: 120px;
 }
 
-#wishlistInner-addgame:hover {
-    background-color: #586f96;
-}
-
-#wishlistInner-addgame h2 {
-    width: 100%;
-    text-align: center;
+.gameSelect {
     margin: auto;
+    appearance: none;
+    background-color: #1a1c22;
+	border: 2px solid #1a1c22;
+    border-right: 5px solid #1a1c22;
+    border-left: 5px solid #1a1c22;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 14px 10px;
+	border-radius: 2px;
+	display: inline-block;
+    cursor: pointer;
+}
+
+.gameSelect:hover {
+    background-color: #1e1f23;
+}
+
+.gameSelect:checked {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNDM5N2ZlIiBkPSJNMTczLjg5OCA0MzkuNDA0bC0xNjYuNC0xNjYuNGMtOS45OTctOS45OTctOS45OTctMjYuMjA2IDAtMzYuMjA0bDM2LjIwMy0zNi4yMDRjOS45OTctOS45OTggMjYuMjA3LTkuOTk4IDM2LjIwNCAwTDE5MiAzMTIuNjkgNDMyLjA5NSA3Mi41OTZjOS45OTctOS45OTcgMjYuMjA3LTkuOTk3IDM2LjIwNCAwbDM2LjIwMyAzNi4yMDRjOS45OTcgOS45OTcgOS45OTcgMjYuMjA2IDAgMzYuMjA0bC0yOTQuNCAyOTQuNDAxYy05Ljk5OCA5Ljk5Ny0yNi4yMDcgOS45OTctMzYuMjA0LS4wMDF6Ii8+PC9zdmc+");
 }
