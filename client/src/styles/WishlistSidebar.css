@@ -1,12 +1,21 @@
 .sidebar {
     background-color: #282e35;
     font-size: 20px;
-    box-shadow: 0px 0px 6px 0px #000000;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.6);
     padding-bottom: 3px;
-    max-width: 230px;
-    min-width: 150px;
+    max-width: 325px;
+    min-width: 175px;
     width: 20%;
     transition: all 0.5s;
+    z-index: 1;
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        min-width: 0;
+    }
+  
 }
 
 #sidebar-right {
@@ -22,19 +31,40 @@
 }
 
 #sidebar-right-content {
-  background-color: #343b44;
+  background-color: #282e35;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  margin-top: 60px;
-  width: 27px;
-  height: 25px;
+  margin-top: auto;
+  margin-bottom: auto;
   z-index: 1;
   box-shadow: 1px 0px 3px 0px rgba(0, 0, 0, 0.5);
-  margin-left: 3px;
+  margin-left: 5px;
 }
 
 #sidebar-right-content:hover {
-  background-color: #4d545c;
+  background-color: #31383f;
+  box-shadow: 1px 0px 5px 0px rgba(0, 0, 0, 0.7);
+}
+
+#sidebar-right-content div {
+  margin: auto;
+  cursor: pointer;
+  width: 24px;
+  height: 80px;
+  line-height: 80px;
+  text-align: center;
+  transition: all 0.5s;
+}
+
+@media screen and (max-width: 768px) {
+  #sidebar-right {
+    width: 0;
+  }
+
+  #sidebar-right-content {
+    margin-left: 0;
+  }
+  
 }
 
 #sidebar-right-content img {
