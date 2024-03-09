@@ -5,16 +5,36 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import collapseLeft from "../../resources/collapse-left.svg";
+import collapseRight from "../../resources/collapse-right.svg";
 
 const WishlistSidebar = () => {
 
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
+    const [showSidebar, setShowSidebar] = useState(true);
+
+    function toggleHideSidebar(e) {
+        let sidebar = document.getElementsByClassName("sidebar");
+        let collapseImage = document.getElementById("collapse-side-image");
+        for (let element of sidebar) {
+            if (showSidebar) {
+                element.style.width = "0";
+                element.style.minWidth = "0";
+                collapseImage.src = collapseRight;
+            } else {
+                element.style.width = "20%";
+                element.style.minWidth = "150px";
+                collapseImage.src = collapseLeft;
+            }
+        }
+
+        setShowSidebar(!showSidebar);
+    }
 
     return (
         <div className="sidebar">
             <div id="sidebar-right">
-                <div id="sidebar-right-content">
-                    <img src={collapseLeft} alt="left" />
+                <div id="sidebar-right-content" onClick={(e) => {toggleHideSidebar();}}>
+                    <img src={collapseLeft} alt="left" id="collapse-side-image"/>
                 </div>
             </div>
             <div id="sidebar-content">
