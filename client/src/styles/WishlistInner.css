@@ -257,7 +257,7 @@
 .gameLink div {
     box-sizing: border-box;
     height: 100%;
-    max-width: 250px;
+    width: 200px;
     padding: 15px 10px;
     text-align: center;
     display: flex;
@@ -268,6 +268,7 @@
     object-fit: contain;
     height: 100%;
     max-width: 170px;
+    margin: auto;
 }
 
 .gameTitle h1 {
