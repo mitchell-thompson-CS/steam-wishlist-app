@@ -8,6 +8,7 @@ import { setEvent, setLoading, setSearchPopup } from "../../actions/eventAction"
 import { addGame, removeGame } from "../../actions/gameAction";
 import RenameWishlistPopup from "../Popups/RenameWishlistPopup";
 import DeleteWishlistPopup from "../Popups/DeleteWishlistPopup";
+import { isUser } from "../../actions/userAction";
 
 const WishlistInner = () => {
     const [wishlistItem, setWishlistItem] = useState([]);
@@ -40,6 +41,13 @@ const WishlistInner = () => {
                 let response = await fetch('/api/wishlist/' + id, { mode: 'cors', credentials: 'include' });
                 dispatch(setLoading(false));
                 if (response.status !== 200) {
+                    if (response.status === 401) {
+                        dispatch(setEvent(false, "You are not logged in"));
+                    } else if (response.status === 403) {
+                        dispatch(setEvent(false, "You do not have access to this wishlist"));
+                    } else {
+                        dispatch(setEvent(false, "Error fetching wishlist data"));
+                    }
                     return false;
                 }
                 data = await response.json();
@@ -51,6 +59,7 @@ const WishlistInner = () => {
                     } else if (data.editors[user.id] !== undefined) {
                         dispatch(setWishlist(id, "shared", data));
                     }
+                    setWishlistItem(data);
                 }
             } else if (!gettingWishlistData.current) {
                 // update the data with the current wishlist if it already exists
@@ -77,7 +86,6 @@ const WishlistInner = () => {
         async function handleWishlistData() {
             let success = await fetchWishlistData();
             if (!success) {
-                dispatch(setEvent(false, "Error fetching wishlist data"));
                 navigate("/wishlists");
             }
         }
