@@ -26,7 +26,7 @@ const WishlistSidebar = () => {
     }
 
     function resizeSidebar(e) {
-        const size = `${e.x}px`;
+        const size = `${e.x + 3}px`;
         let sidebar = document.getElementsByClassName("sidebar");
         for (let element of sidebar) {
             element.style.width = size;
