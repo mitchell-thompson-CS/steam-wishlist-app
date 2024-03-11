@@ -10,17 +10,19 @@ import collapseRight from "../../resources/collapse-right.svg";
 const WishlistSidebar = () => {
 
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
+    const [sideWidth, setSideWidth] = useState(175);
 
     function toggleHideSidebar(e) {
         let sidebar = document.getElementsByClassName("sidebar");
         for (let element of sidebar) {
             let style = window.getComputedStyle(element);
+            setSideWidth(style.width);
             if (style.width > "0px") {
                 element.style.width = "0";
                 element.style.minWidth = "0";
             } else {
-                element.style.width = "";
-                element.style.minWidth = "";
+                element.style.width = sideWidth;
+                element.style.minWidth = "175px";
             }
         }
     }
@@ -53,7 +55,6 @@ const WishlistSidebar = () => {
             <div id="sidebar-right">
                 <div id="sidebar-right-content" onClick={() => { toggleHideSidebar(); }}>
                     <div id="sidebar-expand">|||</div>
-                    {/* <img src={collapseLeft} alt="left" id="collapse-side-image"/> */}
                 </div>
             </div>
             <div id="sidebar-content">
