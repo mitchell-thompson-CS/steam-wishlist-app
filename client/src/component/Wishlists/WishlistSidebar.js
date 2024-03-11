@@ -50,6 +50,24 @@ const WishlistSidebar = () => {
         });
     }, []);
 
+    function searchForWishlist(e) {
+        if (!wishlistItems || !wishlistItems.owned || !wishlistItems.shared) return;
+        let search = e.target.value.toLowerCase();
+        let wishlists = {};
+        for (let type of Object.keys(wishlistItems)){
+            wishlists = {...wishlists, ...wishlistItems[type]};
+        }
+
+        for (let wishlist of Object.keys(wishlists)) {
+            let element = document.getElementById("sidebar-" + wishlist);
+            if (wishlists[wishlist].name.toLowerCase().includes(search) || wishlist.includes(search)) {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+        }
+    }
+
     return (
         <div className="sidebar">
             <div id="sidebar-right">
@@ -61,7 +79,10 @@ const WishlistSidebar = () => {
                 <ul>
                     <li id="wishlistSearchArea">
                         <form>
-                            <input type="text" id="wishlistSearch" name="search" placeholder="Search..." />
+                            <input type="text" id="wishlistSearch" name="search" placeholder="Search..."
+                                autoComplete="off"
+                                onChange={searchForWishlist}
+                            />
                         </form>
                     </li>
                     <li id="wishlistsidebarhome">
@@ -75,7 +96,7 @@ const WishlistSidebar = () => {
                 <ul id="sidebar-wishlists">
                     {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
                         value ?
-                            <li key={key} className="wishlistItem" title={value.name}>
+                            <li key={key} className="wishlistItem" title={value.name} id={"sidebar-"+key}>
                                 <Link to={"/wishlists/" + key}>
                                     {value.name}
                                 </Link>
@@ -84,7 +105,7 @@ const WishlistSidebar = () => {
                     ))}
                     {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
                         value ?
-                            <li key={key} className="wishlistItem" title={value.name}>
+                            <li key={key} className="wishlistItem" title={value.name} id={"sidebar-"+key}>
                                 <Link to={"/wishlists/" + key}>{value.name}</Link>
                             </li>
                             : null

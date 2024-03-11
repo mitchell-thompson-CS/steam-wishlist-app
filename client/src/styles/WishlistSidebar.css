@@ -105,6 +105,32 @@
   height: 51px;
   display: flex;
   align-items: center;
+  margin: 0 5px;
+}
+
+#wishlistSearchArea input[type=text] {
+  width: 100%;
+  padding: 15px 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #2a2e36;
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+#wishlistSearchArea input[type=text]:hover {
+  background-color: #333841;
+}
+
+#wishlistSearchArea input[type=text]:focus {
+  outline: none;
+  background-color: #23262e;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+#wishlistSearchArea input[type=text]::placeholder {
+  color: #7a7c7d9f;
 }
 
 #wishlistSearch {
