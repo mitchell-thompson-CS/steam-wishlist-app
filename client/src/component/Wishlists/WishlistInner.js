@@ -41,12 +41,14 @@ const WishlistInner = () => {
                 let response = await fetch('/api/wishlist/' + id, { mode: 'cors', credentials: 'include' });
                 dispatch(setLoading(false));
                 if (response.status !== 200) {
-                    if (response.status === 401) {
-                        dispatch(setEvent(false, "You are not logged in"));
-                    } else if (response.status === 403) {
-                        dispatch(setEvent(false, "You do not have access to this wishlist"));
-                    } else {
-                        dispatch(setEvent(false, "Error fetching wishlist data"));
+                    if (user && Object.keys(user).length > 0) {
+                        if (response.status === 401) {
+                            dispatch(setEvent(false, "You are not logged in"));
+                        } else if (response.status === 403) {
+                            dispatch(setEvent(false, "You do not have access to this wishlist"));
+                        } else {
+                            dispatch(setEvent(false, "Error fetching wishlist data"));
+                        }
                     }
                     return false;
                 }
@@ -70,7 +72,7 @@ const WishlistInner = () => {
                 }
             }
 
-            if(gettingWishlistData.current){
+            if (gettingWishlistData.current) {
                 return true;
             }
 
@@ -85,7 +87,7 @@ const WishlistInner = () => {
 
         async function handleWishlistData() {
             let success = await fetchWishlistData();
-            if (!success) {
+            if (!success && user && Object.keys(user).length > 0) {
                 navigate("/wishlists");
             }
         }
@@ -245,6 +247,12 @@ const WishlistInner = () => {
             document.addEventListener('click', closeSettingsPopupClick);
         }
     }, [settingsPopup, closeSettingsPopupClick]);
+
+    useEffect(() => {
+        if (!user || Object.keys(user).length === 0) {
+            navigate("/");
+        }
+    }, [user, navigate]);
 
     return (
         <div className="wishlistInner">
