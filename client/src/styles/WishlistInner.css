@@ -209,8 +209,7 @@
 
 .gameList {
     width: 100%;
-    /* min-width: 1000px; */
-    /* max-width: 3000px; */
+    min-width: 390px;
     display: inline-block;
     font-size: 20px;
     padding: 40px 50px 10px 50px;
