@@ -72,7 +72,7 @@ const Navbar = () => {
                                 if (e.target.value !== searchTerm) {
                                     setSearchTerm(e.target.value)
                                 }
-                            }} 
+                            }}
                             tabIndex={"-1"}
                         />
                     </form>
@@ -84,19 +84,18 @@ const Navbar = () => {
             </ul>
             <ul className="right">
                 <li>
+                    {user.avatar ?
+                        <img id="avatar" src={user.avatar} alt="avatar" onClick={logout}/> :
+                        <div></div>}
+                </li>
+                <li>
                     {user.name ?
-                        <button className="signin" onClick={logout}>{user.name}</button> :
+                        <button className="signin" id="username" onClick={logout}>{user.name}</button> :
                         <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)}
                             className="signin">LOGIN</a>
                     }
                 </li>
-                <li>
-                    {user.avatar ?
-                        <img id="avatar" src={user.avatar} alt="avatar" /> :
-                        <div></div>}
-                </li>
             </ul>
-            <div className="clear"></div>
         </nav>
     );
 }
