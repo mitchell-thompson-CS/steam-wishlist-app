@@ -1,12 +1,10 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import '../styles/Navbar.css'
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteUser, isUser, setUser } from "../actions/userAction";
 import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
-
-const searchDelay = 500;
 
 // TODO: currently if user hits log in, then goes back, then forward, then successfully logs in
 // the user will not be updated. This is because the user is only updated when the page is loaded
