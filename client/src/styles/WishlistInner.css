@@ -242,15 +242,17 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    column-gap: 0;
+    column-gap: 30px;
 
     /* auto removes columns as it shrinks */
-    flex-wrap: wrap;
-    overflow: hidden;
+    /* flex-wrap: wrap;
+    overflow: hidden; */
 
     /* allows you to still view content if its too big */
-    /* flex-wrap: nowrap;
-    overflow: auto; */
+    flex-wrap: nowrap;
+    overflow: auto;
+
+    white-space: nowrap;
 }
 
 .gameLink div {
