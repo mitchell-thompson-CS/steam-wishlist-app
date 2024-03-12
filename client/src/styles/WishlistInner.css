@@ -33,7 +33,7 @@
     color: #9f9fa1;
 }
 
-@media (max-width: 1300px){
+@media (max-width: 768px){
     #wishlistInner-count {
         display: none;
     }
