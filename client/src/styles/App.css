@@ -3,6 +3,8 @@
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
+  scrollbar-color: #2e3f54;
+  scrollbar-width: 10px;
 }
 
 ::-webkit-scrollbar {
@@ -11,7 +13,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #1b2838;
+  background: #131c28;
   border-radius: 10px; 
 }
 
