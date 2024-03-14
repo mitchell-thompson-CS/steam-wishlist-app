@@ -48,6 +48,7 @@
     margin-bottom: 5px;
     /* this padding is for the loading image that appears from SearchForGamePopup.js */
     padding-right: 65px;
+    transition: all 0.1s linear;
 }
 
 #popup-game-search:focus {
@@ -92,4 +93,23 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+@media  screen and (max-height: 600px) {
+    #search-for-game-popup-inner {
+        font-size: 16px;
+        top: 10px;
+        transform: unset;
+        bottom: unset;
+    }
+
+    #popup-game-search {
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .popup-search-result {
+        height: 15%;
+        padding: 2% 5%;
+    }
 }
