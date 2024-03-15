@@ -422,7 +422,7 @@ const WishlistInner = () => {
                                                     <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
                                                     : null
                                                 }
-                                                <p className="priceFinal">{gameData[key].price_overview.final_formatted}</p>
+                                                <p className={"priceFinal " + (gameData[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{gameData[key].price_overview.final_formatted}</p>
                                             </>
                                             : <p className="priceFinal">Free</p>
                                         }

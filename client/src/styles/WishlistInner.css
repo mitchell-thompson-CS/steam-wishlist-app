@@ -298,6 +298,10 @@
     color: #88929c;
 }
 
+.sale-price {
+    color: #beee11;
+}
+
 .gameLowestPrice {
     display: inline-flex;
     flex-direction: column;
