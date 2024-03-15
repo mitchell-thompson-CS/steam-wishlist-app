@@ -77,6 +77,7 @@
     text-decoration: none;
     color: white;
     cursor: pointer;
+    transition: all 0.1s linear;
 }
 
 .popup-search-result:focus, .popup-search-result:hover {
@@ -95,7 +96,17 @@
     white-space: nowrap;
 }
 
-@media  screen and (max-height: 600px) {
+@media screen and (max-width: 800px) {
+    .popup-search-result {
+        font-size: 16px;
+    }
+
+    #popup-game-search {
+        font-size: 16px;
+    }
+}
+
+@media  screen and (max-height: 450px) {
     #search-for-game-popup-inner {
         font-size: 16px;
         top: 10px;
