@@ -28,6 +28,8 @@ const WishlistInner = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const [curReviewPercent, setCurReviewPercent] = useState(NaN);
+
     useEffect(() => {
         // fetches the wishlist data for the current wishlist
         async function fetchWishlistData() {
@@ -254,6 +256,33 @@ const WishlistInner = () => {
         }
     }, [user, navigate]);
 
+    function getReviewColor(value) {
+        console.log(value);
+        if (isNaN(value)) {
+            return "#888888";
+        } else if (value > 80) {
+            return "lightskyblue";
+        } else if (value > 50) {
+            return "#ffff00";
+        } else {
+            return "#ff0000";
+        }
+    }
+
+    function getReviewPercent(key) {
+        let num = (Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+        return (
+            <p className="reviewPercent" style={{
+                color: getReviewColor(num)
+            }}>
+                {isNaN(num) === false
+                    ? <>{num}%</>
+                    : "No Reviews"
+                }
+            </p>
+        )
+    }
+
     return (
         <div className="wishlistInner">
             <RenameWishlistPopup trigger={renamePopup} setTrigger={setRenamePopup} id={id} wishlist={wishlistItem} />
@@ -413,12 +442,7 @@ const WishlistInner = () => {
                                 {/* game review percentage */}
                                 <div className="gamePercent">
                                     <p className="reviewPercentTitle">Rating</p>
-                                    <p className="reviewPercent">
-                                        {isNaN((Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)) === false
-                                            ? <>{(Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2)}%</>
-                                            : "No Reviews"
-                                        }
-                                    </p>
+                                    {getReviewPercent(key)}
                                     <p className="reviewTotal">
                                         {gameData[key].reviews.total_reviews !== 0
                                             ? <>{gameData[key].reviews.total_reviews} Reviews</>
