@@ -257,7 +257,6 @@ const WishlistInner = () => {
     }, [user, navigate]);
 
     function getReviewColor(value) {
-        console.log(value);
         if (isNaN(value)) {
             return "#888888";
         } else if (value > 80) {
