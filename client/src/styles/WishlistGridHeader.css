@@ -12,6 +12,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    transition: all 0.3s linear;
+}
+
+.wishlist-header-left {
+    width: 100%;
+}
+
+.wishlist-header-left h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all 0.3s linear;
 }
 
 #wishlist-header-mini {
@@ -54,4 +66,15 @@
     margin: auto;
     width: 100%;
     height: 100%;
+}
+
+@media screen and (max-width: 400px) {
+    .wishlist-header-left h1 {
+        font-size: 24px;
+    }
+
+    #wishlist-header {
+        padding: 0 10px;
+        height: 60px;
+    }
 }
