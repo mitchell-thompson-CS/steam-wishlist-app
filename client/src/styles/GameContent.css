@@ -87,6 +87,13 @@
     margin-bottom: 10px;
 }
 
+@media screen and (min-width: 2334px) {
+    #game-content {
+        width: calc(100% - 700px);
+        max-width: calc(100% - 700px);
+    }
+}
+
 @media screen and (max-width: 850px) {
     #game-content {
         width: 80%;
