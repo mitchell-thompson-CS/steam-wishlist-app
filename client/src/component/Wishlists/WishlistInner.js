@@ -10,6 +10,8 @@ import RenameWishlistPopup from "../Popups/RenameWishlistPopup";
 import DeleteWishlistPopup from "../Popups/DeleteWishlistPopup";
 import { isUser } from "../../actions/userAction";
 
+import loadingImage from '../../resources/rolling-loading.apng';
+
 const WishlistInner = () => {
     const [wishlistItem, setWishlistItem] = useState([]);
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -28,7 +30,7 @@ const WishlistInner = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [curReviewPercent, setCurReviewPercent] = useState(NaN);
+    const [loadingGames, setLoadingGames] = useState(false);
 
     useEffect(() => {
         // fetches the wishlist data for the current wishlist
@@ -37,7 +39,6 @@ const WishlistInner = () => {
             let wishlistFound = (id && wishlistItems !== undefined && wishlistItems.owned !== undefined && wishlistItems.shared !== undefined &&
                 (wishlistItems.owned[id] !== undefined || wishlistItems.shared[id] !== undefined));
             if (!wishlistFound && !gettingWishlistData.current) {
-                console.log("getting wishlist");
                 gettingWishlistData.current = true;
                 dispatch(setLoading(true));
                 let response = await fetch('/api/wishlist/' + id, { mode: 'cors', credentials: 'include' });
@@ -103,27 +104,32 @@ const WishlistInner = () => {
         async function fetchGameData(data) {
             if (!gettingGameData && data && data.games && gameData !== undefined) {
                 setGettingGameData(true);
+                let arr = [];
                 for (const [key, value] of Object.entries(data.games)) {
                     if (gameData[key] === undefined) {
-                        try {
-                            dispatch(setLoading(true));
-                            await fetch('/api/game/' + key, { mode: 'cors', credentials: 'include' })
-                                .then(function (response2) {
-                                    if (response2.status === 200) {
-                                        return response2.json();
-                                    }
-                                }).then(function (data2) {
-                                    if (data2) {
-                                        dispatch(addGame(key, data2));
-                                    }
-                                    dispatch(setLoading(false));
-                                })
-                        } catch (error) {
-                            console.error(error);
-                        }
+                        arr.push(key);
                     }
                 }
-                setGettingGameData(false);
+                try {
+                    if (arr.length === 0) {
+                        setGettingGameData(false);
+                        return;
+                    }
+                    setLoadingGames(true);
+                    let res = await axios.get('/api/games/' + JSON.stringify(arr));
+                    if (res.status === 200) {
+                        for (const [key, value] of Object.entries(res.data)) {
+                            if (gameData[key] === undefined) {
+                                dispatch(addGame(key, value));
+                            }
+                        }
+                    }
+                    setLoadingGames(false);
+                    setGettingGameData(false);
+                } catch (e) {
+                    setLoadingGames(false);
+                    console.log(e);
+                }
             }
         }
         fetchGameData(wishlistItem);
@@ -453,6 +459,9 @@ const WishlistInner = () => {
                         </li>
                         : null
                 ))}
+                {loadingGames
+                    ? <img src={loadingImage} alt="loading" id="wishlistInner-loading" />
+                    : null}
             </ul>
         </div >
     )

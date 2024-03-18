@@ -215,6 +215,15 @@
     padding: 40px 50px 10px 50px;
 }
 
+#wishlistInner-loading {
+    position: absolute;
+    height: 140px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .gameItem {
     height: 140px;
     list-style: none;
