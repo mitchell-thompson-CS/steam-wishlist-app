@@ -88,6 +88,61 @@ async function getGamePage(req, res) {
     }
 }
 
+/** Gets the game data for multiple games and sends it to the client.
+ * 
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getGamesPage(req, res) {
+    let function_name = getGamesPage.name;
+    if (!req || !req.body) {
+        Logging.handleResponse(res, 400, {}, "getGamePage", "Invalid request", LogLevels.ERROR);
+        return;
+    }
+    let post = JSON.parse(JSON.stringify(req.body));
+    let game_ids = post.game_ids;
+    if(!game_ids || game_ids.length === 0 || Array.isArray(game_ids) === false) {
+        Logging.handleResponse(res, 400, {}, function_name, "No game ids provided", LogLevels.ERROR);
+        return;
+    }
+
+    let gameData = {};
+    for (let i = 0; i < game_ids.length; i++) {
+        let data = await getGameData(game_ids[i]);
+        if (data && data[game_ids[i]] && data[game_ids[i]]['success']) {
+            let entry = data[game_ids[i]]['data'];
+            // we want type, name, dlc, short_description, header_image, website, pc_requirements, mac_requirements, 
+            // linux_requirements, developers, publishers, price_overview, platforms, categories, genres, release_date
+            gameData[game_ids[i]] = {
+                'type': entry['type'],
+                'name': entry['name'],
+                'dlc': entry['dlc'],
+                'short_description': entry['short_description'],
+                'header_image': entry['header_image'],
+                'website': entry['website'],
+                'pc_requirements': entry['pc_requirements'],
+                'mac_requirements': entry['mac_requirements'],
+                'linux_requirements': entry['linux_requirements'],
+                'developers': entry['developers'],
+                'publishers': entry['publishers'],
+                'price_overview': entry['price_overview'],
+                'platforms': entry['platforms'],
+                'categories': entry['categories'],
+                'genres': entry['genres'],
+                'release_date': entry['release_date'],
+                'reviews': entry['reviews']
+            }
+        } else {
+            // make log note that game does not exist, but continue for the rest of the ids
+            Logging.log(LogLevels.WARN, function_name, "Game " + game_ids[i] + " does not exist");
+        }
+    }
+
+    Logging.handleResponse(res, 200, gameData, function_name, "Got game data for " + game_ids);
+    
+}
+
 exports.getGamePage = getGamePage;
 exports.searchGamePage = searchGamePage;
 exports.getGameData = getGameData;
+exports.getGamesPage = getGamesPage;

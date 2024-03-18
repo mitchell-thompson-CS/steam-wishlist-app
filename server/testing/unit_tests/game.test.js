@@ -1,4 +1,4 @@
-const { getGamePage, getGameData, searchGamePage } = require("../../modules/game");
+const { getGamePage, getGameData, searchGamePage, getGamesPage } = require("../../modules/game");
 const { startTypesense, exportedForTesting, searchTypesenseCollection } = require("../../modules/typesense");
 const { typesenseClient } = require("../typesenseClient");
 
@@ -86,6 +86,100 @@ describe("Game Module", () => {
         await getGamePage(req, res);
 
         expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamesPage - success", async () => {
+        let req = {
+            body: {
+                game_ids: ["400", "105600", "620"]
+            }
+        }
+
+        let res = resTemplate;
+        await getGamesPage(req, res);
+
+        expect(res.status).toBe(200);
+        expect(res.data).toBeDefined();
+        expect(res.data).toHaveProperty("400");
+        expect(res.data).toHaveProperty("105600");
+        expect(res.data).toHaveProperty("620");
+        expect(res.data["400"]).toHaveProperty("name");
+        expect(res.data["400"]).toHaveProperty("type");
+        expect(res.data["400"].name).toBe("Portal");
+        expect(res.data["400"].type).toBe("game");
+        expect(res.data["105600"]).toHaveProperty("name");
+        expect(res.data["105600"]).toHaveProperty("type");
+        expect(res.data["105600"].name).toBe("Terraria");
+        expect(res.data["105600"].type).toBe("game");
+        expect(res.data["620"]).toHaveProperty("name");
+        expect(res.data["620"]).toHaveProperty("type");
+        expect(res.data["620"].name).toBe("Portal 2");
+        expect(res.data["620"].type).toBe("game");
+    });
+
+    test("getGamesPage - failure - no body", async () => {
+        let req = {};
+        let res = resTemplate;
+        await getGamesPage(req, res);
+
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamesPage - failure - empty body", async () => {
+        let req = {
+            body: {}
+        };
+        let res = resTemplate;
+        await getGamesPage(req, res);
+
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamesPage - failure - no game_ids", async () => {
+        let req = {
+            body: {
+                game_ids: []
+            }
+        };
+        let res = resTemplate;
+        await getGamesPage(req, res);
+
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamesPage - failure - invalid input type", async () => {
+        let req = {
+            body: {
+                game_id: 400,
+                game_ids: 400
+            }
+        };
+        let res = resTemplate;
+        await getGamesPage(req, res);
+
+        expect(res.status).toBe(400);
+        expect(res.data).toBeDefined();
+        expect(res.data).toEqual({});
+    });
+
+    test("getGamesPage - failure - nonexistant game_ids", async () => {
+        let req = {
+            body: {
+                game_ids: ["-123", "-456", "-789"]
+            }
+        };
+        let res = resTemplate;
+        await getGamesPage(req, res);
+
+        expect(res.status).toBe(200);
         expect(res.data).toBeDefined();
         expect(res.data).toEqual({});
     });
