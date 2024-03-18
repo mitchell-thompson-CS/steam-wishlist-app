@@ -8,11 +8,11 @@ function loadFromSessionStorage() {
     try {
         const serializedState = sessionStorage.getItem("state");
         let state = JSON.parse(serializedState);
-        const serializedState2 = localStorage.getItem("state");
-        let state2 = JSON.parse(serializedState2);
+        // const serializedState2 = localStorage.getItem("state");
+        // let state2 = JSON.parse(serializedState2);
         return {
             ...state,
-            ...state2,
+            // ...state2,
         };
     } catch (e) {
         console.log(e);
@@ -28,11 +28,10 @@ function saveToSessionStorage(state) {
         });
         sessionStorage.setItem("state", serializedState);
 
-        // TODO: remove gameReducer from local storage? what happens if it gets full?
-        const serializedState2 = JSON.stringify({
-            gameReducer: state.gameReducer,
-        });
-        localStorage.setItem("state", serializedState2);
+        // const serializedState2 = JSON.stringify({
+        //     gameReducer: state.gameReducer,
+        // });
+        // localStorage.setItem("state", serializedState2);
     } catch (e) {
         console.log(e);
     }
