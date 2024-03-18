@@ -124,12 +124,12 @@ const WishlistInner = () => {
                             }
                         }
                     }
-                    setLoadingGames(false);
-                    setGettingGameData(false);
                 } catch (e) {
-                    setLoadingGames(false);
-                    console.log(e);
+                    dispatch(setEvent(false, "Error fetching game data"));
                 }
+
+                setLoadingGames(false);
+                setGettingGameData(false);
             }
         }
         fetchGameData(wishlistItem);
