@@ -6,6 +6,7 @@ import { setAddGameToWishlist, setEvent, setLoading, setSearchPopup } from '../.
 import axios from 'axios';
 import { addGameToWishlist } from '../../actions/wishlistAction';
 import LoadingImage from '../../resources/rolling-loading.apng';
+import { deleteUser, setUser } from '../../actions/userAction';
 
 const searchDelay = 500;
 
@@ -156,6 +157,10 @@ const SearchForGamePopup = (props) => {
                                                 }
                                             } catch (error) {
                                                 dispatch(setEvent(false, "Error adding game to wishlist"));
+                                                if(error.response && error.response.status === 401) {
+                                                    dispatch(deleteUser());
+                                                    dispatch(setEvent(false, "You have been logged out. Please log in again."));
+                                                }
                                             }
                                             dispatch(setLoading(false));
                                             dispatch(setSearchPopup(false));
