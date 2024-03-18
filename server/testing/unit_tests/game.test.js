@@ -92,8 +92,8 @@ describe("Game Module", () => {
 
     test("getGamesPage - success", async () => {
         let req = {
-            body: {
-                game_ids: ["400", "105600", "620"]
+            params: {
+                game_ids: JSON.stringify(["400", "105600", "620"])
             }
         }
 
@@ -131,7 +131,7 @@ describe("Game Module", () => {
 
     test("getGamesPage - failure - empty body", async () => {
         let req = {
-            body: {}
+            params: {}
         };
         let res = resTemplate;
         await getGamesPage(req, res);
@@ -143,7 +143,7 @@ describe("Game Module", () => {
 
     test("getGamesPage - failure - no game_ids", async () => {
         let req = {
-            body: {
+            params: {
                 game_ids: []
             }
         };
@@ -157,7 +157,7 @@ describe("Game Module", () => {
 
     test("getGamesPage - failure - invalid input type", async () => {
         let req = {
-            body: {
+            params: {
                 game_id: 400,
                 game_ids: 400
             }
@@ -172,8 +172,8 @@ describe("Game Module", () => {
 
     test("getGamesPage - failure - nonexistant game_ids", async () => {
         let req = {
-            body: {
-                game_ids: ["-123", "-456", "-789"]
+            params: {
+                game_ids: JSON.stringify(["-123", "-456", "-789"])
             }
         };
         let res = resTemplate;

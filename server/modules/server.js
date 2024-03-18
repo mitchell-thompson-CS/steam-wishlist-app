@@ -71,7 +71,7 @@ app.get('/api/game/search/:query', mediumRateLimit, searchGamePage);
 
 app.get('/api/game/:game_id', mediumRateLimit, getGamePage);
 
-app.get('/api/game/get', mediumRateLimit, getGamesPage);
+app.get('/api/games/:game_ids', mediumRateLimit, getGamesPage);
 
 // home paths
 app.get('/api/home/featured', getFeatured);

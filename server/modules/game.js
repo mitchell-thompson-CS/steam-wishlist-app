@@ -95,14 +95,20 @@ async function getGamePage(req, res) {
  */
 async function getGamesPage(req, res) {
     let function_name = getGamesPage.name;
-    if (!req || !req.body) {
-        Logging.handleResponse(res, 400, {}, "getGamePage", "Invalid request", LogLevels.ERROR);
+    if (!req || !req.params || !req.params.game_ids) {
+        Logging.handleResponse(res, 400, {}, function_name, "Invalid request");
         return;
     }
-    let post = JSON.parse(JSON.stringify(req.body));
-    let game_ids = post.game_ids;
-    if(!game_ids || game_ids.length === 0 || Array.isArray(game_ids) === false) {
-        Logging.handleResponse(res, 400, {}, function_name, "No game ids provided", LogLevels.ERROR);
+    let game_ids;
+    try {
+        game_ids = JSON.parse(req.params.game_ids);
+    } catch (e) {
+        Logging.handleResponse(res, 400, {}, function_name, "Invalid request");
+        return;
+    }
+
+    if (!game_ids || game_ids.length === 0 || Array.isArray(game_ids) === false){
+        Logging.handleResponse(res, 400, {}, function_name, "Invalid request");
         return;
     }
 
