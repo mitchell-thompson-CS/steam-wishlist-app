@@ -6,7 +6,7 @@ import { setAddGameToWishlist, setEvent, setLoading, setSearchPopup } from '../.
 import axios from 'axios';
 import { addGameToWishlist } from '../../actions/wishlistAction';
 import LoadingImage from '../../resources/rolling-loading.apng';
-import { deleteUser, setUser } from '../../actions/userAction';
+import { deleteUser } from '../../actions/userAction';
 
 const searchDelay = 500;
 
