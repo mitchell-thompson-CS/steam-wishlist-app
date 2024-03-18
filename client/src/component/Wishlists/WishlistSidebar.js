@@ -4,25 +4,20 @@ import '../../styles/WishlistSidebar.css';
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import collapseLeft from "../../resources/collapse-left.svg";
-import collapseRight from "../../resources/collapse-right.svg";
-
 const WishlistSidebar = () => {
 
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
-    const [sideWidth, setSideWidth] = useState(175);
 
     function toggleHideSidebar(e) {
         let sidebar = document.getElementsByClassName("sidebar");
         for (let element of sidebar) {
             let style = window.getComputedStyle(element);
-            setSideWidth(style.width);
             if (style.width > "0px") {
                 element.style.width = "0";
                 element.style.minWidth = "0";
             } else {
-                element.style.width = sideWidth;
-                element.style.minWidth = "175px";
+                element.style.width = "";
+                element.style.minWidth = "";
             }
         }
     }
@@ -69,7 +64,10 @@ const WishlistSidebar = () => {
     }
 
     return (
-        <div className="sidebar">
+        <div className="sidebar" style={{
+            width: window.innerWidth > 650 ? "" : "0",
+            minWidth: window.innerWidth > 650 ? "" : "0"
+        }}>
             <div id="sidebar-right">
                 <div id="sidebar-right-content" onClick={() => { toggleHideSidebar(); }}>
                     <div id="sidebar-expand">|||</div>

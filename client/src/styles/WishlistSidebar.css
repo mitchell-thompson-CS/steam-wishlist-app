@@ -9,14 +9,17 @@
     transition: all 0.5s;
     z-index: 1;
     flex-shrink: 0;
+    position: relative;
+    height: 100%;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 650px) {
     .sidebar {
-      width: 0;
-      min-width: 0;
+      width: 90%;
+      min-width: 90%;
+      max-width: 90%;
+      position: absolute;
     }
-  
 }
 
 #sidebar-right {
