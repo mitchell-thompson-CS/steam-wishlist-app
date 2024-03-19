@@ -8,70 +8,170 @@ import { setEvent, setLoading } from "../actions/eventAction";
 const HomeView = () => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
     const [gettingGameData, setGettingGameData] = useState(false);
+    const user = useSelector(state => state.userReducer.user);
     const dispatch = useDispatch();
+    const [featuredGames, setFeaturedGames] = useState(null);
 
-    // useEffect(() => {
-    //     async function fetchFeaturedGames() {
-    //         if (!gettingGameData) {
-    //             setGettingGameData(true);
-    //         try {
-    //             dispatch(setLoading(true));
-    //             await fetch('/api/home/featured',{ mode: 'cors', credentials: 'include' })
-    //                 .then(function (response) {
-    //                     if (response.status === 200) {
-    //                         return response.json();
-    //                     }
-    //                 }).then(function (data) {
-    //                     if (data) {
-    //                         // dispatch(addGame(key, data));
-    //                     }
-    //                 })
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //         setGettingGameData(false);
-    //         dispatch(setLoading(false));
-    //     }
-    // }
+    useEffect(() => {
+        async function fetchFeaturedGames() {
+            if (!gettingGameData && featuredGames === null) {
+                setGettingGameData(true);
+                try {
+                    dispatch(setLoading(true));
+                    await fetch('/api/home/featured', { mode: 'cors', credentials: 'include' })
+                        .then(function (response) {
+                            if (response.status === 200) {
+                                return response.json();
+                            } else {
+                                throw new Error("Error getting featured games");
+                            }
+                        }).then(function (data) {
+                            if (data) {
+                                setFeaturedGames(data);
+                                console.log(data);
+                            }
+                        })
+                } catch (error) {
+                    console.error(error);
+                    setFeaturedGames([]);
+                }
+                setGettingGameData(false);
+                dispatch(setLoading(false));
+            }
+        }
 
-    //     fetchFeaturedGames();
-    // }, [dispatch, gettingGameData]);
+        fetchFeaturedGames();
+    }, [dispatch, gettingGameData, featuredGames]);
+
+    function getReviewColor(value) {
+        if (isNaN(value)) {
+            return "#888888";
+        } else if (value > 80) {
+            return "lightskyblue";
+        } else if (value > 50) {
+            return "#ffff00";
+        } else {
+            return "#ff0000";
+        }
+    }
+
+    function getReviewPercent(key) {
+        let num = (Math.round(((featuredGames[key].reviews.total_positive / featuredGames[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+        return (
+            <p className="reviewPercent" style={{
+                color: getReviewColor(num)
+            }}>
+                {isNaN(num) === false
+                    ? <>{num}%</>
+                    : "No Reviews"
+                }
+            </p>
+        )
+    }
+
+    function print(key) {
+        console.log(key);
+        return true;
+    }
 
     return (
         <div className="homeView">
-            <div id="homeWishlistHeader">
-                <div className="homeHeaderLeft">
-                    <h1>YOUR WISHLISTS</h1>
-                </div>
-            </div>
-            <div className="wishlistRow">
-                {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
-                    <div key={key} className="rowItemContainer" title={value.name} >
-                        <Link className="rowItem" to={"/wishlists/" + key}>
-                            <h2>{value.name}</h2>
-                            <p>
-                                {value.games ? Object.keys(value.games).length : 0}
-                                {value.games && Object.keys(value.games).length === 1 ? " Game" : " Games"}
-                            </p>
-                        </Link>
+            {user && Object.keys(user).length > 0 ?
+                <div id="homeWishlists">
+                    <div id="homeWishlistHeader" className="homeHeader">
+                        <div className="homeHeaderLeft">
+                            <h1>YOUR WISHLISTS</h1>
+                        </div>
                     </div>
-                ))}
-                {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
-                    <div key={key} className="rowItemContainer" title={value.name}>
-                        <Link className="rowItem" to={"/wishlists/" + key}>
-                            <h2>{value.name}</h2>
-                            <p>
-                                {value.games ? Object.keys(value.games).length : 0}
-                                {value.games && Object.keys(value.games).length === 1 ? " Game" : " Games"}
-                            </p>
-                        </Link>
+                    <div id="noWishlists">
+                        {(wishlistItems.owned || wishlistItems.shared) ? "" : "No Wishlists"}
                     </div>
-                ))}
-            </div>
-            <div id="homePopularHeader">
-                <div className="homeHeaderLeft">
-                    <h1>TRENDING GAMES</h1>
+                    <div className="wishlistRow">
+                        {wishlistItems.owned && Object.entries(wishlistItems.owned).map(([key, value]) => (
+                            <div key={key} className="rowItemContainer" title={value.name} >
+                                <Link className="rowItem" to={"/wishlists/" + key}>
+                                    <h2>{value.name}</h2>
+                                    <p>
+                                        {value.games ? Object.keys(value.games).length : 0}
+                                        {value.games && Object.keys(value.games).length === 1 ? " Game" : " Games"}
+                                    </p>
+                                </Link>
+                            </div>
+                        ))}
+                        {wishlistItems.shared && Object.entries(wishlistItems.shared).map(([key, value]) => (
+                            <div key={key} className="rowItemContainer" title={value.name}>
+                                <Link className="rowItem" to={"/wishlists/" + key}>
+                                    <h2>{value.name}</h2>
+                                    <p>
+                                        {value.games ? Object.keys(value.games).length : 0}
+                                        {value.games && Object.keys(value.games).length === 1 ? " Game" : " Games"}
+                                    </p>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+                : null}
+            <div id="homeTrending">
+                <div id="homeTrendingHeader" className="homeHeader">
+                    <div className="homeHeaderLeft">
+                        <h1>TRENDING GAMES</h1>
+                    </div>
+                </div>
+                <ul id="trendingGames">
+                {featuredGames && Object.entries(featuredGames).map(([key, value]) => (
+                    featuredGames[key] ?
+                        <li key={key} className="gameItem" title={featuredGames[key].name}>
+                            <a href={"/game/" + key} className="gameLink">
+                                {/* title */}
+                                <div className="gameTitleHome">
+                                    <h1 className="gameName">{featuredGames[key].name}</h1>
+                                    <img src={featuredGames[key].header_image} alt="game thumbnail" />
+                                </div>
+
+                                {/* price */}
+                                <div className="gamePrice">
+                                    <p className="priceTitle">Price</p>
+                                    <span className="price">
+                                        {featuredGames[key].price_overview ?
+                                            <>
+                                                {featuredGames[key].price_overview.initial_formatted !== "" ?
+                                                    <p className="priceInitial">{featuredGames[key].price_overview.initial_formatted}</p>
+                                                    : null
+                                                }
+                                                <p className={"priceFinal " + (featuredGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{featuredGames[key].price_overview.final_formatted}</p>
+                                            </>
+                                            : <p className="priceFinal">Free</p>
+                                        }
+                                    </span>
+                                </div>
+
+                                {/* lowest price */}
+                                <div className="gameLowestPrice">
+                                    <p className="lowestPriceTitle">Lowest Price</p>
+                                </div>
+
+                                {/* playing the game now */}
+                                <div className="gamePlayingNow">
+                                    <p className="playingNowTitle">Playing Now</p>
+                                </div>
+
+                                {/* game review percentage */}
+                                <div className="gamePercent">
+                                    <p className="reviewPercentTitle">Rating</p>
+                                    {getReviewPercent(key)}
+                                    <p className="reviewTotal">
+                                        {featuredGames[key].reviews.total_reviews !== 0
+                                            ? <>{featuredGames[key].reviews.total_reviews} Reviews</>
+                                            : null
+                                        }
+                                    </p>
+                                </div>
+                            </a>
+                        </li>
+                        : null
+                ))}
+                </ul>
             </div>
         </div>
     )

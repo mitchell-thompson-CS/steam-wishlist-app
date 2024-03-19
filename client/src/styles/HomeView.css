@@ -4,13 +4,10 @@
     justify-content: center;
 }
 
-#homeWishlistHeader {
+.homeHeader {
     padding-top: 20px;
-    padding-bottom: 5px;
     margin: 0 50px;
     display: flex;
-    border-bottom: 3px solid #393f46;
-    border-radius: 3px;
 }
 
 .homeHeaderLeft {
@@ -22,22 +19,36 @@
     justify-content: flex-start;
     font-size: 12px;
     color: gray;
+
+    border-bottom: 3px solid #393f46;
+    border-radius: 3px;
+    padding-bottom: 5px;
+    min-width: 300px;
+    width: 100%;
 }
 
 .homeHeaderLeft * {
     height: 100%;
+    white-space: nowrap;
 }
 
 .wishlistRow {
-    width: 100%;
+    /* width: 100%; */
     height: 180px;
-    padding: 20px 50px 50px 50px;
+    /* padding: 0px 50px 0px 50px; */
     display: grid;
     grid-template-columns: repeat(auto-fill, 160px);
-    overflow: hidden;
+    /* overflow: hidden; */
     gap: 10px;
-    justify-content: center;
-    margin-bottom: 50px;
+    /* justify-content: center; */
+    justify-items: center;
+    align-items: center;
+    /* margin-top: 20px; */
+    /* margin-bottom: 50px; */
+    margin: 20px 50px 50px 50px;
+
+    grid-auto-flow: column;
+    overflow-x: auto;
 }
 
 .rowItem {
@@ -88,11 +99,41 @@
     box-shadow: 10px white;
 }
 
-#homePopularHeader {
-    padding-top: 20px;
-    padding-bottom: 5px;
-    margin: 0 50px;
-    display: flex;
-    border-bottom: 3px solid #393f46;
-    border-radius: 3px;
+#noWishlists {
+    position: absolute;
+    font-size: 30px;
+    font-weight: bold;
+    width: 100%;
+    height: 180px;
+    text-align: center;
+    line-height: 180px;
+}
+
+#trendingGames {
+    width: 100%;
+    min-width: 390px;
+    display: inline-block;
+    font-size: 20px;
+    padding: 40px 50px 10px 50px;
+}
+
+.gameTitleHome {
+    margin-left: 50px;
+    flex-shrink: 0;
+}
+
+.gameTitleHome img {
+    object-fit: contain;
+    height: 100%;
+    max-width: 100%;
+    margin: auto;
+}
+
+.gameTitleHome h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 30px;
+    font-size: 20px;
+    vertical-align: middle;
 }
