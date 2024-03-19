@@ -59,6 +59,8 @@ async function login(req, res) {
         }
     });
 
+    Logging.log("login", "Logged in " + req.user.displayName + " (" + req.user.id + ")", LogLevels.INFO);
+
     res.redirect(req.session.prevPage);
 }
 
