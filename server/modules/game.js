@@ -9,6 +9,7 @@ const { searchForGame } = require('./typesense.js');
  * @returns 
  */
 async function getGameData(appid) {
+    let function_name = getGameData.name;
     let currency = 'USD';
     try {
         let appdetails_res = await axios.get('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid);
@@ -23,7 +24,7 @@ async function getGameData(appid) {
             return appdetails;
         }
     } catch (error) {
-        Logging.log(LogLevels.ERROR, "getGameData", "Error getting data for game " + appid + ": " + error);
+        Logging.log(function_name, "Error getting data for game " + appid + ": " + error, LogLevels.ERROR);
         return null;
     }
 }
