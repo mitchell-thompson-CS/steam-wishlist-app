@@ -61,6 +61,11 @@ async function login(req, res) {
 
     Logging.log("login", "Logged in " + req.user.displayName + " (" + req.user.id + ")", LogLevels.INFO);
 
+    // in case they didn't pass through a route
+    if (req.session.prevPage === undefined) {
+        req.session.prevPage = "/";
+    }
+
     res.redirect(req.session.prevPage);
 }
 
