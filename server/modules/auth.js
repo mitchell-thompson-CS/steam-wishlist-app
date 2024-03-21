@@ -61,11 +61,6 @@ async function login(req, res) {
 
     Logging.log("login", "Logged in " + req.user.displayName + " (" + req.user.id + ")", LogLevels.INFO);
 
-    // in case they didn't pass through a route
-    if (req.session.prevPage === undefined) {
-        req.session.prevPage = "/";
-    }
-
     res.redirect(req.session.prevPage);
 }
 
@@ -117,6 +112,9 @@ function isLoggedIn(req, res, next) {
  */
 async function savePrevPageToSession(req, res, next) {
     req.session.prevPage = req.query.redir;
+    if (req.session.prevPage === undefined || req.session.prevPage === "") {
+        req.session.prevPage = "/";
+    }
     await req.session.save(() => {
         next();
     });
