@@ -74,6 +74,6 @@ app.get('/api/game/:game_id', mediumRateLimit, getGamePage);
 app.get('/api/games/:game_ids', mediumRateLimit, getGamesPage);
 
 // home paths
-app.get('/api/home/featured', getFeatured);
+app.get('/api/home/featured', mediumRateLimit, getFeatured);
 
 exports.app = app;
