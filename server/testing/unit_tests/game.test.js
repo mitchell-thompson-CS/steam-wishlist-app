@@ -185,26 +185,21 @@ describe("Game Module", () => {
     });
 
     test("getGameData - failure - nonexistant game_id", async () => {
-        let game_id = "123";
+        let game_id = "-123";
         let res = await getGameData(game_id);
 
-        expect(res).toBeDefined();
-        expect(res[game_id]).toBeDefined();
-        expect(res[game_id].success).toBe(false);
+        expect(res).toEqual(null);
     });
 
     test("getGameData - success", async () => {
         let game_id = "400";
         let res = await getGameData(game_id);
-
+        
         expect(res).toBeDefined();
-        expect(res[game_id]).toBeDefined();
-        expect(res[game_id].success).toBe(true);
-        expect(res[game_id].data).toBeDefined();
-        expect(res[game_id].data).toHaveProperty("name");
-        expect(res[game_id].data).toHaveProperty("type");
-        expect(res[game_id].data.name).toBe("Portal");
-        expect(res[game_id].data.type).toBe("game");
+        expect(res).toHaveProperty("name");
+        expect(res).toHaveProperty("type");
+        expect(res.name).toBe("Portal");
+        expect(res.type).toBe("game");
     });
 
     test("searchGamePage - failure", async () => {

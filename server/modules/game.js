@@ -53,6 +53,9 @@ async function getGameData(appid) {
             }
 
             return gameData;
+        } else {
+            // game does not exist
+            return null;
         }
     } catch (error) {
         Logging.log(function_name, "Error getting data for game " + appid + ": " + error, LogLevels.ERROR);
