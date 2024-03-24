@@ -16,12 +16,43 @@ async function getGameData(appid) {
         let appdetails = appdetails_res.data;
         let appreviews_res = await axios.get('https://store.steampowered.com/appreviews/' + appid + '?json=1');
         let appreviews = appreviews_res.data;
+        let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+        let appplayercount = appplayercount_res.data.response;
+        if (appplayercount && appplayercount.result === 1) {
+            appdetails[appid]['data']['playingnow'] = appplayercount;
+        } else {
+            appdetails[appid]['data']['playingnow'] = -1;
+        }
 
-        if (appdetails && appdetails[appid] && appreviews) {
+        if (appdetails && appdetails[appid] && appdetails[appid]['data'] && appreviews) {
             if (appreviews['success'] && appdetails[appid]['success']) {
                 appdetails[appid]['data']['reviews'] = appreviews['query_summary'];
             }
-            return appdetails;
+
+            let entry = appdetails[appid]['data'];
+
+            let gameData = {
+                'type': entry['type'],
+                'name': entry['name'],
+                'dlc': entry['dlc'],
+                'short_description': entry['short_description'],
+                'header_image': entry['header_image'],
+                'website': entry['website'],
+                'pc_requirements': entry['pc_requirements'],
+                'mac_requirements': entry['mac_requirements'],
+                'linux_requirements': entry['linux_requirements'],
+                'developers': entry['developers'],
+                'publishers': entry['publishers'],
+                'price_overview': entry['price_overview'],
+                'platforms': entry['platforms'],
+                'categories': entry['categories'],
+                'genres': entry['genres'],
+                'release_date': entry['release_date'],
+                'reviews': entry['reviews'],
+                'playingnow' : entry['playingnow']
+            }
+
+            return gameData;
         }
     } catch (error) {
         Logging.log(function_name, "Error getting data for game " + appid + ": " + error, LogLevels.ERROR);
@@ -57,32 +88,9 @@ async function getGamePage(req, res) {
     }
 
     let data = await getGameData(req.params.game_id);
-    if (data && data[req.params.game_id] && data[req.params.game_id]['success']) {
-        let entry = data[req.params.game_id]['data'];
-        // we want type, name, dlc, short_description, header_image, website, pc_requirements, mac_requirements, 
-        // linux_requirements, developers, publishers, price_overview, platforms, categories, genres, release_date
-        let gameData = {
-            'type': entry['type'],
-            'name': entry['name'],
-            'dlc': entry['dlc'],
-            'short_description': entry['short_description'],
-            'header_image': entry['header_image'],
-            'website': entry['website'],
-            'pc_requirements': entry['pc_requirements'],
-            'mac_requirements': entry['mac_requirements'],
-            'linux_requirements': entry['linux_requirements'],
-            'developers': entry['developers'],
-            'publishers': entry['publishers'],
-            'price_overview': entry['price_overview'],
-            'platforms': entry['platforms'],
-            'categories': entry['categories'],
-            'genres': entry['genres'],
-            'release_date': entry['release_date'],
-            'reviews': entry['reviews']
-        }
-
+    if (data) {
         // res.send(gameData);
-        Logging.handleResponse(res, 200, gameData, "getGamePage", "Got game data for " + req.params.game_id);
+        Logging.handleResponse(res, 200, data, "getGamePage", "Got game data for " + req.params.game_id);
     } else {
         // failure to get data
         Logging.handleResponse(res, 404, null, "getGamePage", "Game " + req.params.game_id + " does not exist", LogLevels.ERROR);
@@ -116,29 +124,8 @@ async function getGamesPage(req, res) {
     let gameData = {};
     for (let i = 0; i < game_ids.length; i++) {
         let data = await getGameData(game_ids[i]);
-        if (data && data[game_ids[i]] && data[game_ids[i]]['success']) {
-            let entry = data[game_ids[i]]['data'];
-            // we want type, name, dlc, short_description, header_image, website, pc_requirements, mac_requirements, 
-            // linux_requirements, developers, publishers, price_overview, platforms, categories, genres, release_date
-            gameData[game_ids[i]] = {
-                'type': entry['type'],
-                'name': entry['name'],
-                'dlc': entry['dlc'],
-                'short_description': entry['short_description'],
-                'header_image': entry['header_image'],
-                'website': entry['website'],
-                'pc_requirements': entry['pc_requirements'],
-                'mac_requirements': entry['mac_requirements'],
-                'linux_requirements': entry['linux_requirements'],
-                'developers': entry['developers'],
-                'publishers': entry['publishers'],
-                'price_overview': entry['price_overview'],
-                'platforms': entry['platforms'],
-                'categories': entry['categories'],
-                'genres': entry['genres'],
-                'release_date': entry['release_date'],
-                'reviews': entry['reviews']
-            }
+        if(data) {
+            gameData[game_ids[i]] = data;
         } else {
             // make log note that game does not exist, but continue for the rest of the ids
             Logging.log(LogLevels.WARN, function_name, "Game " + game_ids[i] + " does not exist");

@@ -7,7 +7,7 @@ const { getWishlists, createWishlist, deleteWishlist } = require("./wishlists.js
 const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlists, addEditorToWishlist, deleteEditorFromWishlist } = require("./wishlistInner.js");
 const { getGamePage, searchGamePage, getGamesPage } = require("./game.js");
 const { lowRateLimit, mediumRateLimit, highRateLimit } = require("./rateLimit.js");
-const { getFeatured } = require("./home.js");
+const { getFeatured, getTopSellers } = require("./home.js");
 
 const app = express()
 
@@ -75,5 +75,7 @@ app.get('/api/games/:game_ids', mediumRateLimit, getGamesPage);
 
 // home paths
 app.get('/api/home/featured', mediumRateLimit, getFeatured);
+
+app.get('/api/home/top-sellers', mediumRateLimit, getTopSellers);
 
 exports.app = app;

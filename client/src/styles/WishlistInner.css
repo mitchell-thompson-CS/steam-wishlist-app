@@ -352,6 +352,11 @@
     color: #88929c;
 }
 
+.playingNow {
+    display: flex;
+    margin: auto;
+}
+
 .gameSelectSection {
     display: flex;
     align-items: center;

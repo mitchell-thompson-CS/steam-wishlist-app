@@ -442,6 +442,9 @@ const WishlistInner = () => {
                                 {/* playing the game now */}
                                 <div className="gamePlayingNow">
                                     <p className="playingNowTitle">Playing Now</p>
+                                    <p className="playingNow">
+                                        {gameData[key].playingnow.player_count}
+                                    </p>
                                 </div>
 
                                 {/* game review percentage */}
