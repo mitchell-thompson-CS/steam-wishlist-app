@@ -113,16 +113,19 @@ async function addGameToWishlists(req, res) {
         return;
     }
 
+    let cur_wishlist = null;
+
     try {
         let gameData = await getGameData(game_id);
         // game doesn't exist
-        if (!gameData || !gameData[game_id] || gameData[game_id]['success'] === false) {
+        if (!gameData) {
             Logging.handleResponse(res, 404, null, function_name,
                 "Game " + game_id + " doesn't exist");
             return;
         }
 
         for (let wishlist_id of wishlists) {
+            cur_wishlist = wishlist_id;
             let wishlistSnapshot = await getDb().collection('wishlists').doc(wishlist_id).get();
             if (!wishlistSnapshot.exists) {
                 // wishlist doesn't exist
@@ -140,7 +143,7 @@ async function addGameToWishlists(req, res) {
             }
 
             await getDb().collection('wishlists').doc(wishlist_id).update({
-                [`games.${game_id}`]: gameData[game_id]['data']['name']
+                [`games.${game_id}`]: gameData['name']
             })
         }
 
@@ -149,7 +152,7 @@ async function addGameToWishlists(req, res) {
         return;
     } catch (error) {
         Logging.handleResponse(res, 500, null, function_name,
-            "Error adding game " + game_id + " to wishlist " + wishlist_id + " by user " + req.user.id + ": " + error);
+            "Error adding game " + game_id + " to wishlist " + cur_wishlist + " by user " + req.user.id + ": " + error);
         return;
     }
 }
