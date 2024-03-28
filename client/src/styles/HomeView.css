@@ -8,6 +8,7 @@
     padding-top: 20px;
     margin: 0 50px;
     display: flex;
+    margin-bottom: 30px;
 }
 
 .homeHeaderLeft {
@@ -33,10 +34,10 @@
 }
 
 .wishlistRow {
-    /* width: 100%; */
-    height: 185px;
+    width: 80%;
+    height: 200px;
     /* padding: 0px 50px 0px 50px; */
-    padding-bottom: 5px;
+    padding: 10px;
     display: grid;
     grid-template-columns: repeat(auto-fill, 160px);
     /* overflow: hidden; */
@@ -46,7 +47,7 @@
     align-items: center;
     /* margin-top: 20px; */
     /* margin-bottom: 50px; */
-    margin: 20px 50px 50px 50px;
+    margin: auto auto 50px auto;
 
     grid-auto-flow: column;
     overflow-x: auto;
@@ -70,6 +71,7 @@
     color: white;
     border-radius: 15px;
     padding-top: 50px;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .rowItem h2 {
@@ -117,7 +119,7 @@
     min-width: 390px;
     display: inline-block;
     font-size: 20px;
-    padding: 40px 50px 10px 50px;
+    /* padding: 40px 50px 10px 50px; */
 }
 
 .gameTitleHome {
@@ -139,4 +141,28 @@
     min-height: 30px;
     font-size: 20px;
     vertical-align: middle;
+}
+
+.listContainer {
+    width: 80%;
+    max-height: 480px;
+    overflow: hidden;
+    margin: auto auto 10px auto;
+    transition: all .3s linear;
+}
+
+.viewMore {
+    cursor: pointer;
+    margin: auto 10% auto auto;
+    float: right;
+    text-align: right;
+    color: lightskyblue;
+}
+
+#homeTrending {
+    margin-bottom: 20px;
+}
+
+#homeTopSellers {
+    margin-bottom: 20px;
 }

@@ -12,6 +12,8 @@ const HomeView = () => {
     const dispatch = useDispatch();
     const [featuredGames, setFeaturedGames] = useState(null);
     const [topGames, setTopGames] = useState(null);
+    const [trendingIsExpanded, setTrendingIsExpanded] = useState(false);
+    const [topIsExpanded, setTopIsExpanded] = useState(false);
 
     useEffect(() => {
         async function fetchFeaturedGames() {
@@ -57,6 +59,18 @@ const HomeView = () => {
 
         fetchFeaturedGames();
     }, [dispatch, gettingGameData, featuredGames, topGames]);
+
+    const toggleExpandTrending = () => {
+        setTrendingIsExpanded(!trendingIsExpanded);
+    }
+
+    const trendingHeight = trendingIsExpanded ? 'unset' : '480px';
+
+    const toggleExpandTop = () => {
+        setTopIsExpanded(!topIsExpanded);
+    }
+
+    const topHeight = topIsExpanded ? 'unset' : '480px';
 
     function getReviewColor(value) {
         if (isNaN(value)) {
@@ -133,63 +147,66 @@ const HomeView = () => {
                         <h1>TRENDING GAMES</h1>
                     </div>
                 </div>
-                <ul id="trendingGames">
-                    {featuredGames && Object.entries(featuredGames).map(([key, value]) => (
-                        featuredGames[key] ?
-                            <li key={key} className="gameItem" title={featuredGames[key].name}>
-                                <a href={"/game/" + key} className="gameLink">
-                                    {/* title */}
-                                    <div className="gameTitleHome">
-                                        <h1 className="gameName">{featuredGames[key].name}</h1>
-                                        <img src={featuredGames[key].header_image} alt="game thumbnail" />
-                                    </div>
+                <div className="listContainer" style={{ 'max-height': trendingHeight }}>
+                    <ul id="trendingGames">
+                        {featuredGames && Object.entries(featuredGames).map(([key, value]) => (
+                            featuredGames[key] ?
+                                <li key={key} className="gameItem" title={featuredGames[key].name}>
+                                    <a href={"/game/" + key} className="gameLink">
+                                        {/* title */}
+                                        <div className="gameTitleHome">
+                                            <h1 className="gameName">{featuredGames[key].name}</h1>
+                                            <img src={featuredGames[key].header_image} alt="game thumbnail" />
+                                        </div>
 
-                                    {/* price */}
-                                    <div className="gamePrice">
-                                        <p className="priceTitle">Price</p>
-                                        <span className="price">
-                                            {featuredGames[key].price_overview ?
-                                                <>
-                                                    {featuredGames[key].price_overview.initial_formatted !== "" ?
-                                                        <p className="priceInitial">{featuredGames[key].price_overview.initial_formatted}</p>
-                                                        : null
-                                                    }
-                                                    <p className={"priceFinal " + (featuredGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{featuredGames[key].price_overview.final_formatted}</p>
-                                                </>
-                                                : <p className="priceFinal">Free</p>
-                                            }
-                                        </span>
-                                    </div>
+                                        {/* price */}
+                                        <div className="gamePrice">
+                                            <p className="priceTitle">Price</p>
+                                            <span className="price">
+                                                {featuredGames[key].price_overview ?
+                                                    <>
+                                                        {featuredGames[key].price_overview.initial_formatted !== "" ?
+                                                            <p className="priceInitial">{featuredGames[key].price_overview.initial_formatted}</p>
+                                                            : null
+                                                        }
+                                                        <p className={"priceFinal " + (featuredGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{featuredGames[key].price_overview.final_formatted}</p>
+                                                    </>
+                                                    : <p className="priceFinal">Free</p>
+                                                }
+                                            </span>
+                                        </div>
 
-                                    {/* lowest price */}
-                                    <div className="gameLowestPrice">
-                                        <p className="lowestPriceTitle">Lowest Price</p>
-                                    </div>
+                                        {/* lowest price */}
+                                        <div className="gameLowestPrice">
+                                            <p className="lowestPriceTitle">Lowest Price</p>
+                                        </div>
 
-                                    {/* playing the game now */}
-                                    <div className="gamePlayingNow">
-                                        <p className="playingNowTitle">Playing Now</p>
-                                        <p className="playingNow">
-                                            {featuredGames[key].playingnow.player_count}
-                                        </p>
-                                    </div>
+                                        {/* playing the game now */}
+                                        <div className="gamePlayingNow">
+                                            <p className="playingNowTitle">Playing Now</p>
+                                            <p className="playingNow">
+                                                {featuredGames[key].playingnow.player_count}
+                                            </p>
+                                        </div>
 
-                                    {/* game review percentage */}
-                                    <div className="gamePercent">
-                                        <p className="reviewPercentTitle">Rating</p>
-                                        {getReviewPercent(key)}
-                                        <p className="reviewTotal">
-                                            {featuredGames[key].reviews.total_reviews !== 0
-                                                ? <>{featuredGames[key].reviews.total_reviews} Reviews</>
-                                                : null
-                                            }
-                                        </p>
-                                    </div>
-                                </a>
-                            </li>
-                            : null
-                    ))}
-                </ul>
+                                        {/* game review percentage */}
+                                        <div className="gamePercent">
+                                            <p className="reviewPercentTitle">Rating</p>
+                                            {getReviewPercent(key)}
+                                            <p className="reviewTotal">
+                                                {featuredGames[key].reviews.total_reviews !== 0
+                                                    ? <>{featuredGames[key].reviews.total_reviews} Reviews</>
+                                                    : null
+                                                }
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                : null
+                        ))}
+                    </ul>
+                </div>
+                <span className="viewMore" onClick={toggleExpandTrending}>{trendingIsExpanded ? 'View Less' : 'View More'}</span>
             </div>
 
             <div id="homeTopSellers">
@@ -198,63 +215,67 @@ const HomeView = () => {
                         <h1>TOP SELLERS</h1>
                     </div>
                 </div>
-                <ul id="trendingGames">
-                    {topGames && Object.entries(topGames).map(([key, value]) => (
-                        topGames[key] ?
-                            <li key={key} className="gameItem" title={topGames[key].name}>
-                                <a href={"/game/" + key} className="gameLink">
-                                    {/* title */}
-                                    <div className="gameTitleHome">
-                                        <h1 className="gameName">{topGames[key].name}</h1>
-                                        <img src={topGames[key].header_image} alt="game thumbnail" />
-                                    </div>
+                <div className="listContainer" style={{ 'max-height': topHeight }}>
+                    <ul id="trendingGames">
+                        {topGames && Object.entries(topGames).map(([key, value]) => (
+                            topGames[key] ?
+                                <li key={key} className="gameItem" title={topGames[key].name}>
+                                    <p className="topRanking"></p>
+                                    <a href={"/game/" + key} className="gameLink">
+                                        {/* title */}
+                                        <div className="gameTitleHome">
+                                            <h1 className="gameName">{topGames[key].name}</h1>
+                                            <img src={topGames[key].header_image} alt="game thumbnail" />
+                                        </div>
 
-                                    {/* price */}
-                                    <div className="gamePrice">
-                                        <p className="priceTitle">Price</p>
-                                        <span className="price">
-                                            {topGames[key].price_overview ?
-                                                <>
-                                                    {topGames[key].price_overview.initial_formatted !== "" ?
-                                                        <p className="priceInitial">{topGames[key].price_overview.initial_formatted}</p>
-                                                        : null
-                                                    }
-                                                    <p className={"priceFinal " + (topGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{topGames[key].price_overview.final_formatted}</p>
-                                                </>
-                                                : <p className="priceFinal">Free</p>
-                                            }
-                                        </span>
-                                    </div>
+                                        {/* price */}
+                                        <div className="gamePrice">
+                                            <p className="priceTitle">Price</p>
+                                            <span className="price">
+                                                {topGames[key].price_overview ?
+                                                    <>
+                                                        {topGames[key].price_overview.initial_formatted !== "" ?
+                                                            <p className="priceInitial">{topGames[key].price_overview.initial_formatted}</p>
+                                                            : null
+                                                        }
+                                                        <p className={"priceFinal " + (topGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{topGames[key].price_overview.final_formatted}</p>
+                                                    </>
+                                                    : <p className="priceFinal">Free</p>
+                                                }
+                                            </span>
+                                        </div>
 
-                                    {/* lowest price */}
-                                    <div className="gameLowestPrice">
-                                        <p className="lowestPriceTitle">Lowest Price</p>
-                                    </div>
+                                        {/* lowest price */}
+                                        <div className="gameLowestPrice">
+                                            <p className="lowestPriceTitle">Lowest Price</p>
+                                        </div>
 
-                                    {/* playing the game now */}
-                                    <div className="gamePlayingNow">
-                                        <p className="playingNowTitle">Playing Now</p>
-                                        <p className="playingNow">
-                                            {topGames[key].playingnow.player_count}
-                                        </p>
-                                    </div>
+                                        {/* playing the game now */}
+                                        <div className="gamePlayingNow">
+                                            <p className="playingNowTitle">Playing Now</p>
+                                            <p className="playingNow">
+                                                {topGames[key].playingnow.player_count}
+                                            </p>
+                                        </div>
 
-                                    {/* game review percentage */}
-                                    <div className="gamePercent">
-                                        <p className="reviewPercentTitle">Rating</p>
-                                        {getReviewPercent(key)}
-                                        <p className="reviewTotal">
-                                            {topGames[key].reviews.total_reviews !== 0
-                                                ? <>{topGames[key].reviews.total_reviews} Reviews</>
-                                                : null
-                                            }
-                                        </p>
-                                    </div>
-                                </a>
-                            </li>
-                            : null
-                    ))}
-                </ul>
+                                        {/* game review percentage */}
+                                        <div className="gamePercent">
+                                            <p className="reviewPercentTitle">Rating</p>
+                                            {getReviewPercent(key)}
+                                            <p className="reviewTotal">
+                                                {topGames[key].reviews.total_reviews !== 0
+                                                    ? <>{topGames[key].reviews.total_reviews} Reviews</>
+                                                    : null
+                                                }
+                                            </p>
+                                        </div>
+                                    </a>
+                                </li>
+                                : null
+                        ))}
+                    </ul>
+                </div>
+                <span className="viewMore" onClick={toggleExpandTop}>{topIsExpanded ? 'View Less' : 'View More'}</span>
             </div>
         </div>
     )
