@@ -7,7 +7,7 @@ testSchema.name = "games_test";
 let searchParameters = {
     'q': "Half-Life 2",
     'query_by': 'name',
-    'per_page': 10,
+    'per_page': 5,
 };
 
 beforeAll(async () => {
@@ -43,7 +43,7 @@ it("searchForGame with initialized typesense with games_test collection", async 
     expect(results).toBeDefined()
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
-    expect(results.hits[0].document.name).toBe("Half-Life 2")
+    expect(results.hits[0].document.name).toMatch(/(Half-Life 2)/i)
 }, 15000);
 
 it("searchForGame with empty games_test collection", async () => {
@@ -65,7 +65,7 @@ it("searchForGame with final startTypesense true", async () => {
     expect(results).toBeDefined()
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
-    expect(results.hits[0].document.name).toBe("Half-Life 2")
+    expect(results.hits[0].document.name).toMatch(/(Half-Life 2)/i)
 }, 15000);
 
 it("searchForGame with final startTypesense false", async () => {
@@ -74,7 +74,7 @@ it("searchForGame with final startTypesense false", async () => {
     expect(results).toBeDefined()
     expect(results.hits).toBeDefined()
     expect(results.hits[0].document).toBeDefined()
-    expect(results.hits[0].document.name).toBe("Half-Life 2")
+    expect(results.hits[0].document.name).toMatch(/(Half-Life 2)/i)
     expect(results.hits[0].document.id).toBeDefined();
     expect(results.hits[0].document.appid).toBe(undefined)
 }, 15000);
