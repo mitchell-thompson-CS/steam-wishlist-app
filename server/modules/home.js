@@ -66,8 +66,8 @@ async function getFeatured(req, res) {
 }
 
 async function getTopSellers(req, res) {
-    let function_name = getFeatured.name;
-    Logging.handleResponse(res, 200, top_sellers_games, function_name, "Got featured games");
+    let function_name = getTopSellers.name;
+    Logging.handleResponse(res, 200, top_sellers_games, function_name, "Got top selling games");
 }
 
 exports.getFeatured = getFeatured;
