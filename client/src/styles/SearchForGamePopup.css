@@ -100,10 +100,6 @@
     .popup-search-result {
         font-size: 16px;
     }
-
-    #popup-game-search {
-        font-size: 16px;
-    }
 }
 
 @media  screen and (max-height: 450px) {
