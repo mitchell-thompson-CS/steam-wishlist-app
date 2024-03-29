@@ -45,6 +45,7 @@ async function getSteamTopSellers() {
         top_sellers_games = [];
         for (let game of top_sellers) {
             let game_data = await getGameData(game['appid']);
+            game_data.appid = game['appid'];
             // top_sellers_games[game['appid']] = game_data;
             top_sellers_games.push(game_data);
         }

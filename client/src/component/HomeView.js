@@ -4,6 +4,7 @@ import axios from "axios";
 import '../styles/HomeView.css';
 import { Link } from "react-router-dom";
 import { setEvent, setLoading } from "../actions/eventAction";
+import Footer from "./Footer.js";
 
 const HomeView = () => {
     const wishlistItems = useSelector(state => state.wishlistReducer.wishlists);
@@ -217,13 +218,13 @@ const HomeView = () => {
                 </div>
                 <div className="listContainer" style={{ maxHeight: topHeight }}>
                     <ul id="trendingGames">
-                        {topGames && Object.entries(topGames).map(([key, value]) => (
+                        {topGames && Object.entries(topGames).map(([key, value], index) => (
                             topGames[key] ?
                                 <li key={key} className="gameItem" title={topGames[key].name}>
-                                    <p className="topRanking"></p>
-                                    <a href={"/game/" + key} className="gameLink">
+                                    <a href={"/game/" + topGames[key].appid} className="gameLink">
+                                        <p className="topRanking">{index + 1}</p>
                                         {/* title */}
-                                        <div className="gameTitleHome">
+                                        <div className="gameTitleHome topTitle">
                                             <h1 className="gameName">{topGames[key].name}</h1>
                                             <img src={topGames[key].header_image} alt="game thumbnail" />
                                         </div>
@@ -277,6 +278,7 @@ const HomeView = () => {
                 </div>
                 <span className="viewMore" onClick={toggleExpandTop}>{topIsExpanded ? 'View Less' : 'View More'}</span>
             </div>
+            <Footer/>
         </div>
     )
 }
