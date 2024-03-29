@@ -1,4 +1,5 @@
 import GameSidebar from "./GameSidebar"
+import Footer from "../Footer.js";
 
 import '../../styles/Game.css';
 import GameContent from "./GameContent";
@@ -43,6 +44,7 @@ const Game = () => {
             <GameContent />
             <div className="clear"></div>
         </div>
+        <Footer/>
         </>
     )
 }

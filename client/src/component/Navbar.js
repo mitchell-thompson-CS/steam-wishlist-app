@@ -16,6 +16,7 @@ const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const showHiddenNav = useRef(false);
+    const [width, setWidth] = useState(window.innerWidth);
 
     useEffect(() => {
         // deal with setting the users state (if it needs setting)
@@ -60,28 +61,69 @@ const Navbar = () => {
         dispatch(setSearchPopup(true));
     }
 
+    function clickAwayFromNav(e) {
+        if (e.target && e.target.id !== "navItems"
+            && e.target.id !== "expandListsvg"
+            && e.target.id !== "expandList"
+            && e.target.parentElement
+            && e.target.parentElement.id !== "expandListsvg"
+            && e.target.parentElement.id !== "expandList") {
+            closeNav();
+        }
+    }
+
+    function closeNav() {
+        let navItems = document.getElementById("navItems");
+        navItems.style.width = "";
+        document.removeEventListener("click", clickAwayFromNav);
+        showHiddenNav.current = false;
+    }
+
     function expandNav() {
         let navItems = document.getElementById("navItems");
         if (navItems) {
             if (showHiddenNav.current === false) {
                 navItems.style.visibility = "visible";
+                navItems.style.width = "80vw";
+                document.addEventListener("click", clickAwayFromNav);
+                showHiddenNav.current = true;
             } else {
+                closeNav();
+            }
+        }
+    }
+
+    function resizeEvent(e) {
+        setWidth(window.innerWidth);
+    }
+
+    useEffect(() => {
+        let navItems = document.getElementById("navItems");
+        navItems.onanimationend = () => {
+            if (navItems.style.width === "") {
                 navItems.style.visibility = "";
             }
         }
 
-        showHiddenNav.current = !showHiddenNav.current;
-    }
+        window.addEventListener("resize", resizeEvent)
+    }, [])
+
+    useEffect(() => {
+        if(width > 650) {
+            document.removeEventListener("click", clickAwayFromNav);
+            showHiddenNav.current = false;
+        }
+    }, [width]);
 
     return (
         <nav>
             <ul className="left">
                 <li id="expandList" onClick={expandNav}>
-                    <svg width="45px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="expandListsvg" width="45px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 6H20M4 12H20M4 18H20" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 </li>
-                <ul id="navItems">
+                <ul id="navItems" style={width > 650 ? {width: ""} : {}}>
                     <li>
                         <Link className="navPage" to="/"><img id="logo" src="/logo.svg" alt="logo" /></Link>
 
@@ -100,11 +142,7 @@ const Navbar = () => {
                         <ul id="gameSearchResults"></ul>
                     </li>
                     <li>
-                        <ul>
-                            <li>
-                                <Link className="navPage" to="/wishlists">WISHLISTS</Link>
-                            </li>
-                        </ul>
+                        <Link className="navPage" to="/wishlists">WISHLISTS</Link>
                     </li>
                 </ul>
             </ul>

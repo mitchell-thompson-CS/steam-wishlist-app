@@ -160,31 +160,45 @@ nav ul li a:hover, nav ul li button:hover {
 
   #navItems {
     position: fixed;
-    top: 75px;
+    top: 74px;
     left: 0;
-    height: calc(100vh - 75px);
-    width: 100vw;
-    background-color: #000;
+    height: calc(100vh - 74px);
+    width: 0;
+    background-color: #16202c;
     display: block;
     justify-content: unset;
     align-items: unset;
     visibility: hidden;
     transition: visbility 0s;
+    transition: width 0.3s;
+    overflow: hidden;
+    padding: 0;
+    box-shadow: 5px 0 5px -2px #121a24;
+    user-select: none;
   }
 
-  #navItems ul {
-    align-items: unset;
-    height: unset;
-    justify-content: unset;
+  nav ul li {
     display: block;
-  }
-
-  #navItems li {
-    padding: 10px 0;
   }
 
   .navPage {
     transition: visibility 0s;
-    /* padding: 0; */
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    padding: 30px 20px;
+  }
+
+  #navItems li:nth-child(odd) {
+    background-color: #171d25;
+
+  }
+
+  #navItems li:nth-child(even) {
+    background-color: #192029;
+  }
+
+  #navItems li:nth-child(1) {
+    background-color: #192029;
   }
 }
