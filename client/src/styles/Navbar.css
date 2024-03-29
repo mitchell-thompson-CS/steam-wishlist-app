@@ -61,7 +61,7 @@ nav ul li a:hover, nav ul li button:hover {
   background-color: #1b2838;
 }
 
-#gameSearch {
+.gameSearch {
   border-radius: 20px;
   padding: 5px 10px;
   border: none;
@@ -77,9 +77,114 @@ nav ul li a:hover, nav ul li button:hover {
   transition: 0.2s;
 }
 
+#middleNavSearch {
+  display: none;
+}
+
+#expandList {
+  display: none;
+}
+
+#expandList:hover {
+  cursor: pointer;
+}
+
+#expandList svg {
+  fill: white;
+  color: white;
+  
+}
+
 @media screen and (max-width: 768px) {
   #username {
     display: none;
+  } 
+}
+
+@media screen and (max-width: 650px) {
+  .left {
+    width: 45px;
+    flex: none;
+    margin-right: 10px;
+    display: block;
+  }
+
+  #searchArea {
+    display: none;
+  }
+
+  #middleNavSearch {
+    display: block;
+    width: 100%;
+    min-width: 150px;
+    height: 40px;
   }
   
+  .right {
+    flex: none;
+    width: 90px;
+    justify-content: center;
+  }
+
+  #expandList {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    /* height: 45px; */
+  }
+
+  nav {
+    gap: unset;
+    justify-content: unset;
+  }
+
+  .signin {
+    padding: 0;
+  }
+  
+  .gameSearch {
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
+  }
+
+  #avatar {
+    width: 45px;
+    height: 45px;
+  }
+
+  #avatar-container {
+    width: 45px;
+    height: 45px;
+  }
+
+  #navItems {
+    position: fixed;
+    top: 75px;
+    left: 0;
+    height: calc(100vh - 75px);
+    width: 100vw;
+    background-color: #000;
+    display: block;
+    justify-content: unset;
+    align-items: unset;
+    visibility: hidden;
+    transition: visbility 0s;
+  }
+
+  #navItems ul {
+    align-items: unset;
+    height: unset;
+    justify-content: unset;
+    display: block;
+  }
+
+  #navItems li {
+    padding: 10px 0;
+  }
+
+  .navPage {
+    transition: visibility 0s;
+    /* padding: 0; */
+  }
 }

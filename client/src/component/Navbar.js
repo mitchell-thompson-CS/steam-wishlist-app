@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import '../styles/Navbar.css'
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,6 +15,7 @@ const Navbar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const showHiddenNav = useRef(false);
 
     useEffect(() => {
         // deal with setting the users state (if it needs setting)
@@ -59,33 +60,63 @@ const Navbar = () => {
         dispatch(setSearchPopup(true));
     }
 
+    function expandNav() {
+        let navItems = document.getElementById("navItems");
+        if (navItems) {
+            if (showHiddenNav.current === false) {
+                navItems.style.visibility = "visible";
+            } else {
+                navItems.style.visibility = "";
+            }
+        }
+
+        showHiddenNav.current = !showHiddenNav.current;
+    }
+
     return (
         <nav>
             <ul className="left">
-                <li>
-                    <Link className="navPage" to="/"><img id="logo" src="/logo.svg" alt="logo" /></Link>
+                <li id="expandList" onClick={expandNav}>
+                    <svg width="45px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6H20M4 12H20M4 18H20" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </li>
-                <li id="searchArea" onFocus={focusSearch}>
-                    <form>
-                        <input type="text" id="gameSearch" name="search" placeholder="Search..." autoComplete="off"
-                            onChange={(e) => {
-                                if (e.target.value !== searchTerm) {
-                                    setSearchTerm(e.target.value)
-                                }
-                            }}
-                            tabIndex={"-1"}
-                        />
-                    </form>
-                    <ul id="gameSearchResults"></ul>
-                </li>
-                <li>
-                    <Link className="navPage" to="/wishlists">WISHLISTS</Link>
-                </li>
+                <ul id="navItems">
+                    <li>
+                        <Link className="navPage" to="/"><img id="logo" src="/logo.svg" alt="logo" /></Link>
+
+                    </li>
+                    <li id="searchArea" onFocus={focusSearch}>
+                        <form>
+                            <input type="text" className="gameSearch" name="search" placeholder="Search..." autoComplete="off"
+                                onChange={(e) => {
+                                    if (e.target.value !== searchTerm) {
+                                        setSearchTerm(e.target.value)
+                                    }
+                                }}
+                                tabIndex={"-1"}
+                            />
+                        </form>
+                        <ul id="gameSearchResults"></ul>
+                    </li>
+                    <li>
+                        <ul>
+                            <li>
+                                <Link className="navPage" to="/wishlists">WISHLISTS</Link>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </ul>
+            <div id="middleNavSearch" onFocus={focusSearch}>
+                <input type="text" className="gameSearch" name="search" placeholder="Search..." autoComplete="off"
+                    tabIndex={"-1"}
+                />
+            </div>
             <ul className="right">
-                <li>
+                <li id="avatar-container">
                     {user.avatar ?
-                        <img id="avatar" src={user.avatar} alt="avatar" onClick={logout}/> :
+                        <img id="avatar" src={user.avatar} alt="avatar" onClick={logout} /> :
                         <div></div>}
                 </li>
                 <li>
