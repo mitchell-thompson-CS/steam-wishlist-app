@@ -64,13 +64,13 @@ const HomeView = () => {
         setTrendingIsExpanded(!trendingIsExpanded);
     }
 
-    const trendingHeight = trendingIsExpanded ? 'unset' : '480px';
+    const trendingHeight = trendingIsExpanded ? 'none' : '480px';
 
     const toggleExpandTop = () => {
         setTopIsExpanded(!topIsExpanded);
     }
 
-    const topHeight = topIsExpanded ? 'unset' : '480px';
+    const topHeight = topIsExpanded ? 'none' : '480px';
 
     function getReviewColor(value) {
         if (isNaN(value)) {
@@ -147,7 +147,7 @@ const HomeView = () => {
                         <h1>TRENDING GAMES</h1>
                     </div>
                 </div>
-                <div className="listContainer" style={{ 'max-height': trendingHeight }}>
+                <div className="listContainer" style={{ maxHeight: trendingHeight }}>
                     <ul id="trendingGames">
                         {featuredGames && Object.entries(featuredGames).map(([key, value]) => (
                             featuredGames[key] ?
@@ -215,7 +215,7 @@ const HomeView = () => {
                         <h1>TOP SELLERS</h1>
                     </div>
                 </div>
-                <div className="listContainer" style={{ 'max-height': topHeight }}>
+                <div className="listContainer" style={{ maxHeight: topHeight }}>
                     <ul id="trendingGames">
                         {topGames && Object.entries(topGames).map(([key, value]) => (
                             topGames[key] ?

@@ -148,7 +148,7 @@
     max-height: 480px;
     overflow: hidden;
     margin: auto auto 10px auto;
-    transition: all .3s linear;
+    /* transition: max-height .3s linear; */
 }
 
 .viewMore {
