@@ -225,7 +225,7 @@ const SearchForGamePopup = (props) => {
             <div id="search-for-game-popup-blur" style={{
                 opacity: props.trigger ? 1 : 0,
                 visibility: props.trigger ? "visible" : "hidden",
-                backdropFilter: props.trigger ? "blur(5px) opacity(1)" : "blur(0px) opacity(0)"
+                backdropFilter: props.trigger ? "" : "blur(0px) opacity(0)",
             }}></div>
 
             <div id="search-for-game-popup-inner" style={{

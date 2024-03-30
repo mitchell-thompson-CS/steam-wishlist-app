@@ -11,6 +11,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(50, 50, 80, 0.5);
+    backdrop-filter: blur(5px) opacity(1);
     /* transition: all 0.1s linear; */
 }
 
@@ -109,7 +110,7 @@
 @media  screen and (max-height: 450px) {
     #search-for-game-popup-inner {
         font-size: 16px;
-        top: 10px;
+        top: 40px;
         transform: unset;
         bottom: unset;
     }
