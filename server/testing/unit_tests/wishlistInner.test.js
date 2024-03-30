@@ -177,6 +177,34 @@ describe("Wishlist Inner", () => {
         expect(res.status).toBe(400);
     });
 
+    test("renameWishlist - failure - invalid wishlist_name", async () => {
+        await login(req, res);
+
+        await createWishlist(req, res);
+
+        res.status = function (code) {
+            this.status = code;
+            return this;
+        }
+
+        await getWishlists(req, res);
+        expect(res.status).toBe(200);
+
+        let wishlists = res.data;
+        expect(wishlists).toBeDefined();
+        expect(wishlists.owned).toBeDefined();
+        expect(wishlists.shared).toBeDefined();
+        expect(Object.keys(wishlists.owned).length).toBe(1);
+
+        let wishlist_id = Object.keys(wishlists.owned)[0];
+
+        req.body.wishlist_id = wishlist_id;
+        req.body.wishlist_name = "broken$ name ";
+        await renameWishlist(req,res);
+
+        expect(res.status).toBe(400);
+    });
+
     test("getWishlistInner - success - owner access", async () => {
         await login(req, res);
 

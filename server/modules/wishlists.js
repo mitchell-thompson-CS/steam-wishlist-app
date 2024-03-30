@@ -30,7 +30,7 @@ async function createWishlist(req, res) {
     let new_id = uuidv4();
 
     // wishlist wasn't given in the request
-    if (!wishlist_name) {
+    if (!wishlist_name || !(await checkWishlistName(wishlist_name))) {
         Logging.handleResponse(res, 400, null, function_name,
             "Wishlist name is empty in request by " + req.user.id);
         return;
@@ -212,10 +212,18 @@ async function getWishlistsHelper(user_id) {
     });
 }
 
+async function checkWishlistName(name) {
+    if(name.length > 20 || !name.match(/^([0-9]|[a-z])+( {0,1}[0-9a-z]+)*$/i)) {
+        return false;
+    }
+
+    return true;
+}
 
 exports.getWishlists = getWishlists;
 exports.createWishlist = createWishlist;
 exports.deleteWishlist = deleteWishlist;
+exports.checkWishlistName = checkWishlistName;
 exports.exportedForTesting = {
     getWishlistsHelper: getWishlistsHelper,
 }

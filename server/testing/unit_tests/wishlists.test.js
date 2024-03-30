@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
-const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
+const { exportedForTesting, getWishlists, createWishlist, deleteWishlist, checkWishlistName } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
 
 let res;
@@ -267,6 +267,17 @@ describe("Wishlists", () => {
         expect(res.status).toBe(400);
     });
 
+    test("createWishlist - failure - invalid wishlist_name", async () => {
+        await login(req, res);
+
+        req.body = {
+            wishlist_name: "invalid$ wishlist name "
+        };
+        await createWishlist(req, res);
+
+        expect(res.status).toBe(400);
+    });
+
     test("deleteWishlist - success", async () => {
         await login(req, res);
 
@@ -391,5 +402,35 @@ describe("Wishlists", () => {
         await deleteWishlist(req, res);
 
         expect(res.status).toBe(400);
+    });
+
+    test("checkWishlistName - success", async () => {
+        let result = await checkWishlistName("this 1s 4 t3st");
+
+        expect(result).toEqual(true);
+    });
+
+    test("checkWishlistName - failure spaces", async () => {
+        let result = await checkWishlistName(" this ");
+        
+        expect(result).toEqual(false);
+    });
+
+    test("checkWishlistName - failure characters", async () => {
+        let result = await checkWishlistName("this%$s#");
+        
+        expect(result).toEqual(false);
+    });
+
+    test("checkWishlistName - failure everything", async () => {
+        let result = await checkWishlistName(" this $$@!#s ");
+        
+        expect(result).toEqual(false);
+    });
+
+    test("checkWishlistName - failure length", async () => {
+        let result = await checkWishlistName("thisisatotallyvalidbuttoolongstringthatshouldn'tbeacceptedbytheserver");
+        
+        expect(result).toEqual(false);
     });
 });

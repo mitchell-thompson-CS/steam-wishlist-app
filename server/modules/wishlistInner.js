@@ -1,6 +1,7 @@
 const { getDb } = require('./firebase')
 const { Logging, LogLevels } = require('./logging')
-const { getGameData } = require('./game')
+const { getGameData } = require('./game');
+const { checkWishlistName } = require('./wishlists');
 const FieldValue = require('firebase-admin').firestore.FieldValue;
 
 
@@ -13,7 +14,7 @@ async function renameWishlist(req, res) {
     let post = JSON.parse(JSON.stringify(req.body));
     var wishlist_name = post['wishlist_name'];
     var wishlist_id = post['wishlist_id'];
-    if (!wishlist_name || !wishlist_id) {
+    if (!wishlist_name || !wishlist_id || !(await checkWishlistName(wishlist_name))) {
         // wishlist name is empty
         Logging.handleResponse(res, 400, null, function_name,
             "Wishlist name is empty in request by " + req.user.id);
