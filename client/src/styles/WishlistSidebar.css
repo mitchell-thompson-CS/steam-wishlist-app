@@ -13,15 +13,6 @@
     height: 100%;
 }
 
-@media screen and (max-width: 650px) {
-    .sidebar {
-      width: 90%;
-      min-width: 90%;
-      max-width: 90%;
-      position: absolute;
-    }
-}
-
 #sidebar-right {
   float: right;
   height: 100%;
@@ -58,17 +49,6 @@
   line-height: 80px;
   text-align: center;
   transition: all 0.5s;
-}
-
-@media screen and (max-width: 400px) {
-  #sidebar-right {
-    width: 0;
-  }
-
-  #sidebar-right-content {
-    margin-left: 0;
-  }
-  
 }
 
 #sidebar-right-content img {
@@ -224,4 +204,34 @@
 
 .clear {
   clear: both;
+}
+
+@media screen and (max-width: 400px) {
+  #sidebar-right {
+    width: 0;
+  }
+
+  #sidebar-right-content {
+    margin-left: 0;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .sidebar {
+    width: 90%;
+    min-width: 90%;
+    max-width: 90%;
+    position: absolute;
+  }
+
+  .wishlistItem {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .wishlistItem a {
+    font-size: 16px;
+    line-height: 50px;
+  }
 }
