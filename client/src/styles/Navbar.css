@@ -24,7 +24,8 @@ nav ul {
 
 nav ul li {
   position: relative;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
   text-align: center;
   font-size: 20px;
   flex-shrink: 0;
