@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import '../styles/Navbar.css'
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,7 +15,7 @@ const Navbar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const showHiddenNav = useRef(false);
+    const [showHiddenNav, setShowHiddenNav] = useState(false);
     const [width, setWidth] = useState(window.innerWidth);
 
     useEffect(() => {
@@ -61,7 +61,17 @@ const Navbar = () => {
         dispatch(setSearchPopup(true));
     }
 
-    function clickAwayFromNav(e) {
+    let closeNav;
+    let clickAwayFromNav;
+    
+    closeNav = useCallback(() => {
+        let navItems = document.getElementById("navItems");
+        navItems.style.width = "";
+        document.removeEventListener("click", clickAwayFromNav);
+        setShowHiddenNav(false);
+    }, [clickAwayFromNav]);
+
+    clickAwayFromNav = useCallback((e) => {
         if (e.target && e.target.id !== "navItems"
             && e.target.id !== "expandListsvg"
             && e.target.id !== "expandList"
@@ -70,23 +80,18 @@ const Navbar = () => {
             && e.target.parentElement.id !== "expandList") {
             closeNav();
         }
-    }
+    }, [closeNav]);
 
-    function closeNav() {
-        let navItems = document.getElementById("navItems");
-        navItems.style.width = "";
-        document.removeEventListener("click", clickAwayFromNav);
-        showHiddenNav.current = false;
-    }
+    
 
     function expandNav() {
         let navItems = document.getElementById("navItems");
         if (navItems) {
-            if (showHiddenNav.current === false) {
+            if (showHiddenNav === false) {
                 navItems.style.visibility = "visible";
                 navItems.style.width = "80vw";
                 document.addEventListener("click", clickAwayFromNav);
-                showHiddenNav.current = true;
+                setShowHiddenNav(true);
             } else {
                 closeNav();
             }
@@ -111,16 +116,16 @@ const Navbar = () => {
     useEffect(() => {
         if(width > 650) {
             document.removeEventListener("click", clickAwayFromNav);
-            showHiddenNav.current = false;
+            setShowHiddenNav(false);
         }
-    }, [width]);
+    }, [width, clickAwayFromNav]);
 
     return (
         <nav>
             <ul className="left">
                 <li id="expandList" onClick={expandNav}>
                     <svg id="expandListsvg" width="45px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 6H20M4 12H20M4 18H20" stroke="#FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M4 6H20M4 12H20M4 18H20" stroke={showHiddenNav?"#335d94":"#FFF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 </li>
                 <ul id="navItems" style={width > 650 ? {width: ""} : {}}>
@@ -152,7 +157,7 @@ const Navbar = () => {
                 />
             </div>
             <ul className="right">
-                <li id="avatar-container">
+                <li id="avatar-container" style={!user.avatar ? {width: 0, height: 0} : {}}>
                     {user.avatar ?
                         <img id="avatar" src={user.avatar} alt="avatar" onClick={logout} /> :
                         <div></div>}
