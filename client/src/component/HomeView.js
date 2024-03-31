@@ -164,7 +164,7 @@ const HomeView = () => {
                                         <div className="gamePrice">
                                             <p className="priceTitle">Price</p>
                                             <span className="price">
-                                                {featuredGames[key].price_overview ?
+                                                {featuredGames[key].price_overview && featuredGames[key].price_overview.final_formatted ?
                                                     <>
                                                         {featuredGames[key].price_overview.initial_formatted !== "" ?
                                                             <p className="priceInitial">{featuredGames[key].price_overview.initial_formatted}</p>
@@ -180,6 +180,12 @@ const HomeView = () => {
                                         {/* lowest price */}
                                         <div className="gameLowestPrice">
                                             <p className="lowestPriceTitle">Lowest Price</p>
+                                            {featuredGames[key].price_overview && featuredGames[key].price_overview.lowestprice && featuredGames[key].price_overview.final_formatted ?
+                                                <p className="lowestPrice">
+                                                    {"$" + featuredGames[key].price_overview.lowestprice}
+                                                </p> :
+                                                <p className="noLowest lowestPrice">No Lowest</p>
+                                            }
                                         </div>
 
                                         {/* playing the game now */}
@@ -233,7 +239,7 @@ const HomeView = () => {
                                         <div className="gamePrice">
                                             <p className="priceTitle">Price</p>
                                             <span className="price">
-                                                {topGames[key].price_overview ?
+                                                {topGames[key].price_overview && topGames[key].price_overview.final_formatted ?
                                                     <>
                                                         {topGames[key].price_overview.initial_formatted !== "" ?
                                                             <p className="priceInitial">{topGames[key].price_overview.initial_formatted}</p>
@@ -249,6 +255,12 @@ const HomeView = () => {
                                         {/* lowest price */}
                                         <div className="gameLowestPrice">
                                             <p className="lowestPriceTitle">Lowest Price</p>
+                                            {topGames[key].price_overview && topGames[key].price_overview.lowestprice && topGames[key].price_overview.final_formatted ?
+                                                <p className="lowestPrice">
+                                                    {"$" + topGames[key].price_overview.lowestprice}
+                                                </p> :
+                                                <p className="noLowest lowestPrice">No Lowest</p>
+                                            }
                                         </div>
 
                                         {/* playing the game now */}
@@ -278,7 +290,7 @@ const HomeView = () => {
                 </div>
                 <span className="viewMore" onClick={toggleExpandTop}>{topIsExpanded ? 'View Less' : 'View More'}</span>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     )
 }

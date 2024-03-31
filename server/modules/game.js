@@ -1,6 +1,7 @@
 const { default: axios } = require('axios');
 const { Logging, LogLevels } = require('./logging.js');
 const { searchForGame } = require('./typesense.js');
+require('dotenv').config({ path: __dirname + '/../../.env' });
 
 /** Gets data for a game from the Steam API and returns JSON object of it if it exists.
  *  Returns null if the game does not exist.
@@ -18,6 +19,27 @@ async function getGameData(appid) {
         let appreviews = appreviews_res.data;
         let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
         let appplayercount = appplayercount_res.data.response;
+        let appstorelow;
+        try {
+            if (process.env.NODE_ENV !== "test") {
+                let appdealid_res = await axios.get('https://api.isthereanydeal.com/games/lookup/v1?key=' + process.env.ANY_DEAL_API_KEY + "&appid=" + appid);
+                const gameIds = [
+                    appdealid_res.data.game.id
+                ];
+                let appstorelow_res = await axios.post('https://api.isthereanydeal.com/games/storelow/v2?key=' + process.env.ANY_DEAL_API_KEY + "&shops=61", gameIds);
+                appstorelow = appstorelow_res.data[0].lows[0].price.amount;
+            }
+        } catch (e) {
+            Logging.log(function_name, "Unable to get lows for game " + appid, LogLevels.WARN);
+        }
+
+        if (appstorelow) {
+            appdetails[appid]['data']['price_overview'] = {
+                ...appdetails[appid]['data']['price_overview'],
+                lowestprice: appstorelow
+            };
+        }
+
         if (appplayercount && appplayercount.result === 1) {
             appdetails[appid]['data']['playingnow'] = appplayercount;
         } else {
@@ -49,7 +71,7 @@ async function getGameData(appid) {
                 'genres': entry['genres'],
                 'release_date': entry['release_date'],
                 'reviews': entry['reviews'],
-                'playingnow' : entry['playingnow']
+                'playingnow': entry['playingnow']
             }
 
             return gameData;
@@ -119,7 +141,7 @@ async function getGamesPage(req, res) {
         return;
     }
 
-    if (!game_ids || game_ids.length === 0 || Array.isArray(game_ids) === false){
+    if (!game_ids || game_ids.length === 0 || Array.isArray(game_ids) === false) {
         Logging.handleResponse(res, 400, {}, function_name, "Invalid request");
         return;
     }
@@ -127,7 +149,7 @@ async function getGamesPage(req, res) {
     let gameData = {};
     for (let i = 0; i < game_ids.length; i++) {
         let data = await getGameData(game_ids[i]);
-        if(data) {
+        if (data) {
             gameData[game_ids[i]] = data;
         } else {
             // make log note that game does not exist, but continue for the rest of the ids
@@ -136,7 +158,7 @@ async function getGamesPage(req, res) {
     }
 
     Logging.handleResponse(res, 200, gameData, function_name, "Got game data for " + game_ids);
-    
+
 }
 
 exports.getGamePage = getGamePage;

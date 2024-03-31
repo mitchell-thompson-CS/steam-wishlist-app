@@ -278,6 +278,26 @@ describe("Wishlists", () => {
         expect(res.status).toBe(400);
     });
 
+    test("createWishlist - failure - too many wishlists", async () => {
+        await login(req, res);
+
+        for(let i = 0; i < 20; i++) {
+            await createWishlist(req, res);
+            expect(res.status).toBe(200);
+            res = {
+                ...res,
+                status: function (code) {
+                    this.status = code;
+                    return this;
+                }
+            }
+        }
+
+        await createWishlist(req, res);
+
+        expect(res.status).toBe(403);
+    });
+
     test("deleteWishlist - success", async () => {
         await login(req, res);
 

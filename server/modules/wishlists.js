@@ -4,6 +4,8 @@ const { Logging, LogLevels } = require('./logging')
 const { v4: uuidv4 } = require('uuid');
 const FieldValue = require('firebase-admin').firestore.FieldValue;
 
+const MAX_WISHLISTS = 20;
+
 /** Gets a users wishlists and sends the wishlists to the client as a JSON object
  * @params request object
  * @params response object
@@ -37,6 +39,20 @@ async function createWishlist(req, res) {
     }
 
     try {
+        // first check if they already have the maximum number of wishlists
+        let userWishlists = await getDb().collection('users').doc(req.user.id).get();
+        if(!userWishlists.exists) {
+            Logging.handleResponse(res, 404, null, function_name,
+                "User doesn't exist in database");
+            return;
+        }
+        userWishlists = userWishlists.data();
+        if(userWishlists.wishlists && Object.keys(userWishlists.wishlists).length >= MAX_WISHLISTS) {
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " has too many wishlists.");
+            return;
+        }
+
         // create wishlist in firestore
         let wishlistSnapshot = await getDb().collection('wishlists').doc(new_id).get()
         if (wishlistSnapshot.exists) {

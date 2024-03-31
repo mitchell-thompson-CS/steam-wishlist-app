@@ -437,6 +437,12 @@ const WishlistInner = () => {
                                 {/* lowest price */}
                                 <div className="gameLowestPrice">
                                     <p className="lowestPriceTitle">Lowest Price</p>
+                                    {gameData[key].price_overview && gameData[key].price_overview.lowestprice && gameData[key].price_overview.final_formatted ?
+                                        <p className="lowestPrice">
+                                            {"$" + gameData[key].price_overview.lowestprice}
+                                        </p> :
+                                        <p className="noLowest lowestPrice">No Lowest</p>
+                                    }
                                 </div>
 
                                 {/* playing the game now */}

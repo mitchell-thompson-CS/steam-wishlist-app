@@ -49,7 +49,7 @@ describe("Game Module", () => {
         expect(res.data).toHaveProperty("type");
         expect(res.data.name).toBe("Portal");
         expect(res.data.type).toBe("game");
-    });
+    }, 7500);
 
     test("getGamePage - failure - invalid id", async () => {
         let req = {
@@ -117,7 +117,7 @@ describe("Game Module", () => {
         expect(res.data["620"]).toHaveProperty("type");
         expect(res.data["620"].name).toBe("Portal 2");
         expect(res.data["620"].type).toBe("game");
-    });
+    }, 10000);
 
     test("getGamesPage - failure - no body", async () => {
         let req = {};
