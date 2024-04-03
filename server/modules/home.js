@@ -24,8 +24,12 @@ async function getSteamStore() {
 
         featured_games = {};
         for (let game of featured['featured_win']) {
-            let game_data = await getGameData(game['id']);
-            featured_games[game['id']] = game_data;
+            try {
+                let game_data = await getGameData(game['id']);
+                featured_games[game['id']] = game_data;
+            } catch (e) {
+                Logging.log(function_name, "Error getting game " + game['id'], LogLevels.WARN);
+            }
         }
     } catch (error) {
         Logging.log(function_name, "Error getting data for featured games: " + error, LogLevels.ERROR);
@@ -44,10 +48,13 @@ async function getSteamTopSellers() {
         top_sellers = res.data.response.ranks;
         top_sellers_games = [];
         for (let game of top_sellers) {
-            let game_data = await getGameData(game['appid']);
-            game_data.appid = game['appid'];
-            // top_sellers_games[game['appid']] = game_data;
-            top_sellers_games.push(game_data);
+            try {
+                let game_data = await getGameData(game['appid']);
+                game_data.appid = game['appid'];
+                top_sellers_games.push(game_data);
+            } catch (e) {
+                Logging.log(function_name, "Error getting game " + game['appid'], LogLevels.WARN);
+            }
         }
     } catch (error) {
         Logging.log(function_name, "Error getting data for top sellers: " + error, LogLevels.ERROR);
