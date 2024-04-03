@@ -32,7 +32,6 @@ const HomeView = () => {
                         }).then(function (data) {
                             if (data) {
                                 setFeaturedGames(data);
-                                console.log(data);
                             }
                         })
                     await fetch('/api/home/top-sellers', { mode: 'cors', credentials: 'include' })
@@ -45,7 +44,6 @@ const HomeView = () => {
                         }).then(function (data) {
                             if (data) {
                                 setTopGames(data);
-                                console.log(data);
                             }
                         })
                 } catch (error) {
