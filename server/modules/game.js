@@ -15,10 +15,21 @@ async function getGameData(appid) {
     try {
         let appdetails_res = await axios.get('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid);
         let appdetails = appdetails_res.data;
-        let appreviews_res = await axios.get('https://store.steampowered.com/appreviews/' + appid + '?json=1');
-        let appreviews = appreviews_res.data;
-        let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
-        let appplayercount = appplayercount_res.data.response;
+        let appreviews;
+        try {
+            let appreviews_res = await axios.get('https://store.steampowered.com/appreviews/' + appid + '?json=1');
+            appreviews = appreviews_res.data;
+        } catch (e) {
+            Logging.log(function_name, "Error getting reviews for app " + appid);
+        }
+
+        let appplayercount;
+        try {
+            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+            appplayercount = appplayercount_res.data.response;
+        } catch (e) {
+            Logging.log(function_name, "Error getting player count for app " + appid);
+        }
         let appstorelow;
         try {
             if (process.env.NODE_ENV !== "test") {
@@ -46,8 +57,8 @@ async function getGameData(appid) {
             appdetails[appid]['data']['playingnow'] = -1;
         }
 
-        if (appdetails && appdetails[appid] && appdetails[appid]['data'] && appreviews) {
-            if (appreviews['success'] && appdetails[appid]['success']) {
+        if (appdetails && appdetails[appid] && appdetails[appid]['data']) {
+            if (appreviews && appreviews['success'] && appdetails[appid]['success']) {
                 appdetails[appid]['data']['reviews'] = appreviews['query_summary'];
             }
 

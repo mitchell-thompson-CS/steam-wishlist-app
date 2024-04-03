@@ -146,13 +146,13 @@ const SearchForGamePopup = (props) => {
                                             // add the game to the wishlist then close the popup
                                             dispatch(setLoading(true));
                                             try {
-                                                let res_add = await axios.post('/api/game/add', { game_id: cur_data.appid, wishlists: [searchPopup.addingGame] });
+                                                let res_add = await axios.post('/api/game/add', { game_id: cur_data.id, wishlists: [searchPopup.addingGame] });
                                                 if (res_add.status === 200) {
                                                     dispatch(setEvent(true, "Game added to wishlist"));
                                                     if (wishlistItems && wishlistItems.owned && wishlistItems.owned[searchPopup.addingGame]) {
-                                                        dispatch(addGameToWishlist(searchPopup.addingGame, "owned", cur_data.appid, cur_data.name))
+                                                        dispatch(addGameToWishlist(searchPopup.addingGame, "owned", cur_data.id, cur_data.name))
                                                     } else if (wishlistItems && wishlistItems.shared && wishlistItems.shared[searchPopup.addingGame]) {
-                                                        dispatch(addGameToWishlist(searchPopup.addingGame, "shared", cur_data.appid, cur_data.name))
+                                                        dispatch(addGameToWishlist(searchPopup.addingGame, "shared", cur_data.id, cur_data.name))
                                                     }
                                                 }
                                             } catch (error) {
@@ -168,7 +168,7 @@ const SearchForGamePopup = (props) => {
                                     } else {
                                         // no wishlist to add to, so just make it a link to the game
                                         new_el = document.createElement("a");
-                                        new_el.href = "/game/" + cur_data.appid;
+                                        new_el.href = "/game/" + cur_data.id;
                                         new_el.innerHTML = "<li>" + cur_data.name + "</li>";
                                     }
 
