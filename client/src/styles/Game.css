@@ -1,3 +1,4 @@
 .game {
     padding: 25px;
+    flex-grow: 1;
 }

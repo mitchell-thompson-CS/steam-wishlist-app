@@ -38,13 +38,13 @@ const Game = () => {
 
     return (
         <>
-        <AddGameToWishlistPopup trigger={addingGame} />
-        <div className="game">
-            <GameSidebar />
-            <GameContent />
-            <div className="clear"></div>
-        </div>
-        <Footer/>
+            <AddGameToWishlistPopup trigger={addingGame} />
+            <div className="game">
+                <GameSidebar />
+                <GameContent />
+                <div className="clear"></div>
+            </div>
+            <Footer />
         </>
     )
 }

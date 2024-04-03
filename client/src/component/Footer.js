@@ -5,7 +5,7 @@ const Footer = () => {
         <div id="footer">
             <span id="steamStatement">
                 AppName is a hobby project and is not affiliated with Valve or Steam. Steam and the Steam logo are trademarks of Valve Corporation.
-                <br></br>
+                <br/><br/>
                 All other trademarks are property of their respective owners.
             </span>
             <div id="githubContainer">
@@ -19,7 +19,7 @@ const Footer = () => {
                         </path>
                     </svg>
                 </a>
-                <a className="githubLink" href="https://github.com/mitchell-thompson-CS/steam-wishlist-app" title="https://github.com/mitchell-thompson-CS/steam-wishlist-app">
+                <a id="githubText" className="githubLink" href="https://github.com/mitchell-thompson-CS/steam-wishlist-app" title="https://github.com/mitchell-thompson-CS/steam-wishlist-app">
                     Project Github
                 </a>
             </div>

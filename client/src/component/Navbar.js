@@ -131,7 +131,6 @@ const Navbar = () => {
                 <ul id="navItems" style={width > 650 ? {width: ""} : {}}>
                     <li>
                         <Link className="navPage" to="/"><img id="logo" src="/logo.svg" alt="logo" /></Link>
-
                     </li>
                     <li id="searchArea" onFocus={focusSearch}>
                         <form>
