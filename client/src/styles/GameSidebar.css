@@ -90,6 +90,10 @@
     color: #beee11;
 }
 
+#no-players {
+    color: #888888;
+}
+
 .game-quick-info {
     padding-top: 10px;
 }

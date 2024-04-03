@@ -244,6 +244,35 @@ const GameSidebar = () => {
                         </span>
                         <div className="clear"></div>
                     </div> {/* end of game-quick-info */}
+                    <div className="game-quick-info"> {/* lowest price section */}
+                        <h3>Lowest Price:</h3>
+                        <span className="lowest-price-game">
+                            {gameData[id] !== undefined && gameData[id].price_overview &&
+                                gameData[id].price_overview.lowestprice && gameData[id].price_overview.final_formatted ?
+                                <>
+                                    <p className="priceFinal-game">{"$" + gameData[id].price_overview.lowestprice}</p>
+                                </>
+                                : <p className="noLowest lowestPrice">No Lowest</p>
+                            }
+                        </span>
+                        <div className="clear"></div>
+                    </div> {/* end of game-quick-info */}
+                    <div className="game-quick-info"> {/* player count section */}
+                        <h3>Playing Now:</h3>
+                        <span className="playing-now-game">
+                            {gameData[id] !== undefined && gameData[id].playingnow && gameData[id].playingnow.player_count > 0 ?
+                                <>
+                                    {gameData[id].playingnow.player_count}
+                                </>
+                                :
+                                <>
+                                    <p id="no-players">No players</p>
+                                </>
+                            }
+                            {console.log(gameData[id])}
+                        </span>
+                        <div className="clear"></div>
+                    </div> {/* end of game-quick-info */}
                 </div> {/* end of game-info-section */}
                 <div className="game-info-section"> {/* view on steam and add to wishlist section */}
                     <a href={"https://store.steampowered.com/app/" + id} className="game-sidebar-button" id="view-on-steam">View on Steam</a>
