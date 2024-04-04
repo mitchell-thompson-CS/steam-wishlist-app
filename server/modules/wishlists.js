@@ -4,6 +4,8 @@ const { Logging, LogLevels } = require('./logging')
 const { v4: uuidv4 } = require('uuid');
 const FieldValue = require('firebase-admin').firestore.FieldValue;
 
+const MAX_WISHLISTS = 20;
+
 /** Gets a users wishlists and sends the wishlists to the client as a JSON object
  * @params request object
  * @params response object
@@ -30,13 +32,27 @@ async function createWishlist(req, res) {
     let new_id = uuidv4();
 
     // wishlist wasn't given in the request
-    if (!wishlist_name) {
+    if (!wishlist_name || !(await checkWishlistName(wishlist_name))) {
         Logging.handleResponse(res, 400, null, function_name,
             "Wishlist name is empty in request by " + req.user.id);
         return;
     }
 
     try {
+        // first check if they already have the maximum number of wishlists
+        let userWishlists = await getDb().collection('users').doc(req.user.id).get();
+        if(!userWishlists.exists) {
+            Logging.handleResponse(res, 404, null, function_name,
+                "User doesn't exist in database");
+            return;
+        }
+        userWishlists = userWishlists.data();
+        if(userWishlists.wishlists && Object.keys(userWishlists.wishlists).length >= MAX_WISHLISTS) {
+            Logging.handleResponse(res, 403, null, function_name,
+                "User " + req.user.id + " has too many wishlists.");
+            return;
+        }
+
         // create wishlist in firestore
         let wishlistSnapshot = await getDb().collection('wishlists').doc(new_id).get()
         if (wishlistSnapshot.exists) {
@@ -59,7 +75,7 @@ async function createWishlist(req, res) {
                 [`wishlists.${new_id}`]: getDb().collection('wishlists').doc(new_id)
             })
             // wishlist added to user
-            Logging.handleResponse(res, 200, null, function_name,
+            Logging.handleResponse(res, 200, {"id": new_id}, function_name,
                 "Wishlist " + new_id + " created by " + req.user.id);
         } catch (error) {
             // problem adding the wishlist to the user
@@ -212,10 +228,18 @@ async function getWishlistsHelper(user_id) {
     });
 }
 
+async function checkWishlistName(name) {
+    if(name.length > 20 || !name.match(/^([0-9]|[a-z])+( {0,1}[0-9a-z]+)*$/i)) {
+        return false;
+    }
+
+    return true;
+}
 
 exports.getWishlists = getWishlists;
 exports.createWishlist = createWishlist;
 exports.deleteWishlist = deleteWishlist;
+exports.checkWishlistName = checkWishlistName;
 exports.exportedForTesting = {
     getWishlistsHelper: getWishlistsHelper,
 }

@@ -1,0 +1,19 @@
+/* TODO: need to make sure this is centered (i just eyeballed it for now) */
+#errorpopup {
+    position: fixed;
+    background-color: red;
+    margin-left: 45vw;
+    padding: 25px;
+    z-index: 1000;
+    border-radius: 10px;
+    visibility: visible;
+    opacity: 0.9;
+    transition: visibility 0s 2s, opacity 2s linear;
+}
+
+#errorpopup.hidden {
+    transition: visibility 0s 2s, opacity 2s linear;
+    color: black;
+    visibility: hidden;
+    opacity: 0;
+}

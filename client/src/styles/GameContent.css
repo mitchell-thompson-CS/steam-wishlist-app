@@ -1,0 +1,125 @@
+#game-content {
+    width: 70%;
+    max-width: calc(100% - 300px);
+    float: right;
+    padding: 0 10px 0 20px;
+    transition: all 0.3s linear;
+}
+
+.game-content-section {
+    background-color: #282e35;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
+}
+
+.game-content-section * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-content-section-header {
+    font-size: 25px;
+    margin: 0;
+    margin-bottom: 15px;
+    padding: 0;
+    text-align: center;
+    user-select: none;
+}
+
+#game-requirements-selector {
+    width: 100%;
+    user-select: none;
+    margin-bottom: 20px;
+}
+
+.platform-selector {
+    width: calc(33% - 10px);
+    float: left;
+    padding: 10px;
+    margin: 5px;
+    background-color: #3e444b;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    transition: all 0.3s linear;
+}
+
+.platform-selector:hover {
+    cursor: pointer;
+    background-color: #4e545b;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.8);
+}
+
+#minimum-requirements, #recommended-requirements {
+    float: left;
+    width: 48%;
+    padding: 10px;
+    background-color: #3e444b;
+    border-radius: 5px;
+}
+
+#minimum-requirements {
+    margin-right: 2%;
+}
+
+#recommended-requirements {
+    margin-left: 2%;
+}
+
+#minimum-requirements *, #recommended-requirements * {
+    margin-bottom: 5px;
+}
+
+#game-requirements {
+    transition: all 0.3s linear;
+}
+
+.bb_ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    color: lightgrey;
+}
+
+.bb_ul li {
+    margin-bottom: 10px;
+}
+
+@media screen and (min-width: 2334px) {
+    #game-content {
+        width: calc(100% - 700px);
+        max-width: calc(100% - 700px);
+    }
+}
+
+@media screen and (max-width: 850px) {
+    #game-content {
+        width: 80%;
+        min-width: 300px;
+        max-width: 80%;
+        float: none;
+        padding: 0;
+        margin: 0 auto 20px auto;
+    }
+
+    #game-requirements {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    #game-content {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .platform-selector {
+        font-size: 12px;
+    }
+
+    #game-requirements {
+        font-size: 12px;
+    }
+}

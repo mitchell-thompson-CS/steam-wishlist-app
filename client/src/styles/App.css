@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  scrollbar-color: #2e3f54;
+  scrollbar-width: 10px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #131c28;
+  border-radius: 10px; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2e3f54;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #527db2;
+}
+
+button {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.App {
+  background-color: #1b2838;
+  min-height: 100vh;
+  color: white;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  height: 75px;
+  box-shadow: 0px 0px 6px 0px #000000;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}

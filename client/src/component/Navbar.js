@@ -1,191 +1,175 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
-import { useCookies } from 'react-cookie';
-import '../Navbar.css'
-
-const searchDelay = 500;
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import '../styles/Navbar.css'
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteUser, isUser, setUser } from "../actions/userAction";
+import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
+import logo from '../wishlistlogo.svg';
 
 // TODO: currently if user hits log in, then goes back, then forward, then successfully logs in
 // the user will not be updated. This is because the user is only updated when the page is loaded
 
 const Navbar = () => {
 
-    const [user, setUser] = useState([]);
+    const user = useSelector(state => state.userReducer.user);
     const [searchTerm, setSearchTerm] = useState("");
-    const searchPosition = useRef(-1);
-    const [cookies, setCookie, removeCookie] = useCookies(['user']);
-    const[loggingIn, setLoggingIn] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [showHiddenNav, setShowHiddenNav] = useState(false);
+    const [width, setWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        let cookieUser = cookies.user;
-        if (!cookieUser && !loggingIn) {
-            console.log("getting user")
-            fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache'})
+        // deal with setting the users state (if it needs setting)
+        if (!isUser(user)) {
+            dispatch(setLoading(true));
+            fetch('/api/user', { mode: 'cors', credentials: 'include', cache: 'no-cache' })
                 .then(function (response) {
                     if (response.status === 200) {
                         return response.json();
                     }
                 }).then(function (data) {
                     if (data) {
-                        setUser(data);
-                        setCookie('user', data);
-                    } else {
-                        setCookie('user', {});
+                        dispatch(setUser(data.id, data.name, data.avatar));
                     }
+                    dispatch(setLoading(false));
                 });
-        } else {
-            setUser(cookieUser);
         }
-
-        const delayDebounce = setTimeout(() => {
-            if (searchTerm && searchTerm !== "") {
-                fetch('/api/game/search/' + searchTerm, { mode: 'cors', credentials: 'include' })
-                    .then(function (response) {
-                        if (response.status === 200) {
-                            return response.json();
-                        }
-                    }).then(function (data) {
-                        if (data) {
-                            let searchResults = document.getElementById("gameSearchResults");
-                            searchResults.innerHTML = "";
-                            for (let i = 0; i < data.length; i++) {
-                                let cur_data = data[i].document;
-                                let a = document.createElement("a");
-                                a.href = "/game/" + cur_data.appid;
-                                a.innerHTML = "<li>" + cur_data.name + "</li>";
-                                a.className = "searchResult";
-                                a.id = "searchResult" + i;
-                                a.onmouseover = function (event) {
-                                    for (let j = 0; j < searchResults.children.length; j++) {
-                                        searchResults.children[j].style.backgroundColor = null;
-                                    }
-                                    event.target.style.backgroundColor = "#282e35";
-                                    searchPosition.current = i;
-                                };
-                                a.onmouseout = function (event) {
-                                    event.target.style.backgroundColor = null;
-                                }
-                                searchResults.appendChild(a);
-                            }
-
-                        }
-                    });
-            }
-        }, searchDelay);
-
-        document.onclick = function (event) {
-            if (event.target.id !== "gameSearch" && event.target.id !== "gameSearchResults") {
-                let searchResults = document.getElementById("gameSearchResults");
-                searchResults.style.display = "none";
-                for (let j = 0; j < searchResults.children.length; j++) {
-                    searchResults.children[j].style.backgroundColor = null;
-                }
-                searchPosition.current = -1;
-            }
-        }
-        return () => clearTimeout(delayDebounce);
-    }, [searchTerm, user, cookies.user, setCookie, loggingIn]);
+    }, [user, dispatch]);
 
     async function logout() {
         try {
             let response = await axios.post('/api/auth/logout');
             if (response.status === 200) {
-                setCookie('user', {});
+                successfulLogout();
             }
         } catch (error) {
             if (error.response.status === 401) {
-                setCookie('user', {});
+                successfulLogout();
             }
             console.error(error);
         }
     }
 
-    async function login() {
-        setLoggingIn(true);
-        // removeCookie('user');
-        setCookie('user', false);
+    function successfulLogout() {
+        navigate("/");
+        dispatch(deleteUser());
+        dispatch(setEvent(true, "Successfully logged out"));
     }
 
     function focusSearch(event) {
-        document.getElementById("gameSearchResults").style.display = "block";
+        // document.getElementById("gameSearchResults").style.display = "block";
+        dispatch(setSearchPopup(true));
     }
 
-    function handleSearchKeyDown(event) {
-        // event.preventDefault();
-        let results = document.getElementsByClassName("searchResult");
+    let closeNav;
+    let clickAwayFromNav;
+    
+    closeNav = useCallback(() => {
+        let navItems = document.getElementById("navItems");
+        navItems.style.width = "";
+        document.removeEventListener("click", clickAwayFromNav);
+        setShowHiddenNav(false);
+    }, [clickAwayFromNav]);
 
-        if (searchPosition.current !== -1) {
-            results[searchPosition.current].dispatchEvent(new Event("mouseout"));
+    clickAwayFromNav = useCallback((e) => {
+        if (e.target && e.target.id !== "navItems"
+            && e.target.id !== "expandListsvg"
+            && e.target.id !== "expandList"
+            && e.target.parentElement
+            && e.target.parentElement.id !== "expandListsvg"
+            && e.target.parentElement.id !== "expandList") {
+            closeNav();
         }
+    }, [closeNav]);
 
-        if (event.key === "ArrowDown") {
-            event.preventDefault();
-            if (searchPosition.current === -1 && results.length > 0) {
-                searchPosition.current = 0;
-            }
-            else if (searchPosition.current < results.length - 1) {
-                searchPosition.current = searchPosition.current + 1;
-            }
-        } else if (event.key === "ArrowUp") {
-            event.preventDefault();
-            if (searchPosition.current === -1) {
-                searchPosition.current = results.length - 1;
-            } else if (searchPosition.current > 0 && results.length > 0) {
-                searchPosition.current = searchPosition.current - 1;
-            }
-        } else if (event.key === "Enter") {
-            event.preventDefault();
-            if (searchPosition.current !== -1) {
-                results[searchPosition.current].click();
-            }
-        }
+    
 
-        if (searchPosition.current !== -1) {
-            results[searchPosition.current].dispatchEvent(new Event("mouseover"));
+    function expandNav() {
+        let navItems = document.getElementById("navItems");
+        if (navItems) {
+            if (showHiddenNav === false) {
+                navItems.style.visibility = "visible";
+                navItems.style.width = "80vw";
+                document.addEventListener("click", clickAwayFromNav);
+                setShowHiddenNav(true);
+            } else {
+                closeNav();
+            }
         }
     }
+
+    function resizeEvent(e) {
+        setWidth(window.innerWidth);
+    }
+
+    useEffect(() => {
+        let navItems = document.getElementById("navItems");
+        navItems.onanimationend = () => {
+            if (navItems.style.width === "") {
+                navItems.style.visibility = "";
+            }
+        }
+
+        window.addEventListener("resize", resizeEvent)
+    }, [])
+
+    useEffect(() => {
+        if(width > 650) {
+            document.removeEventListener("click", clickAwayFromNav);
+            setShowHiddenNav(false);
+        }
+    }, [width, clickAwayFromNav]);
 
     return (
         <nav>
             <ul className="left">
-
-                <li>
-                    <a href="/"><img id="logo" src="/logo.svg" alt="logo" /></a>
+                <li id="expandList" onClick={expandNav}>
+                    <svg id="expandListsvg" width="45px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6H20M4 12H20M4 18H20" stroke={showHiddenNav?"#335d94":"#FFF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </li>
-                {/* <li>
-                        <a href="http://localhost:3000/">HOME</a>
-                    </li> */}
-                <li id="searchArea" onFocus={focusSearch} onKeyDown={handleSearchKeyDown}>
-                    <form>
-                        <input type="text" id="gameSearch" name="search" placeholder="Search..." autoComplete="off"
-                            onChange={(e) => {
-                                if (e.target.value !== searchTerm) {
-                                    setSearchTerm(e.target.value)
-                                }
-                            }} />
-                    </form>
-                    <ul id="gameSearchResults"></ul>
-                </li>
-                <li>
-                    <a href="/wishlists">WISHLISTS</a>
-                </li>
+                <ul id="navItems" style={width > 650 ? {width: ""} : {}}>
+                    <li>
+                        <Link className="navPage" to="/"><img id="logo" src={logo} alt="logo" /></Link>
+                    </li>
+                    <li id="searchArea" onFocus={focusSearch}>
+                        <form>
+                            <input type="text" className="gameSearch" name="search" placeholder="Search..." autoComplete="off"
+                                onChange={(e) => {
+                                    if (e.target.value !== searchTerm) {
+                                        setSearchTerm(e.target.value)
+                                    }
+                                }}
+                                tabIndex={"-1"}
+                            />
+                        </form>
+                        <ul id="gameSearchResults"></ul>
+                    </li>
+                    <li>
+                        <Link className="navPage" to="/wishlists">WISHLISTS</Link>
+                    </li>
+                </ul>
             </ul>
+            <div id="middleNavSearch" onFocus={focusSearch}>
+                <input type="text" className="gameSearch" name="search" placeholder="Search..." autoComplete="off"
+                    tabIndex={"-1"}
+                />
+            </div>
             <ul className="right">
-                <li>
-                    {user.name ?
-                        <button className="signin" onClick={logout}>{user.name}</button> :
-                        <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)} 
-                        onClick={login}
-                        className="signin">LOGIN</a>
-                    }
-                </li>
-                <li>
+                <li id="avatar-container" style={!user.avatar ? {width: 0, height: 0} : {}}>
                     {user.avatar ?
-                        <img id="avatar" src={user.avatar} alt="avatar" /> :
+                        <img id="avatar" src={user.avatar} alt="avatar" onClick={logout} /> :
                         <div></div>}
                 </li>
+                <li>
+                    {user.name ?
+                        <button className="signin" id="username" onClick={logout}>{user.name}</button> :
+                        <a href={"/api/auth/steam?redir=" + encodeURIComponent(window.location.href)}
+                            className="signin">LOGIN</a>
+                    }
+                </li>
             </ul>
-            <div className="clear"></div>
         </nav>
     );
 }

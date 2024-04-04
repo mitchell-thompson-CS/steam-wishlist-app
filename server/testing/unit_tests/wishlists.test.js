@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const { getDb, setDb } = require("../../modules/firebase");
 const axios = require("axios");
-const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
+const { exportedForTesting, getWishlists, createWishlist, deleteWishlist, checkWishlistName } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
 
 let res;
@@ -232,6 +232,8 @@ describe("Wishlists", () => {
         await createWishlist(req, res);
 
         expect(res.status).toBe(200);
+        expect(res.data).toBeDefined();
+        expect(res.data.id).toBeDefined();
 
         let collection = await getDb().collection("users").doc("12345").get();
         let data = collection.data();
@@ -263,6 +265,37 @@ describe("Wishlists", () => {
         await createWishlist(req, res);
 
         expect(res.status).toBe(400);
+    });
+
+    test("createWishlist - failure - invalid wishlist_name", async () => {
+        await login(req, res);
+
+        req.body = {
+            wishlist_name: "invalid$ wishlist name "
+        };
+        await createWishlist(req, res);
+
+        expect(res.status).toBe(400);
+    });
+
+    test("createWishlist - failure - too many wishlists", async () => {
+        await login(req, res);
+
+        for(let i = 0; i < 20; i++) {
+            await createWishlist(req, res);
+            expect(res.status).toBe(200);
+            res = {
+                ...res,
+                status: function (code) {
+                    this.status = code;
+                    return this;
+                }
+            }
+        }
+
+        await createWishlist(req, res);
+
+        expect(res.status).toBe(403);
     });
 
     test("deleteWishlist - success", async () => {
@@ -389,5 +422,35 @@ describe("Wishlists", () => {
         await deleteWishlist(req, res);
 
         expect(res.status).toBe(400);
+    });
+
+    test("checkWishlistName - success", async () => {
+        let result = await checkWishlistName("this 1s 4 t3st");
+
+        expect(result).toEqual(true);
+    });
+
+    test("checkWishlistName - failure spaces", async () => {
+        let result = await checkWishlistName(" this ");
+        
+        expect(result).toEqual(false);
+    });
+
+    test("checkWishlistName - failure characters", async () => {
+        let result = await checkWishlistName("this%$s#");
+        
+        expect(result).toEqual(false);
+    });
+
+    test("checkWishlistName - failure everything", async () => {
+        let result = await checkWishlistName(" this $$@!#s ");
+        
+        expect(result).toEqual(false);
+    });
+
+    test("checkWishlistName - failure length", async () => {
+        let result = await checkWishlistName("thisisatotallyvalidbuttoolongstringthatshouldn'tbeacceptedbytheserver");
+        
+        expect(result).toEqual(false);
     });
 });

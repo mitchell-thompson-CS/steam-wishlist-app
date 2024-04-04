@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "firebase emulators:exec --only firestore \"jest --runInBand --detectOpenHandles\"",
-    "test-dev": "NODE_ENV=test-dev jest --watch --runInBand --detectOpenHandles",
+    "test-dev": "NODE_ENV=test jest --watch --runInBand --detectOpenHandles",
+    "test-dev-log": "NODE_ENV=test-dev jest --watch --runInBand --detectOpenHandles --verbose",
     "start": "node index.js",
     "start-dev": "node index.js -v"
   },
@@ -24,6 +25,7 @@
     "express-session": "^1.17.3",
     "firebase": "^10.7.2",
     "firebase-admin": "^12.0.0",
+    "node-schedule": "^2.1.1",
     "passport": "^0.7.0",
     "passport-steam": "^1.0.18",
     "steam-user": "^5.0.7",

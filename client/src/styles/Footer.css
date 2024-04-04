@@ -1,0 +1,42 @@
+#footer {
+    display: flex;
+    width: 100%;
+    padding: 40px;
+    border-top: 3px solid #393f46;
+    align-items: center;
+    gap: 30px;
+    flex: 0 0;
+}
+
+#steamStatement {
+    color: gray;
+    font-size: 14px;
+}
+
+#githubContainer {
+    display: flex;
+    margin: auto 0px auto auto;
+    align-items: center;
+}
+
+.githubLink {
+    text-decoration: none;
+    color: lightskyblue;
+    margin: 3px;
+}
+
+#githubIcon {
+    fill: white;
+}
+
+@media screen and (max-width: 768px) { 
+    #steamStatement {
+        font-size: 10px;
+    }
+    #githubText {
+        display: none;
+    }
+    #footer {
+        padding: 20px;
+    }
+}

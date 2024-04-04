@@ -1,0 +1,127 @@
+.search-for-game-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+#search-for-game-popup-blur {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(50, 50, 80, 0.5);
+    backdrop-filter: blur(5px) opacity(1);
+    /* transition: all 0.1s linear; */
+}
+
+#search-for-game-popup-inner {
+    position: absolute;
+    left: 0; 
+    right: 0; 
+    top: 20%;
+    transform: translateY(-20%);
+    margin-left: auto; 
+    margin-right: auto; 
+    width: 80%;
+    max-width: 800px;
+    height: 60vh;
+    /* min-height: 400px;
+    max-height: 600px; */
+    min-height: 55px;
+    max-height: 55px;
+    border-radius: 25px;
+    user-select: none;
+    font-size: 25px;
+    transition: all 0.1s linear;
+}
+
+#popup-game-search {
+    width: 100%;
+    height: 50px;
+    padding: 5px 25px;
+    border-radius: 25px;
+    border: 1px solid #3e444b;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+    background-color: transparent;
+    color: white;
+    font-size: 25px;
+    margin-bottom: 5px;
+    /* this padding is for the loading image that appears from SearchForGamePopup.js */
+    padding-right: 65px;
+    transition: all 0.1s linear;
+}
+
+#popup-game-search:focus {
+    outline: none;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.8);
+    border: 1px solid #444b52;
+}
+
+#popup-game-search::selection {
+    background: #707a86;
+}
+
+#popup-search-results {
+    width: calc(100%);
+    height: calc(100% - 60px);
+    list-style: none;
+}
+
+.popup-search-result {
+    width: calc(100%);
+    height: 20%;
+    display: table;
+    padding: 2% 5%;
+    border-radius: 25px;
+    table-layout: fixed;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.1s linear;
+}
+
+.popup-search-result:focus, .popup-search-result:hover {
+    outline: none;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
+    background-color: #4d545c;
+}
+
+.popup-search-result li {
+    width: calc(100%);
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 800px) {
+    .popup-search-result {
+        font-size: 16px;
+    }
+
+    #popup-game-search {
+        font-size: 18px;
+    }
+}
+
+@media  screen and (max-height: 450px) {
+    #search-for-game-popup-inner {
+        font-size: 16px;
+        top: 40px;
+        transform: unset;
+        bottom: unset;
+    }
+
+    #popup-game-search {
+        height: 34px;
+        font-size: 16px;
+    }
+
+    .popup-search-result {
+        height: 15%;
+        padding: 2% 5%;
+    }
+}

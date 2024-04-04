@@ -1,0 +1,178 @@
+.homeView {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.homeHeader {
+    padding-top: 20px;
+    margin: 0 50px;
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.homeHeaderLeft {
+    align-items: center;
+    padding-left: 50px;
+    padding-right: 50px;
+    height: 50px;
+    line-height: 50px;
+    justify-content: flex-start;
+    font-size: 12px;
+    color: gray;
+
+    border-bottom: 3px solid #393f46;
+    border-radius: 3px;
+    padding-bottom: 5px;
+    min-width: 300px;
+    width: 100%;
+}
+
+.homeHeaderLeft * {
+    height: 100%;
+    white-space: nowrap;
+}
+
+.wishlistRow {
+    width: 80%;
+    height: 200px;
+    /* padding: 0px 50px 0px 50px; */
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 160px);
+    /* overflow: hidden; */
+    gap: 10px;
+    /* justify-content: center; */
+    justify-items: center;
+    align-items: center;
+    /* margin-top: 20px; */
+    /* margin-bottom: 50px; */
+    margin: auto auto 50px auto;
+
+    grid-auto-flow: column;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.rowItem {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    border: 1px gray;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0px 10px;
+    font-size: 16px;
+    transition: 0.2s;
+    color: white;
+    border-radius: 15px;
+    padding-top: 50px;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.rowItem h2 {
+    text-decoration: underline;
+    font-size: 20px;
+}
+
+.rowItem p {
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.rowItem * {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.rowItem:hover {
+    background-color: #393f46;
+}
+
+.rowItemContainer {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    background-color: #282e35;
+    border-radius: 15px;
+    box-shadow: 10px white;
+    user-select: none;
+}
+
+#noWishlists {
+    position: absolute;
+    font-size: 30px;
+    font-weight: bold;
+    width: 100%;
+    height: 180px;
+    text-align: center;
+    line-height: 180px;
+}
+
+#trendingGames {
+    width: 100%;
+    min-width: 390px;
+    display: inline-block;
+    font-size: 20px;
+    /* padding: 40px 50px 10px 50px; */
+}
+
+.gameTitleHome {
+    margin-left: 50px;
+    flex-shrink: 0;
+}
+
+.topTitle {
+    margin-left: 0px;
+}
+
+.gameTitleHome img {
+    object-fit: contain;
+    height: 100%;
+    max-width: 100%;
+    margin: auto;
+}
+
+.gameTitleHome h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 30px;
+    font-size: 20px;
+    vertical-align: middle;
+}
+
+.listContainer {
+    width: 80%;
+    max-height: 480px;
+    overflow: hidden;
+    margin: auto auto 10px auto;
+    /* transition: max-height .3s linear; */
+}
+
+.viewMore {
+    cursor: pointer;
+    margin: auto 10% auto auto;
+    float: right;
+    text-align: right;
+    color: lightskyblue;
+}
+
+#homeTrending {
+    margin-bottom: 20px;
+}
+
+#homeTopSellers {
+    margin-bottom: 20px;
+}
+
+.topRanking {
+    display: flex;
+    margin: auto 0px auto 30px;
+}
