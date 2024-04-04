@@ -449,7 +449,15 @@ const WishlistInner = () => {
                                 <div className="gamePlayingNow">
                                     <p className="playingNowTitle">Playing Now</p>
                                     <p className="playingNow">
-                                        {gameData[key].playingnow.player_count}
+                                        {gameData[key] !== undefined && gameData[key].playingnow && gameData[key].playingnow.player_count > 0 ?
+                                            <>
+                                                {gameData[key].playingnow.player_count}
+                                            </>
+                                            :
+                                            <>
+                                                <p className="noPlayers">No players</p>
+                                            </>
+                                        }
                                     </p>
                                 </div>
 

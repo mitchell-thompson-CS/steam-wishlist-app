@@ -191,7 +191,15 @@ const HomeView = () => {
                                             <div className="gamePlayingNow">
                                                 <p className="playingNowTitle">Playing Now</p>
                                                 <p className="playingNow">
-                                                    {featuredGames[key].playingnow.player_count}
+                                                    {featuredGames[key] !== undefined && featuredGames[key].playingnow && featuredGames[key].playingnow.player_count > 0 ?
+                                                        <>
+                                                            {featuredGames[key].playingnow.player_count}
+                                                        </>
+                                                        :
+                                                        <>
+                                                            <p className="noPlayers">No players</p>
+                                                        </>
+                                                    }
                                                 </p>
                                             </div>
 
@@ -266,7 +274,15 @@ const HomeView = () => {
                                             <div className="gamePlayingNow">
                                                 <p className="playingNowTitle">Playing Now</p>
                                                 <p className="playingNow">
-                                                    {topGames[key].playingnow.player_count}
+                                                    {topGames[key] !== undefined && topGames[key].playingnow && topGames[key].playingnow.player_count > 0 ?
+                                                        <>
+                                                            {topGames[key].playingnow.player_count}
+                                                        </>
+                                                        :
+                                                        <>
+                                                            <p className="noPlayers">No players</p>
+                                                        </>
+                                                    }
                                                 </p>
                                             </div>
 

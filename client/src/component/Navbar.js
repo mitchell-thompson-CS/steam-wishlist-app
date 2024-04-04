@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteUser, isUser, setUser } from "../actions/userAction";
 import { setEvent, setLoading, setSearchPopup } from "../actions/eventAction";
+import logo from '../wishlistlogo.svg';
 
 // TODO: currently if user hits log in, then goes back, then forward, then successfully logs in
 // the user will not be updated. This is because the user is only updated when the page is loaded
@@ -130,7 +131,7 @@ const Navbar = () => {
                 </li>
                 <ul id="navItems" style={width > 650 ? {width: ""} : {}}>
                     <li>
-                        <Link className="navPage" to="/"><img id="logo" src="/logo.svg" alt="logo" /></Link>
+                        <Link className="navPage" to="/"><img id="logo" src={logo} alt="logo" /></Link>
                     </li>
                     <li id="searchArea" onFocus={focusSearch}>
                         <form>

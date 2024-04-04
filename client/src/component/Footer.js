@@ -4,7 +4,7 @@ const Footer = () => {
     return (
         <div id="footer">
             <span id="steamStatement">
-                AppName is a hobby project and is not affiliated with Valve or Steam. Steam and the Steam logo are trademarks of Valve Corporation.
+                Steam Wishlists is a hobby project and is not affiliated with Valve or Steam. Steam and the Steam logo are trademarks of Valve Corporation.
                 <br/><br/>
                 All other trademarks are property of their respective owners.
             </span>
