@@ -269,7 +269,6 @@ const GameSidebar = () => {
                                     <p id="no-players">No players</p>
                                 </>
                             }
-                            {console.log(gameData[id])}
                         </span>
                         <div className="clear"></div>
                     </div> {/* end of game-quick-info */}
