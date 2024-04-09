@@ -3,6 +3,37 @@ const { Logging, LogLevels } = require('./logging.js');
 const { searchForGame } = require('./typesense.js');
 require('dotenv').config({ path: __dirname + '/../../.env' });
 
+const HEADER_BASE_URL = 'https://cdn.akamai.steamstatic.com/steam/apps/';
+
+const SteamUser = require('steam-user');
+let client = new SteamUser();
+let steamConnected = false;
+client.setOptions({
+    enablePicsCache: true,
+})
+client.logOn();
+
+client.on('loggedOn', async (details) => {
+    Logging.log("SteamUser", "Logged into Steam as " + client.steamID.getSteam3RenderedID());
+    steamConnected = true;
+
+    // let result = await client.getProductInfo([440, 730, 620], [], true);
+    // console.log(result);
+});
+
+client.on('error', async (e) => {
+    Logging.log("SteamUser", "ERROR:" + e, LogLevels.ERROR);
+});
+
+client.on('disconnected', async (e) => {
+    Logging.log("SteamUser", "Steam disconnected", LogLevels.WARN);
+    steamConnected = false;
+});
+
+client.on('debug', async (details) => {
+    // console.log(details);
+})
+
 /** Gets data for a game from the Steam API and returns JSON object of it if it exists.
  *  Returns null if the game does not exist.
  * 
@@ -12,6 +43,105 @@ require('dotenv').config({ path: __dirname + '/../../.env' });
 async function getGameData(appid) {
     let function_name = getGameData.name;
     let currency = 'USD';
+    if (!steamConnected) {
+        return null;
+    }
+
+    try {
+        console.log(appid);
+        if (!Number(appid)) {
+            console.log("not a number");
+            return null;
+        } else {
+            appid = Number(appid);
+        }
+        let appinfo = client.picsCache.apps[appid];
+        if (!appinfo) {
+            Logging.log(function_name, "App " + appid + " not found in cache. Fetching...");
+            appinfo = await client.getProductInfo([appid], [], false);
+            if (!appinfo.apps[appid]) {
+                // app doesn't exist
+                Logging.log(function_name, "App " + appid + " doesn't exist.");
+                return null;
+            }
+            appinfo = appinfo.apps[appid].appinfo;
+        } else {
+            appinfo = appinfo.appinfo;
+        }
+        // console.log(appinfo.extended);
+
+        // console.log(await client.getAppRichPresenceLocalization(appid, "english"));
+        function getOSList() {
+            let result = { windows: false, mac: false, linux: false };
+            if (appinfo.common.oslist) {
+                let list = appinfo.common.oslist.split(/[,]+/);
+                for (let item of list) {
+                    switch (item) {
+                        case "windows":
+                            result.windows = true;
+                            break;
+                        case "macos":
+                            result.mac = true;
+                            break;
+                        case "linux":
+                            result.linux = true;
+                            break;
+                    }
+                }
+                return result;
+            }
+
+            return result;
+        }
+
+        async function getCategoryList() {
+            let result = []
+            try {
+                let categories = appinfo.common.store_tags;
+                let tags = (await client.getStoreTagNames("english", Object.values(categories))).tags;
+                for (let key of Object.keys(tags)) {
+                    let id = key;
+                    let description = tags[key].name;
+                    result.push({
+                        id: id,
+                        description: description
+                    })
+                }
+            } catch (e) {
+                Logging.log(function_name, "Error getting tags for app " + appid, LogLevels.WARN);
+            }
+            return result;
+        }
+
+        let gameData = {
+            'type': appinfo.common.type,
+            'name': appinfo.common.name,
+            'dlc': appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : [],
+            //             'short_description': entry['short_description'],
+            'header_image': appinfo.common.header_image && appinfo.common.header_image.english ?
+                HEADER_BASE_URL + appid + '/' + appinfo.common.header_image.english : "",
+            'website': appinfo.extended.homepage,
+            //             'pc_requirements': entry['pc_requirements'],
+            //             'mac_requirements': entry['mac_requirements'],
+            //             'linux_requirements': entry['linux_requirements'],
+            'developers': [appinfo.extended.developer],
+            'publishers': [appinfo.extended.publisher],
+            //             'price_overview': entry['price_overview'],
+            'platforms': getOSList(),
+            'categories': await getCategoryList(),
+            //             'genres': entry['genres'],
+            //             'release_date': entry['release_date'],
+            //             'reviews': entry['reviews'],
+            //             'playingnow': entry['playingnow']
+        }
+        console.log(gameData);
+        return gameData;
+    } catch (e) {
+        console.log("ERROR");
+        console.log(e);
+        return null;
+    }
+
     try {
         let appdetails_res = await axios.get('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid);
         let appdetails = appdetails_res.data;
