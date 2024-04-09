@@ -275,7 +275,10 @@ const WishlistInner = () => {
     }
 
     function getReviewPercent(key) {
-        let num = (Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+        let num = NaN;
+        if(gameData[key].reviews){
+            num = (Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+        }
         return (
             <p className="reviewPercent" style={{
                 color: getReviewColor(num)
@@ -448,7 +451,7 @@ const WishlistInner = () => {
                                 {/* playing the game now */}
                                 <div className="gamePlayingNow">
                                     <p className="playingNowTitle">Playing Now</p>
-                                    <p className="playingNow">
+                                    <span className="playingNow">
                                         {gameData[key] !== undefined && gameData[key].playingnow && gameData[key].playingnow.player_count > 0 ?
                                             <>
                                                 {gameData[key].playingnow.player_count}
@@ -458,7 +461,7 @@ const WishlistInner = () => {
                                                 <p className="noPlayers">No players</p>
                                             </>
                                         }
-                                    </p>
+                                    </span>
                                 </div>
 
                                 {/* game review percentage */}
@@ -466,7 +469,7 @@ const WishlistInner = () => {
                                     <p className="reviewPercentTitle">Rating</p>
                                     {getReviewPercent(key)}
                                     <p className="reviewTotal">
-                                        {gameData[key].reviews.total_reviews !== 0
+                                        {gameData[key].reviews && gameData[key].reviews.total_reviews !== 0
                                             ? <>{gameData[key].reviews.total_reviews} Reviews</>
                                             : null
                                         }

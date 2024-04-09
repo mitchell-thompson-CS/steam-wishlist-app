@@ -14,8 +14,12 @@ const GameContent = () => {
             let platforms = gameData[id].platforms;
             if (selectedPlatform === 'windows' && platforms.windows === true) {
                 let pc_requirements = gameData[id].pc_requirements;
-                let minimum_requirements = pc_requirements.minimum;
-                let recommended_requirements = pc_requirements.recommended;
+                let minimum_requirements = "";
+                let recommended_requirements = "";
+                if (pc_requirements) {
+                    minimum_requirements = pc_requirements.minimum;
+                    recommended_requirements = pc_requirements.recommended;
+                }
                 let docMin = document.getElementById('minimum-requirements');
                 if (minimum_requirements !== null && minimum_requirements !== undefined && minimum_requirements !== '') {
                     docMin.innerHTML = minimum_requirements;
@@ -32,8 +36,13 @@ const GameContent = () => {
             }
             if (selectedPlatform === 'mac' && platforms.mac === true) {
                 let mac_requirements = gameData[id].mac_requirements;
-                let minimum_requirements = mac_requirements.minimum;
-                let recommended_requirements = mac_requirements.recommended;
+                let minimum_requirements = "";
+                let recommended_requirements = "";
+                if (mac_requirements) {
+                    minimum_requirements = mac_requirements.minimum;
+                    recommended_requirements = mac_requirements.recommended;
+                }
+
                 let docMin = document.getElementById('minimum-requirements');
                 if (minimum_requirements !== null && minimum_requirements !== undefined && minimum_requirements !== '') {
                     docMin.innerHTML = minimum_requirements;
@@ -50,8 +59,12 @@ const GameContent = () => {
             }
             if (selectedPlatform === 'linux' && platforms.linux === true) {
                 let linux_requirements = gameData[id].linux_requirements;
-                let minimum_requirements = linux_requirements.minimum;
-                let recommended_requirements = linux_requirements.recommended;
+                let minimum_requirements = "";
+                let recommended_requirements = "";
+                if (linux_requirements) {
+                    minimum_requirements = linux_requirements.minimum;
+                    recommended_requirements = linux_requirements.recommended;
+                }
 
                 let docMin = document.getElementById('minimum-requirements');
                 if (minimum_requirements !== null && minimum_requirements !== undefined && minimum_requirements !== '') {

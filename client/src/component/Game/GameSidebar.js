@@ -126,7 +126,7 @@ const GameSidebar = () => {
     return (
         <div id="game-info">
             {gameData[id] ?
-                <img src={gameData[id].header_image} alt="game header" />
+                <img src={gameData[id].header_image} alt="" />
                 : <img src={loadingImage} alt="loading" className="loading-header" />
             }
             <div className="game-info-body">
