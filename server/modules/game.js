@@ -47,10 +47,17 @@ let inQueue = {};
 async function addToQueue(appid, onlyPlayerCount = false) {
     if (inQueue[appid] === undefined || (inQueue[appid] === true && onlyPlayerCount === false)) {
         inQueue[appid] = onlyPlayerCount;
+        setCacheUpdating(appid);
         Logging.log("addToQueue", "App " + appid + " added to queue");
         appQueue.push({ appid: appid, onlyPlayerCount: onlyPlayerCount }, () => {
             Logging.log("addToQueue", "App " + appid + " finished queue");
         });
+    }
+}
+
+function setCacheUpdating(appid) {
+    if(cachedData[appid]) {
+        cachedData[appid].updatingCache = true;
     }
 }
 
@@ -62,7 +69,7 @@ const appQueue = async.queue(async (input_data) => {
     let function_name = "AppQueue"
     if (cachedData[appid] && onlyPlayerCount) {
         try {
-            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid + '&key=' + process.env.STEAM_API_KEY);
             let appplayercount = appplayercount_res.data.response;
 
             // only update if we got information
@@ -72,6 +79,7 @@ const appQueue = async.queue(async (input_data) => {
 
             // reset expired time
             cachedData[appid].playerExpiryDate = Date.now() + PLAYER_EXPIRY_TIME;
+            cachedData[appid].updatingCache = false;
             Logging.log(function_name, "Updated player count information for " + appid);
         } catch (e) {
             Logging.log(function_name, "Error getting player count for app " + appid);
@@ -90,7 +98,7 @@ const appQueue = async.queue(async (input_data) => {
         let appdetails = appdetails_res.data;
         let appplayercount;
         try {
-            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid + '&key=' + process.env.STEAM_API_KEY);
             appplayercount = appplayercount_res.data.response;
         } catch (e) {
             Logging.log(function_name, "Error getting player count for app " + appid);
@@ -109,20 +117,20 @@ const appQueue = async.queue(async (input_data) => {
             Logging.log(function_name, "Unable to get lows for game " + appid, LogLevels.WARN);
         }
 
-        if (appstorelow) {
-            appdetails[appid]['data']['price_overview'] = {
-                ...appdetails[appid]['data']['price_overview'],
-                lowestprice: appstorelow
-            };
-        }
-
-        if (appplayercount && appplayercount.result === 1) {
-            appdetails[appid]['data']['playingnow'] = appplayercount;
-        } else {
-            appdetails[appid]['data']['playingnow'] = -1;
-        }
-
         if (appdetails && appdetails[appid] && appdetails[appid]['data']) {
+            if (appstorelow) {
+                appdetails[appid]['data']['price_overview'] = {
+                    ...appdetails[appid]['data']['price_overview'],
+                    lowestprice: appstorelow
+                };
+            }
+
+            if (appplayercount && appplayercount.result === 1) {
+                appdetails[appid]['data']['playingnow'] = appplayercount;
+            } else {
+                appdetails[appid]['data']['playingnow'] = -1;
+            }
+
             let entry = appdetails[appid]['data'];
 
             let gameData = {
@@ -139,14 +147,19 @@ const appQueue = async.queue(async (input_data) => {
                 'expiryDate': Date.now() + EXPIRY_TIME, // currently unused. instead using steamclient's on appUpdate hook to update stale data
                 'playerExpiryDate': Date.now() + PLAYER_EXPIRY_TIME,
                 'createdDate': Date.now(),
+                'updatingCache': false,
             }
 
             cachedData[appid] = gameData;
+        } else if (appdetails && appdetails[appid] && appdetails[appid]['success'] === false) {
+            // when whatever app it is couldn't be grabbed from steam (error on their side, meaning app likely doesn't exist as a proper app)
+            cachedData[appid] = {};
         }
     } catch (e) {
         Logging.log(function_name, "Error getting app " + appid + ": " + e, LogLevels.WARN);
         // rate limit error
         if (e.response.status === 429) {
+            Logging.log(function_name, "Server rate limited", LogLevels.ERROR);
             setTimeout(() => {
                 appQueue.resume();
             }, RATE_LIMIT_WAIT);
@@ -309,15 +322,17 @@ async function handleGameData(appid, appinfo) {
     async function getCategoryList() {
         let result = []
         try {
-            let categories = appinfo.common.store_tags;
-            let tags = (await client.getStoreTagNames("english", Object.values(categories))).tags;
-            for (let key of Object.keys(tags)) {
-                let id = key;
-                let description = tags[key].name;
-                result.push({
-                    id: id,
-                    description: description
-                })
+            if (appinfo && appinfo.common && appinfo.common.store_tags) {
+                let categories = appinfo.common.store_tags;
+                let tags = (await client.getStoreTagNames("english", Object.values(categories))).tags;
+                for (let key of Object.keys(tags)) {
+                    let id = key;
+                    let description = tags[key].name;
+                    result.push({
+                        id: id,
+                        description: description
+                    })
+                }
             }
         } catch (e) {
             Logging.log(function_name, "Error getting tags for app " + appid, LogLevels.WARN);
@@ -351,7 +366,7 @@ async function handleGameData(appid, appinfo) {
         'release_date': cachedData[appid] ? cachedData[appid].release_date : undefined,
         'playingnow': cachedData[appid] ? cachedData[appid].playingnow : undefined,
         'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
-        'cache': cachedData[appid] && cachedData[appid].expiryDate > Date.now() ? true : false,
+        'cache': cachedData[appid] && !(cachedData[appid].updatingCache) ? true : false,
     }
 
     return gameData;
@@ -430,3 +445,5 @@ exports.getGameData = getGameData;
 exports.getGamesPage = getGamesPage;
 exports.steamClient = client;
 exports.steamConnected = steamConnected;
+exports.verifyAppID = verifyAppID;
+exports.addToAppQueue = addToQueue;

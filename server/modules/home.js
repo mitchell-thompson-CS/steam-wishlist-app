@@ -1,7 +1,7 @@
 const { default: axios } = require('axios');
 const schedule = require('node-schedule');
 const { Logging, LogLevels } = require('./logging.js');
-const { getGameData } = require('./game');
+const { getGameData, steamClient } = require('./game');
 require('dotenv').config({ path: __dirname + '/../../.env' });
 
 
@@ -11,6 +11,7 @@ let top_sellers = null;
 let top_sellers_games = [];
 const country = 'US';
 const language = 'en';
+const CHECK_CHANGES_DELAY = 10 * 1000; // 10 seconds
 
 async function getSteamStore() {
     let function_name = getSteamStore.name;
@@ -62,11 +63,48 @@ async function getSteamTopSellers() {
 
 }
 
-schedule.scheduleJob('0 5 10 * * *', getSteamStore);
-schedule.scheduleJob('0 5 10 * * *', getSteamTopSellers);
+schedule.scheduleJob('0 5 10 * * *', setupHomeInfo);
 // run once on startup
-getSteamStore();
-getSteamTopSellers();
+steamClient.on('loggedOn', setupHomeInfo);
+
+function setupHomeInfo() {
+    let function_name = setupHomeInfo.name;
+    let featured = getSteamStore();
+    let top = getSteamTopSellers();
+    Promise.all([featured, top]).then(() => {
+        let timer = setInterval(() => {
+            verifyHome();
+        }, CHECK_CHANGES_DELAY);
+
+        function verifyHome() {
+            Logging.log(function_name, "Checking if featured and top sellers have been successfully acquired");
+            for(let key of Object.keys(featured_games)) {
+                let game = featured_games[key];
+                if(game.cache === false) {
+                    Logging.log(function_name, "Incomplete game " + key + " found in featured games. Reattempting fetch...");
+                    getSteamStore();
+                    getSteamTopSellers();
+                    return;
+                }
+            }
+
+            for(let key of Object.keys(top_sellers_games)) {
+                let game = top_sellers_games[key];
+                if(game.cache === false) {
+                    Logging.log(function_name, "Incomplete game " + key + " found in top sellers. Reattempting fetch...");
+                    getSteamStore();
+                    getSteamTopSellers();
+                    return;
+                }
+            }
+
+            Logging.log(function_name, "Featured and top sellers up to date. Clearing timer...")
+            clearInterval(timer);
+        }
+
+        verifyHome();
+    })
+}
 
 async function getFeatured(req, res) {
     let function_name = getFeatured.name;
