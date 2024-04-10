@@ -181,7 +181,7 @@ async function getGameData(appid) {
 
     try {
         let verifyApp = verifyAppID(appid);
-        if(!verifyApp) {
+        if (!verifyApp) {
             Logging.log(function_name, "Invalid app id " + appid);
             return null;
         }
@@ -189,7 +189,7 @@ async function getGameData(appid) {
 
         let appinfo = (await handleAppInfo([appid]))[appid];
 
-        if(!appinfo){
+        if (!appinfo) {
             return null;
         }
 
@@ -197,6 +197,39 @@ async function getGameData(appid) {
     } catch (e) {
         Logging.log(function_name, "Error getting gameData for app " + appid + ": " + e, LogLevels.WARN)
         return null;
+    }
+}
+
+/** Gets the game data for multiple appids.
+ * 
+ * @param {any[]} appids 
+ * @returns 
+ */
+async function getGamesData(appids) {
+    let function_name = getGamesData.name;
+    if (!steamConnected) {
+        return {};
+    }
+
+    try {
+        let valid_ids = [];
+        for (let appid of appids) {
+            let id_verify = verifyAppID(appid);
+            if (id_verify !== false) {
+                valid_ids.push(id_verify);
+            }
+        }
+
+        let appsinfo = (await handleAppInfo(valid_ids));
+
+        let result = {};
+        for (let appid of valid_ids) {
+            result[appid] = (await handleGameData(appid, appsinfo[appid]));
+        }
+        return result;
+    } catch (e) {
+        Logging.log(function_name, "Error getting gameData for apps " + appids + ": " + e, LogLevels.WARN)
+        return {};
     }
 }
 
@@ -220,21 +253,27 @@ function verifyAppID(appid) {
 async function handleAppInfo(appids) {
     let function_name = handleAppInfo.name;
     let result = {};
-    for(let appid of appids){
+    let not_cached = [];
+    for (let appid of appids) {
         let appinfo = client.picsCache.apps[appid];
-        if (!appinfo) {
-            Logging.log(function_name, "App " + appid + " not found in cache. Fetching...");
-            appinfo = await client.getProductInfo([appid], [], true);
-            if (!appinfo.apps[appid]) {
-                // app doesn't exist
-                Logging.log(function_name, "App " + appid + " doesn't exist.");
-            } else {
-                appinfo = appinfo.apps[appid].appinfo;
-            }
-        } else {
+        if (appinfo) {
             appinfo = appinfo.appinfo;
+            result[appid] = appinfo;
+        } else {
+            not_cached.push(appid);
         }
-        result[appid] = appinfo;
+    }
+
+    if (not_cached.length > 0) {
+        Logging.log(function_name, "App(s) " + not_cached + " not found in cache. Fetching...");
+        let appinfos = await client.getProductInfo(not_cached, [], true);
+        if (appinfos.apps) {
+            for (let key of Object.keys(appinfos.apps)) {
+                if (appinfos.apps[key] && appinfos.apps[key].appinfo) {
+                    result[key] = appinfos.apps[key].appinfo;
+                }
+            }
+        }
     }
     return result;
 }
@@ -382,16 +421,7 @@ async function getGamesPage(req, res) {
         return;
     }
 
-    let gameData = {};
-    for (let i = 0; i < game_ids.length; i++) {
-        let data = await getGameData(game_ids[i]);
-        if (data) {
-            gameData[game_ids[i]] = data;
-        } else {
-            // make log note that game does not exist, but continue for the rest of the ids
-            Logging.log(LogLevels.WARN, function_name, "Game " + game_ids[i] + " does not exist");
-        }
-    }
+    let gameData = (await getGamesData(game_ids));
 
     Logging.handleResponse(res, 200, gameData, function_name, "Got game data for " + game_ids);
 
