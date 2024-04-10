@@ -26,6 +26,7 @@ const Game = () => {
                     }
                 }).then(function (data) {
                     if (data) {
+                        console.log(data);
                         dispatch(addGame(id, data));
                     } else {
                         dispatch(setEvent(false, "Error fetching game data"));

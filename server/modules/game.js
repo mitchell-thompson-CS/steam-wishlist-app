@@ -2,16 +2,20 @@ const { default: axios } = require('axios');
 const { Logging, LogLevels } = require('./logging.js');
 const { searchForGame } = require('./typesense.js');
 require('dotenv').config({ path: __dirname + '/../../.env' });
+const async = require('async')
 
 const HEADER_BASE_URL = 'https://cdn.akamai.steamstatic.com/steam/apps/';
+const QUEUE_RATE = 25;
+const EXPIRY_TIME = 1000 * 60 * 60 * 24;
 
 const SteamUser = require('steam-user');
+const cheerio = require('cheerio');
 let client = new SteamUser();
 let steamConnected = false;
 client.setOptions({
     enablePicsCache: true,
 })
-client.logOn();
+client.logOn({ anonymous: true });
 
 client.on('loggedOn', async (details) => {
     Logging.log("SteamUser", "Logged into Steam as " + client.steamID.getSteam3RenderedID());
@@ -32,7 +36,91 @@ client.on('disconnected', async (e) => {
 
 client.on('debug', async (details) => {
     // console.log(details);
-})
+});
+
+let cachedData = {};
+let inQueue = {};
+
+async function addToQueue(appid) {
+    if (!inQueue[appid]) {
+        inQueue[appid] = true;
+        appQueue.push(appid, () => {
+            Logging.log("addToQueue", "App " + appid + " finished queue");
+        });
+    }
+}
+
+// TODO: allow player count to update separately
+const appQueue = async.queue(async (appid) => {
+    let currency = 'USD';
+    let function_name = "AppQueue"
+    try {
+        let appdetails_res = await axios.get('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid);
+        let appdetails = appdetails_res.data;
+        let appplayercount;
+        try {
+            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+            appplayercount = appplayercount_res.data.response;
+        } catch (e) {
+            Logging.log(function_name, "Error getting player count for app " + appid);
+        }
+        let appstorelow;
+        try {
+            if (process.env.NODE_ENV !== "test") {
+                let appdealid_res = await axios.get('https://api.isthereanydeal.com/games/lookup/v1?key=' + process.env.ANY_DEAL_API_KEY + "&appid=" + appid);
+                const gameIds = [
+                    appdealid_res.data.game.id
+                ];
+                let appstorelow_res = await axios.post('https://api.isthereanydeal.com/games/storelow/v2?key=' + process.env.ANY_DEAL_API_KEY + "&shops=61", gameIds);
+                appstorelow = appstorelow_res.data[0].lows[0].price.amount;
+            }
+        } catch (e) {
+            Logging.log(function_name, "Unable to get lows for game " + appid, LogLevels.WARN);
+        }
+
+        if (appstorelow) {
+            appdetails[appid]['data']['price_overview'] = {
+                ...appdetails[appid]['data']['price_overview'],
+                lowestprice: appstorelow
+            };
+        }
+
+        if (appplayercount && appplayercount.result === 1) {
+            appdetails[appid]['data']['playingnow'] = appplayercount;
+        } else {
+            appdetails[appid]['data']['playingnow'] = -1;
+        }
+
+        if (appdetails && appdetails[appid] && appdetails[appid]['data']) {
+            let entry = appdetails[appid]['data'];
+
+            let gameData = {
+                'short_description': entry['short_description'],
+                'pc_requirements': entry['pc_requirements'],
+                'mac_requirements': entry['mac_requirements'],
+                'linux_requirements': entry['linux_requirements'],
+                'developers': entry['developers'],
+                'publishers': entry['publishers'],
+                'price_overview': entry['price_overview'],
+                'genres': entry['genres'],
+                'playingnow': entry['playingnow'],
+                'release_date': entry['release_date'],
+                'expiryDate': Date.now() + EXPIRY_TIME,
+                'createdDate': Date.now(),
+            }
+
+            cachedData[appid] = gameData;
+        }
+    } catch (e) {
+        Logging.log(function_name, "Error getting app " + appid + ": " + e, LogLevels.WARN);
+    }
+
+    try {
+        delete inQueue[appid];
+    } catch (e) {
+        Logging.log(function_name, "Failed to delete from InQueue: " + e, LogLevels.WARN);
+    }
+}, QUEUE_RATE);
 
 /** Gets data for a game from the Steam API and returns JSON object of it if it exists.
  *  Returns null if the game does not exist.
@@ -48,7 +136,6 @@ async function getGameData(appid) {
     }
 
     try {
-        console.log(appid);
         if (!Number(appid)) {
             console.log("not a number");
             return null;
@@ -68,9 +155,7 @@ async function getGameData(appid) {
         } else {
             appinfo = appinfo.appinfo;
         }
-        // console.log(appinfo.extended);
 
-        // console.log(await client.getAppRichPresenceLocalization(appid, "english"));
         function getOSList() {
             let result = { windows: false, mac: false, linux: false };
             if (appinfo.common.oslist) {
@@ -113,115 +198,36 @@ async function getGameData(appid) {
             return result;
         }
 
+        if (!cachedData[appid] || cachedData[appid].expiryDate < Date.now()) {
+            addToQueue(appid);
+        }
+
         let gameData = {
             'type': appinfo.common.type,
             'name': appinfo.common.name,
-            'dlc': appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : [],
-            //             'short_description': entry['short_description'],
-            'header_image': appinfo.common.header_image && appinfo.common.header_image.english ?
+            'dlc': appinfo.extended && appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : [],
+            'short_description': cachedData[appid] ? cachedData[appid].short_description : undefined,
+            'header_image': appinfo.common && appinfo.common.header_image && appinfo.common.header_image.english ?
                 HEADER_BASE_URL + appid + '/' + appinfo.common.header_image.english : "",
-            'website': appinfo.extended.homepage,
-            //             'pc_requirements': entry['pc_requirements'],
-            //             'mac_requirements': entry['mac_requirements'],
-            //             'linux_requirements': entry['linux_requirements'],
-            'developers': [appinfo.extended.developer],
-            'publishers': [appinfo.extended.publisher],
-            //             'price_overview': entry['price_overview'],
+            'website': appinfo.extended ? appinfo.extended.homepage : undefined,
+            'pc_requirements': cachedData[appid] ? cachedData[appid].pc_requirements : undefined,
+            'mac_requirements': cachedData[appid] ? cachedData[appid].mac_requirements : undefined,
+            'linux_requirements': cachedData[appid] ? cachedData[appid].linux_requirements : undefined,
+            'developers': appinfo.extended ? [appinfo.extended.developer] : [],
+            'publishers': appinfo.extended ? [appinfo.extended.publisher] : [],
+            'price_overview': cachedData[appid] ? cachedData[appid].price_overview : undefined,
             'platforms': getOSList(),
             'categories': await getCategoryList(),
-            //             'genres': entry['genres'],
-            //             'release_date': entry['release_date'],
-            //             'reviews': entry['reviews'],
-            //             'playingnow': entry['playingnow']
+            'genres': cachedData[appid] ? cachedData[appid].genres : undefined,
+            'release_date': cachedData[appid] ? cachedData[appid].release_date : undefined,
+            'playingnow': cachedData[appid] ? cachedData[appid].playingnow : undefined,
+            'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
+            'cache': cachedData[appid] ? true : false,
         }
-        console.log(gameData);
+        
         return gameData;
     } catch (e) {
-        console.log("ERROR");
-        console.log(e);
-        return null;
-    }
-
-    try {
-        let appdetails_res = await axios.get('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid);
-        let appdetails = appdetails_res.data;
-        let appreviews;
-        try {
-            let appreviews_res = await axios.get('https://store.steampowered.com/appreviews/' + appid + '?json=1');
-            appreviews = appreviews_res.data;
-        } catch (e) {
-            Logging.log(function_name, "Error getting reviews for app " + appid);
-        }
-
-        let appplayercount;
-        try {
-            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
-            appplayercount = appplayercount_res.data.response;
-        } catch (e) {
-            Logging.log(function_name, "Error getting player count for app " + appid);
-        }
-        let appstorelow;
-        try {
-            if (process.env.NODE_ENV !== "test") {
-                let appdealid_res = await axios.get('https://api.isthereanydeal.com/games/lookup/v1?key=' + process.env.ANY_DEAL_API_KEY + "&appid=" + appid);
-                const gameIds = [
-                    appdealid_res.data.game.id
-                ];
-                let appstorelow_res = await axios.post('https://api.isthereanydeal.com/games/storelow/v2?key=' + process.env.ANY_DEAL_API_KEY + "&shops=61", gameIds);
-                appstorelow = appstorelow_res.data[0].lows[0].price.amount;
-            }
-        } catch (e) {
-            Logging.log(function_name, "Unable to get lows for game " + appid, LogLevels.WARN);
-        }
-
-        if (appstorelow) {
-            appdetails[appid]['data']['price_overview'] = {
-                ...appdetails[appid]['data']['price_overview'],
-                lowestprice: appstorelow
-            };
-        }
-
-        if (appplayercount && appplayercount.result === 1) {
-            appdetails[appid]['data']['playingnow'] = appplayercount;
-        } else {
-            appdetails[appid]['data']['playingnow'] = -1;
-        }
-
-        if (appdetails && appdetails[appid] && appdetails[appid]['data']) {
-            if (appreviews && appreviews['success'] && appdetails[appid]['success']) {
-                appdetails[appid]['data']['reviews'] = appreviews['query_summary'];
-            }
-
-            let entry = appdetails[appid]['data'];
-
-            let gameData = {
-                'type': entry['type'],
-                'name': entry['name'],
-                'dlc': entry['dlc'],
-                'short_description': entry['short_description'],
-                'header_image': entry['header_image'],
-                'website': entry['website'],
-                'pc_requirements': entry['pc_requirements'],
-                'mac_requirements': entry['mac_requirements'],
-                'linux_requirements': entry['linux_requirements'],
-                'developers': entry['developers'],
-                'publishers': entry['publishers'],
-                'price_overview': entry['price_overview'],
-                'platforms': entry['platforms'],
-                'categories': entry['categories'],
-                'genres': entry['genres'],
-                'release_date': entry['release_date'],
-                'reviews': entry['reviews'],
-                'playingnow': entry['playingnow']
-            }
-
-            return gameData;
-        } else {
-            // game does not exist
-            return null;
-        }
-    } catch (error) {
-        Logging.log(function_name, "Error getting data for game " + appid + ": " + error, LogLevels.ERROR);
+        Logging.log(function_name, "Error getting gameData for app " + appid + ": " + e, LogLevels.WARN)
         return null;
     }
 }
