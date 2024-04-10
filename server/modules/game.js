@@ -7,6 +7,7 @@ const async = require('async')
 const HEADER_BASE_URL = 'https://cdn.akamai.steamstatic.com/steam/apps/';
 const QUEUE_RATE = 25;
 const EXPIRY_TIME = 1000 * 60 * 60 * 24; // 24 hours
+const PLAYER_EXPIRY_TIME = 1000 * 60 * 60; // 1 hour
 const RATE_LIMIT_WAIT = 1000 * 60; // 1 minute
 
 const SteamUser = require('steam-user');
@@ -41,19 +42,50 @@ client.on('debug', async (details) => {
 let cachedData = {};
 let inQueue = {};
 
-async function addToQueue(appid) {
-    if (!inQueue[appid]) {
-        inQueue[appid] = true;
-        appQueue.push(appid, () => {
+async function addToQueue(appid, onlyPlayerCount = false) {
+    if (inQueue[appid] === undefined || (inQueue[appid] === true && onlyPlayerCount === false)) {
+        inQueue[appid] = onlyPlayerCount;
+        appQueue.push({appid: appid, onlyPlayerCount: onlyPlayerCount}, () => {
             Logging.log("addToQueue", "App " + appid + " finished queue");
         });
     }
 }
 
 // TODO: allow player count to update separately
-const appQueue = async.queue(async (appid) => {
+const appQueue = async.queue(async (input_data) => {
+    let appid = input_data.appid;
+    let onlyPlayerCount = input_data.onlyPlayerCount;
     let currency = 'USD';
     let function_name = "AppQueue"
+    if(cachedData[appid] && onlyPlayerCount) {
+        // only do this if the info is expired
+        if(cachedData[appid].playerExpiryDate <= Date.now()){
+            try {
+                let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+                let appplayercount = appplayercount_res.data.response;
+
+                // only update if we got information
+                if (appplayercount && appplayercount.result === 1) {
+                    cachedData[appid].playingnow = appplayercount;
+                }
+
+                // reset expired time
+                cachedData[appid].playerExpiryDate = Date.now() + PLAYER_EXPIRY_TIME;
+                Logging.log(function_name, "Updated player count information for " + appid);
+            } catch (e) {
+                Logging.log(function_name, "Error getting player count for app " + appid);
+            }
+
+            delete inQueue[appid];
+        }
+
+        return;
+    } else if (cachedData[appid] && cachedData[appid].expiryDate > Date.now()){
+        // hasn't expired so can exit
+        delete inQueue[appid];
+        return;
+    }
+
     try {
         let appdetails_res = await axios.get('https://store.steampowered.com/api/appdetails?currency=' + currency + '&appids=' + appid);
         let appdetails = appdetails_res.data;
@@ -106,6 +138,7 @@ const appQueue = async.queue(async (appid) => {
                 'playingnow': entry['playingnow'],
                 'release_date': entry['release_date'],
                 'expiryDate': Date.now() + EXPIRY_TIME,
+                'playerExpiryDate': Date.now() + PLAYER_EXPIRY_TIME,
                 'createdDate': Date.now(),
             }
 
@@ -118,7 +151,7 @@ const appQueue = async.queue(async (appid) => {
             setTimeout(() => {
                 appQueue.resume();
             }, RATE_LIMIT_WAIT);
-            appQueue.push(appid);
+            appQueue.push({appid: appid, onlyPlayerCount: onlyPlayerCount});
             appQueue.pause();
             // return to stop from deleting the appid from the inQueue object
             return;
@@ -208,8 +241,10 @@ async function getGameData(appid) {
             return result;
         }
 
-        if (!cachedData[appid] || cachedData[appid].expiryDate < Date.now()) {
+        if (!cachedData[appid] || cachedData[appid].expiryDate <= Date.now()) {
             addToQueue(appid);
+        } else if(cachedData[appid].playerExpiryDate < Date.now()) {
+            addToQueue(appid, true);
         }
 
         let gameData = {
@@ -232,7 +267,7 @@ async function getGameData(appid) {
             'release_date': cachedData[appid] ? cachedData[appid].release_date : undefined,
             'playingnow': cachedData[appid] ? cachedData[appid].playingnow : undefined,
             'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
-            'cache': cachedData[appid] ? true : false,
+            'cache': cachedData[appid] && cachedData[appid].expiryDate > Date.now() ? true : false,
         }
 
         return gameData;
