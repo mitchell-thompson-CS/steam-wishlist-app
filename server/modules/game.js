@@ -21,9 +21,6 @@ client.logOn({ anonymous: true });
 client.on('loggedOn', async (details) => {
     Logging.log("SteamUser", "Logged into Steam as " + client.steamID.getSteam3RenderedID());
     steamConnected = true;
-
-    // let result = await client.getProductInfo([440, 730, 620], [], true);
-    // console.log(result);
 });
 
 client.on('error', async (e) => {
@@ -431,3 +428,5 @@ exports.getGamePage = getGamePage;
 exports.searchGamePage = searchGamePage;
 exports.getGameData = getGameData;
 exports.getGamesPage = getGamesPage;
+exports.steamClient = client;
+exports.steamConnected = steamConnected;
