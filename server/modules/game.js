@@ -6,10 +6,10 @@ const async = require('async')
 
 const HEADER_BASE_URL = 'https://cdn.akamai.steamstatic.com/steam/apps/';
 const QUEUE_RATE = 25;
-const EXPIRY_TIME = 1000 * 60 * 60 * 24;
+const EXPIRY_TIME = 1000 * 60 * 60 * 24; // 24 hours
+const RATE_LIMIT_WAIT = 1000 * 60; // 1 minute
 
 const SteamUser = require('steam-user');
-const cheerio = require('cheerio');
 let client = new SteamUser();
 let steamConnected = false;
 client.setOptions({
@@ -113,6 +113,16 @@ const appQueue = async.queue(async (appid) => {
         }
     } catch (e) {
         Logging.log(function_name, "Error getting app " + appid + ": " + e, LogLevels.WARN);
+        // rate limit error
+        if (e.response.status === 429) {
+            setTimeout(() => {
+                appQueue.resume();
+            }, RATE_LIMIT_WAIT);
+            appQueue.push(appid);
+            appQueue.pause();
+            // return to stop from deleting the appid from the inQueue object
+            return;
+        }
     }
 
     try {
@@ -224,7 +234,7 @@ async function getGameData(appid) {
             'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
             'cache': cachedData[appid] ? true : false,
         }
-        
+
         return gameData;
     } catch (e) {
         Logging.log(function_name, "Error getting gameData for app " + appid + ": " + e, LogLevels.WARN)
