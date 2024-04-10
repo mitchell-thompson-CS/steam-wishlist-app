@@ -39,6 +39,11 @@ client.on('debug', async (details) => {
     // console.log(details);
 });
 
+client.on('appUpdate', async (appid, data) => {
+    // updated other cache information whenever app updates
+    addToQueue(appid);
+})
+
 let cachedData = {};
 let inQueue = {};
 
@@ -46,7 +51,7 @@ async function addToQueue(appid, onlyPlayerCount = false) {
     if (inQueue[appid] === undefined || (inQueue[appid] === true && onlyPlayerCount === false)) {
         inQueue[appid] = onlyPlayerCount;
         Logging.log("addToQueue", "App " + appid + " added to queue");
-        appQueue.push({appid: appid, onlyPlayerCount: onlyPlayerCount}, () => {
+        appQueue.push({ appid: appid, onlyPlayerCount: onlyPlayerCount }, () => {
             Logging.log("addToQueue", "App " + appid + " finished queue");
         });
     }
@@ -58,32 +63,28 @@ const appQueue = async.queue(async (input_data) => {
     let onlyPlayerCount = input_data.onlyPlayerCount;
     let currency = 'USD';
     let function_name = "AppQueue"
-    if(cachedData[appid] && onlyPlayerCount) {
-        // only do this if the info is expired
-        if(cachedData[appid].playerExpiryDate <= Date.now()){
-            try {
-                let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
-                let appplayercount = appplayercount_res.data.response;
+    if (cachedData[appid] && onlyPlayerCount) {
+        try {
+            let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid);
+            let appplayercount = appplayercount_res.data.response;
 
-                // only update if we got information
-                if (appplayercount && appplayercount.result === 1) {
-                    cachedData[appid].playingnow = appplayercount;
-                }
-
-                // reset expired time
-                cachedData[appid].playerExpiryDate = Date.now() + PLAYER_EXPIRY_TIME;
-                Logging.log(function_name, "Updated player count information for " + appid);
-            } catch (e) {
-                Logging.log(function_name, "Error getting player count for app " + appid);
+            // only update if we got information
+            if (appplayercount && appplayercount.result === 1) {
+                cachedData[appid].playingnow = appplayercount;
             }
 
-            delete inQueue[appid];
+            // reset expired time
+            cachedData[appid].playerExpiryDate = Date.now() + PLAYER_EXPIRY_TIME;
+            Logging.log(function_name, "Updated player count information for " + appid);
+        } catch (e) {
+            Logging.log(function_name, "Error getting player count for app " + appid);
         }
 
-        return;
-    } else if (cachedData[appid] && cachedData[appid].expiryDate > Date.now()){
-        // hasn't expired so can exit
-        delete inQueue[appid];
+        try {
+            delete inQueue[appid];
+        } catch (e) {
+            Logging.log(function_name, "Error deleting from inQueue", LogLevels.WARN);
+        }
         return;
     }
 
@@ -138,7 +139,7 @@ const appQueue = async.queue(async (input_data) => {
                 'genres': entry['genres'],
                 'playingnow': entry['playingnow'],
                 'release_date': entry['release_date'],
-                'expiryDate': Date.now() + EXPIRY_TIME,
+                'expiryDate': Date.now() + EXPIRY_TIME, // currently unused. instead using steamclient's on appUpdate hook to update stale data
                 'playerExpiryDate': Date.now() + PLAYER_EXPIRY_TIME,
                 'createdDate': Date.now(),
             }
@@ -152,7 +153,7 @@ const appQueue = async.queue(async (input_data) => {
             setTimeout(() => {
                 appQueue.resume();
             }, RATE_LIMIT_WAIT);
-            appQueue.push({appid: appid, onlyPlayerCount: onlyPlayerCount});
+            appQueue.push({ appid: appid, onlyPlayerCount: onlyPlayerCount });
             appQueue.pause();
             // return to stop from deleting the appid from the inQueue object
             return;
@@ -174,108 +175,150 @@ const appQueue = async.queue(async (input_data) => {
  */
 async function getGameData(appid) {
     let function_name = getGameData.name;
-    let currency = 'USD';
     if (!steamConnected) {
         return null;
     }
 
     try {
-        if (!Number(appid)) {
-            console.log("not a number");
+        let verifyApp = verifyAppID(appid);
+        if(!verifyApp) {
+            Logging.log(function_name, "Invalid app id " + appid);
             return null;
-        } else {
-            appid = Number(appid);
         }
-        let appinfo = client.picsCache.apps[appid];
-        if (!appinfo) {
-            Logging.log(function_name, "App " + appid + " not found in cache. Fetching...");
-            appinfo = await client.getProductInfo([appid], [], false);
-            if (!appinfo.apps[appid]) {
-                // app doesn't exist
-                Logging.log(function_name, "App " + appid + " doesn't exist.");
-                return null;
-            }
-            appinfo = appinfo.apps[appid].appinfo;
-        } else {
-            appinfo = appinfo.appinfo;
+        appid = verifyApp;
+
+        let appinfo = (await handleAppInfo([appid]))[appid];
+
+        if(!appinfo){
+            return null;
         }
 
-        function getOSList() {
-            let result = { windows: false, mac: false, linux: false };
-            if (appinfo.common.oslist) {
-                let list = appinfo.common.oslist.split(/[,]+/);
-                for (let item of list) {
-                    switch (item) {
-                        case "windows":
-                            result.windows = true;
-                            break;
-                        case "macos":
-                            result.mac = true;
-                            break;
-                        case "linux":
-                            result.linux = true;
-                            break;
-                    }
-                }
-                return result;
-            }
-
-            return result;
-        }
-
-        async function getCategoryList() {
-            let result = []
-            try {
-                let categories = appinfo.common.store_tags;
-                let tags = (await client.getStoreTagNames("english", Object.values(categories))).tags;
-                for (let key of Object.keys(tags)) {
-                    let id = key;
-                    let description = tags[key].name;
-                    result.push({
-                        id: id,
-                        description: description
-                    })
-                }
-            } catch (e) {
-                Logging.log(function_name, "Error getting tags for app " + appid, LogLevels.WARN);
-            }
-            return result;
-        }
-
-        if (!cachedData[appid] || cachedData[appid].expiryDate <= Date.now()) {
-            addToQueue(appid);
-        } else if(cachedData[appid].playerExpiryDate < Date.now()) {
-            addToQueue(appid, true);
-        }
-
-        let gameData = {
-            'type': appinfo.common.type,
-            'name': appinfo.common.name,
-            'dlc': appinfo.extended && appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : [],
-            'short_description': cachedData[appid] ? cachedData[appid].short_description : undefined,
-            'header_image': appinfo.common && appinfo.common.header_image && appinfo.common.header_image.english ?
-                HEADER_BASE_URL + appid + '/' + appinfo.common.header_image.english : "",
-            'website': appinfo.extended ? appinfo.extended.homepage : undefined,
-            'pc_requirements': cachedData[appid] ? cachedData[appid].pc_requirements : undefined,
-            'mac_requirements': cachedData[appid] ? cachedData[appid].mac_requirements : undefined,
-            'linux_requirements': cachedData[appid] ? cachedData[appid].linux_requirements : undefined,
-            'developers': appinfo.extended ? [appinfo.extended.developer] : [],
-            'publishers': appinfo.extended ? [appinfo.extended.publisher] : [],
-            'price_overview': cachedData[appid] ? cachedData[appid].price_overview : undefined,
-            'platforms': getOSList(),
-            'categories': await getCategoryList(),
-            'genres': cachedData[appid] ? cachedData[appid].genres : undefined,
-            'release_date': cachedData[appid] ? cachedData[appid].release_date : undefined,
-            'playingnow': cachedData[appid] ? cachedData[appid].playingnow : undefined,
-            'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
-            'cache': cachedData[appid] && cachedData[appid].expiryDate > Date.now() ? true : false,
-        }
-
-        return gameData;
+        return (await handleGameData(appid, appinfo));
     } catch (e) {
         Logging.log(function_name, "Error getting gameData for app " + appid + ": " + e, LogLevels.WARN)
         return null;
     }
+}
+
+/** Verifies if any input is a valid appid (aka a number).
+ * 
+ * @param {*} appid 
+ * @returns
+ */
+function verifyAppID(appid) {
+    if (!Number(appid)) {
+        return false;
+    }
+
+    return Number(appid);
+}
+
+/** Gets the app info from the steam client cache or fetches it.
+ * 
+ * @param {number[]} appids 
+ */
+async function handleAppInfo(appids) {
+    let function_name = handleAppInfo.name;
+    let result = {};
+    for(let appid of appids){
+        let appinfo = client.picsCache.apps[appid];
+        if (!appinfo) {
+            Logging.log(function_name, "App " + appid + " not found in cache. Fetching...");
+            appinfo = await client.getProductInfo([appid], [], true);
+            if (!appinfo.apps[appid]) {
+                // app doesn't exist
+                Logging.log(function_name, "App " + appid + " doesn't exist.");
+            } else {
+                appinfo = appinfo.apps[appid].appinfo;
+            }
+        } else {
+            appinfo = appinfo.appinfo;
+        }
+        result[appid] = appinfo;
+    }
+    return result;
+}
+
+/** Correctly formats app info from the caches into an output object.
+ * 
+ * @param {number} appid 
+ * @param {{}} appinfo 
+ * @returns 
+ */
+async function handleGameData(appid, appinfo) {
+    let function_name = handleGameData.name;
+    function getOSList() {
+        let result = { windows: false, mac: false, linux: false };
+        if (appinfo.common.oslist) {
+            let list = appinfo.common.oslist.split(/[,]+/);
+            for (let item of list) {
+                switch (item) {
+                    case "windows":
+                        result.windows = true;
+                        break;
+                    case "macos":
+                        result.mac = true;
+                        break;
+                    case "linux":
+                        result.linux = true;
+                        break;
+                }
+            }
+            return result;
+        }
+
+        return result;
+    }
+
+    async function getCategoryList() {
+        let result = []
+        try {
+            let categories = appinfo.common.store_tags;
+            let tags = (await client.getStoreTagNames("english", Object.values(categories))).tags;
+            for (let key of Object.keys(tags)) {
+                let id = key;
+                let description = tags[key].name;
+                result.push({
+                    id: id,
+                    description: description
+                })
+            }
+        } catch (e) {
+            Logging.log(function_name, "Error getting tags for app " + appid, LogLevels.WARN);
+        }
+        return result;
+    }
+
+    if (!cachedData[appid]) {
+        addToQueue(appid);
+    } else if (cachedData[appid].playerExpiryDate < Date.now()) {
+        addToQueue(appid, true);
+    }
+
+    let gameData = {
+        'type': appinfo.common.type,
+        'name': appinfo.common.name,
+        'dlc': appinfo.extended && appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : [],
+        'short_description': cachedData[appid] ? cachedData[appid].short_description : undefined,
+        'header_image': appinfo.common && appinfo.common.header_image && appinfo.common.header_image.english ?
+            HEADER_BASE_URL + appid + '/' + appinfo.common.header_image.english : "",
+        'website': appinfo.extended ? appinfo.extended.homepage : undefined,
+        'pc_requirements': cachedData[appid] ? cachedData[appid].pc_requirements : undefined,
+        'mac_requirements': cachedData[appid] ? cachedData[appid].mac_requirements : undefined,
+        'linux_requirements': cachedData[appid] ? cachedData[appid].linux_requirements : undefined,
+        'developers': appinfo.extended ? [appinfo.extended.developer] : [],
+        'publishers': appinfo.extended ? [appinfo.extended.publisher] : [],
+        'price_overview': cachedData[appid] ? cachedData[appid].price_overview : undefined,
+        'platforms': getOSList(),
+        'categories': await getCategoryList(),
+        'genres': cachedData[appid] ? cachedData[appid].genres : undefined,
+        'release_date': cachedData[appid] ? cachedData[appid].release_date : undefined,
+        'playingnow': cachedData[appid] ? cachedData[appid].playingnow : undefined,
+        'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
+        'cache': cachedData[appid] && cachedData[appid].expiryDate > Date.now() ? true : false,
+    }
+
+    return gameData;
 }
 
 /** Searches for a game and sends the top 5 results.
