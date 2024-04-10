@@ -45,6 +45,7 @@ let inQueue = {};
 async function addToQueue(appid, onlyPlayerCount = false) {
     if (inQueue[appid] === undefined || (inQueue[appid] === true && onlyPlayerCount === false)) {
         inQueue[appid] = onlyPlayerCount;
+        Logging.log("addToQueue", "App " + appid + " added to queue");
         appQueue.push({appid: appid, onlyPlayerCount: onlyPlayerCount}, () => {
             Logging.log("addToQueue", "App " + appid + " finished queue");
         });
