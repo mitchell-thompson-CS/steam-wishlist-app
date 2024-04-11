@@ -133,6 +133,11 @@ const appQueue = async.queue(async (input_data) => {
 
             let entry = appdetails[appid]['data'];
 
+            entry['price_overview'] = {
+                ...entry['price_overview'],
+                is_free: entry.is_free
+            };
+
             let gameData = {
                 'short_description': entry['short_description'],
                 'pc_requirements': entry['pc_requirements'],
@@ -153,13 +158,12 @@ const appQueue = async.queue(async (input_data) => {
             cachedData[appid] = gameData;
         } else if (appdetails && appdetails[appid] && appdetails[appid]['success'] === false) {
             // when whatever app it is couldn't be grabbed from steam (error on their side, meaning app likely doesn't exist as a proper app)
-            cachedData[appid] = {};
+            cachedData[appid] = {updatingCache: false};
         }
     } catch (e) {
         Logging.log(function_name, "Error getting app " + appid + ": " + e, LogLevels.WARN);
         // rate limit error
         if (e.response.status === 429) {
-            Logging.log(function_name, "Server rate limited", LogLevels.ERROR);
             setTimeout(() => {
                 appQueue.resume();
             }, RATE_LIMIT_WAIT);
@@ -346,6 +350,12 @@ async function handleGameData(appid, appinfo) {
         addToQueue(appid, true);
     }
 
+    
+    let cacheState = cachedData[appid] && cachedData[appid].updatingCache === false ? true : false;
+
+    // TODO: does bug with prices still exist????? ^^ above might fix it
+    // console.log(appid, !!cachedData[appid], cachedData[appid]?cachedData[appid].updatingCache:null, cachedData[appid]?cachedData[appid].price_overview:null, cacheState);
+
     let gameData = {
         'type': appinfo.common.type,
         'name': appinfo.common.name,
@@ -366,7 +376,7 @@ async function handleGameData(appid, appinfo) {
         'release_date': cachedData[appid] ? cachedData[appid].release_date : undefined,
         'playingnow': cachedData[appid] ? cachedData[appid].playingnow : undefined,
         'reviews': { review_percentage: appinfo.common ? appinfo.common.review_percentage : undefined },
-        'cache': cachedData[appid] && !(cachedData[appid].updatingCache) ? true : false,
+        'cache': cacheState,
     }
 
     return gameData;

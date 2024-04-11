@@ -88,10 +88,9 @@ function setupHomeInfo() {
                 }
             }
 
-            for(let key of Object.keys(top_sellers_games)) {
-                let game = top_sellers_games[key];
+            for(let game of top_sellers_games) {
                 if(game.cache === false) {
-                    Logging.log(function_name, "Incomplete game " + key + " found in top sellers. Reattempting fetch...");
+                    Logging.log(function_name, "Incomplete game " + game.appid + " found in top sellers. Reattempting fetch...");
                     getSteamStore();
                     getSteamTopSellers();
                     return;
