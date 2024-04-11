@@ -57,6 +57,30 @@ const HomeView = () => {
         }
 
         fetchFeaturedGames();
+        const interval = setInterval(() => {
+            let anyFalse = false;
+            if(featuredGames !== null && typeof featuredGames === 'object'){
+                for (let key of Object.keys(featuredGames)) {
+                    console.log(key + ", " + featuredGames[key].cache);
+                    if (!featuredGames[key].cache) {
+                        anyFalse = true;
+                    }
+                }
+            }
+
+            if (topGames !== null) {
+                topGames.forEach(element => {
+                    if (!element.cache) {
+                        anyFalse = true;
+                    }
+                });
+            }
+
+            if (!anyFalse) {
+                clearInterval(interval);
+            }
+        }, 3000);
+        
     }, [dispatch, gettingGameData, featuredGames, topGames]);
 
     const toggleExpandTrending = () => {

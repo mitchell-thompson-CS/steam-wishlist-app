@@ -32,6 +32,9 @@ const WishlistInner = () => {
 
     const [loadingGames, setLoadingGames] = useState(false);
 
+    let interval = useRef(null);
+    const [intervalPing, setIntervalPing] = useState(true);
+
     useEffect(() => {
         // fetches the wishlist data for the current wishlist
         async function fetchWishlistData() {
@@ -73,9 +76,8 @@ const WishlistInner = () => {
                 } else if (wishlistItems.shared && wishlistItems.shared[id] !== undefined) {
                     data = wishlistItems.shared[id];
                 }
-            }
-
-            if (gettingWishlistData.current) {
+            } else if (gettingWishlistData.current) {
+                // currently getting wishlist data, so can end here
                 return true;
             }
 
@@ -95,45 +97,74 @@ const WishlistInner = () => {
             }
         }
         // if the wishlistItem is not already set, we want to fetch the wishlist data
-        // fetchWishlistData();
         handleWishlistData();
     }, [id, wishlistItems, user, dispatch, navigate]);
 
+    // creates an interval on mount and clears it on dismount
     useEffect(() => {
-        // fetches the game data for each game in the wishlist
-        async function fetchGameData(data) {
-            if (!gettingGameData && data && data.games && gameData !== undefined) {
-                setGettingGameData(true);
-                let arr = [];
-                for (const [key, value] of Object.entries(data.games)) {
-                    if (gameData[key] === undefined) {
-                        arr.push(key);
-                    }
+        createInterval();
+
+        return () => {
+            clearInterval(interval.current);
+            interval.current = 0;
+        }
+    }, []);
+
+    /** Creates interval that flips between true and false
+     * 
+     * @param {Number} delay
+     */
+    function createInterval(delay = 3000) {
+        let curPing = true;
+        interval.current = setInterval(() => {
+            curPing = !curPing;
+            setIntervalPing(curPing);
+        }, delay);
+    }
+
+    /** Fetches data for each game in wishlist
+     * 
+     */
+    const fetchGameData = useCallback(async function (data) {
+        if (data && data.games && gameData !== undefined) {
+            let arr = [];
+            // checks which entries don't exist yet, or don't have correct cache data from server
+            for (const [key, value] of Object.entries(data.games)) {
+                if (gameData[key] === undefined || !gameData[key].cache) {
+                    arr.push(key);
                 }
-                try {
-                    if (arr.length === 0) {
-                        setGettingGameData(false);
-                        return;
-                    }
-                    setLoadingGames(true);
-                    let res = await axios.get('/api/games/' + JSON.stringify(arr));
-                    if (res.status === 200) {
-                        for (const [key, value] of Object.entries(res.data)) {
-                            if (gameData[key] === undefined) {
-                                dispatch(addGame(key, value));
-                            }
+            }
+            try {
+                if (arr.length === 0) {
+                    setGettingGameData(false);
+                    clearInterval(interval.current);
+                    interval.current = 0;
+                    return;
+                } else if(interval.current === 0) {
+                    // no interval is running, but we found data that doesn't have proper information yet, so create interval to check for it
+                    createInterval();
+                }
+                setLoadingGames(true);
+                let res = await axios.get('/api/games/' + JSON.stringify(arr));
+                if (res.status === 200) {
+                    for (const [key, value] of Object.entries(res.data)) {
+                        // check that there is a reason to update
+                        if ((gameData[key] === undefined || !gameData[key].cache) && JSON.stringify(gameData[key]) !== JSON.stringify(value)) {
+                            dispatch(addGame(key, value));
                         }
                     }
-                } catch (e) {
-                    dispatch(setEvent(false, "Error fetching game data"));
                 }
-
-                setLoadingGames(false);
-                setGettingGameData(false);
+            } catch (e) {
+                dispatch(setEvent(false, "Error fetching game data"));
             }
+
+            setLoadingGames(false);
         }
+    }, [dispatch, gameData]);
+
+    useEffect(() => {
         fetchGameData(wishlistItem);
-    }, [wishlistItem, gettingGameData, dispatch, gameData]);
+    }, [wishlistItem, gettingGameData, dispatch, fetchGameData, intervalPing]);
 
     // enables the search popup with the current wishlists id
     function enableSearchPopup() {
@@ -276,7 +307,7 @@ const WishlistInner = () => {
 
     function getReviewPercent(key) {
         let num = NaN;
-        if(gameData[key].reviews){
+        if (gameData[key].reviews) {
             num = (Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
         }
         return (
