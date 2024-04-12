@@ -238,8 +238,10 @@ async function getGamesData(appids) {
 
         let result = {};
         for (let appid of valid_ids) {
-            result[appid] = (await handleGameData(appid, appsinfo[appid]));
+            result[appid] = (handleGameData(appid, appsinfo[appid]));
         }
+        // waits for all the results to be completed and then creates new map with them resolved
+        result = await Promise.all(Object.entries(result).map(async ([k,v]) => [k, await v])).then(Object.fromEntries);
         return result;
     } catch (e) {
         Logging.log(function_name, "Error getting gameData for apps " + appids + ": " + e, LogLevels.WARN)
@@ -452,6 +454,7 @@ async function getGamesPage(req, res) {
 exports.getGamePage = getGamePage;
 exports.searchGamePage = searchGamePage;
 exports.getGameData = getGameData;
+exports.getGamesData = getGamesData;
 exports.getGamesPage = getGamesPage;
 exports.steamClient = client;
 exports.steamConnected = steamConnected;
