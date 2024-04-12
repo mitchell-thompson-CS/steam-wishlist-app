@@ -5,8 +5,8 @@ const { getGameData, steamClient, getGamesData } = require('./game');
 require('dotenv').config({ path: __dirname + '/../../.env' });
 
 
-let featured = null;
-let top_sellers = null;
+let featured = [];
+let top_sellers = [];
 const country = 'US';
 const language = 'en';
 const CHECK_CHANGES_DELAY = 10 * 1000; // 10 seconds
@@ -15,14 +15,14 @@ async function getSteamStore() {
     let function_name = getSteamStore.name;
     try {
         let featured_res = await axios.get('https://store.steampowered.com/api/featured/');
-        featured = featured_res.data;
-        if (!featured || !featured['featured_win']) {
+        let data = featured_res.data;
+        if (!data || !data['featured_win']) {
             Logging.log(function_name, "Error getting featured games", LogLevels.ERROR);
             return;
         }
         let temp = [];
-        for(let game of Object.keys(featured['featured_win'])) {
-            temp.push(featured['featured_win'][game]['id']);
+        for (let game of Object.keys(data['featured_win'])) {
+            temp.push(data['featured_win'][game]['id']);
         }
         featured = temp;
     } catch (error) {
@@ -39,10 +39,10 @@ async function getSteamTopSellers() {
             Logging.log(function_name, "Error getting top sellers", LogLevels.ERROR);
             return;
         }
-        top_sellers = res.data.response.ranks;
+        let data = res.data.response.ranks;
         let temp = [];
-        for(let key of Object.keys(top_sellers)) {
-            temp.push(top_sellers[key]['appid']);
+        for (let key of Object.keys(data)) {
+            temp.push(data[key]['appid']);
         }
         top_sellers = temp;
     } catch (error) {
@@ -72,10 +72,15 @@ async function getFeatured(req, res) {
 async function getTopSellers(req, res) {
     let function_name = getTopSellers.name;
     let top_sellers_games = await getGamesData(top_sellers);
+    // need to convert this output into an array so they stay in order
     let list = [];
-    for(let id of top_sellers) {
-        top_sellers_games[id]['appid'] = id;
-        list.push(top_sellers_games[id]);
+    try {
+        for (let id of top_sellers) {
+            top_sellers_games[id]['appid'] = id;
+            list.push(top_sellers_games[id]);
+        }
+    } catch (e) {
+        Logging.log(function_name, "Error converting top sellers to list: " + top_sellers, LogLevels.ERROR);
     }
     Logging.handleResponse(res, 200, list, function_name, "Got top selling games");
 }
