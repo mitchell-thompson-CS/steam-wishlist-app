@@ -140,7 +140,7 @@ const WishlistInner = () => {
                     clearInterval(interval.current);
                     interval.current = 0;
                     return;
-                } else if(interval.current === 0) {
+                } else if (interval.current === 0) {
                     // no interval is running, but we found data that doesn't have proper information yet, so create interval to check for it
                     createInterval();
                 }
@@ -308,7 +308,7 @@ const WishlistInner = () => {
     function getReviewPercent(key) {
         let num = NaN;
         if (gameData[key].reviews) {
-            num = (Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+            num = gameData[key].reviews.review_percentage;
         }
         return (
             <p className="reviewPercent" style={{
@@ -461,7 +461,10 @@ const WishlistInner = () => {
                                                     <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
                                                     : null
                                                 }
-                                                <p className={"priceFinal " + (gameData[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{gameData[key].price_overview.final_formatted}</p>
+                                                <p className={"priceFinal " + (gameData[key].price_overview.initial_formatted !== "" && gameData[key].price_overview.initial_formatted !== undefined ? "sale-price" : "")}>
+                                                    {gameData[key].price_overview.is_free ? "Free" :
+                                                        (gameData[key].price_overview.final_formatted !== undefined ? gameData[key].price_overview.final_formatted : "Not Listed")}
+                                                </p>
                                             </>
                                             : <p className="priceFinal">Free</p>
                                         }
@@ -475,7 +478,10 @@ const WishlistInner = () => {
                                         <p className="lowestPrice">
                                             {"$" + gameData[key].price_overview.lowestprice}
                                         </p> :
-                                        <p className="noLowest lowestPrice">No Lowest</p>
+                                        <p className="noLowest lowestPrice">
+                                            {gameData[key].price_overview && gameData[key].price_overview.is_free ? "Free" :
+                                                (!gameData[key].price_overview || gameData[key].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
+                                        </p>
                                     }
                                 </div>
 
@@ -499,12 +505,6 @@ const WishlistInner = () => {
                                 <div className="gamePercent">
                                     <p className="reviewPercentTitle">Rating</p>
                                     {getReviewPercent(key)}
-                                    <p className="reviewTotal">
-                                        {gameData[key].reviews && gameData[key].reviews.total_reviews !== 0
-                                            ? <>{gameData[key].reviews.total_reviews} Reviews</>
-                                            : null
-                                        }
-                                    </p>
                                 </div>
                             </a>
                         </li>
