@@ -67,6 +67,7 @@ const appQueue = async.queue(async (input_data) => {
     let onlyPlayerCount = input_data.onlyPlayerCount;
     let currency = 'USD';
     let function_name = "AppQueue"
+    // TODO: found bug here related to infinite looping when failing player count check. maybe fixed??
     if (cachedData[appid] && onlyPlayerCount) {
         try {
             let appplayercount_res = await axios.get('https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=' + appid + '&key=' + process.env.STEAM_API_KEY);
@@ -79,11 +80,12 @@ const appQueue = async.queue(async (input_data) => {
 
             // reset expired time
             cachedData[appid].playerExpiryDate = Date.now() + PLAYER_EXPIRY_TIME;
-            cachedData[appid].updatingCache = false;
             Logging.log(function_name, "Updated player count information for " + appid);
         } catch (e) {
             Logging.log(function_name, "Error getting player count for app " + appid);
         }
+
+        cachedData[appid].updatingCache = false;
 
         try {
             delete inQueue[appid];
