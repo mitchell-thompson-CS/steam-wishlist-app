@@ -167,7 +167,9 @@ const appQueue = async.queue(async (input_data) => {
             setTimeout(() => {
                 appQueue.resume();
             }, RATE_LIMIT_WAIT);
-            appQueue.push({ appid: appid, onlyPlayerCount: onlyPlayerCount });
+            appQueue.push({ appid: appid, onlyPlayerCount: onlyPlayerCount }, () => {
+                Logging.log("addToQueue", "App " + appid + " finished queue");
+            });
             appQueue.pause();
             // return to stop from deleting the appid from the inQueue object
             return;
