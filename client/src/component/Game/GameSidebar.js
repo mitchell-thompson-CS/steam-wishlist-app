@@ -198,9 +198,11 @@ const GameSidebar = () => {
                                     gameData[id].genres.map((genre, index) => {
                                         return <span key={index}><p>{genre.description}</p></span>
                                     }) :
-                                    <span>
-                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
-                                    </span>
+                                    gameData[id] && gameData[id].cache ?
+                                        "No Genres" :
+                                        <span>
+                                            <img src={loadingImage} alt="loading..." className="loading-game-field" />
+                                        </span>
                                 }
                             </span>
                         </div>
