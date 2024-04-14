@@ -119,7 +119,7 @@ const appQueue = async.queue(async (input_data) => {
             Logging.log(function_name, "Unable to get lows for game " + appid, LogLevels.WARN);
         }
 
-        if (appdetails && appdetails[appid] && appdetails[appid]['data']) {
+        if (appdetails && appdetails[appid] && appdetails[appid]['success'] && appdetails[appid]['data']) {
             if (appstorelow) {
                 appdetails[appid]['data']['price_overview'] = {
                     ...appdetails[appid]['data']['price_overview'],
@@ -158,7 +158,7 @@ const appQueue = async.queue(async (input_data) => {
             }
 
             cachedData[appid] = gameData;
-        } else if (appdetails && appdetails[appid] && appdetails[appid]['success'] === false) {
+        } else {
             // when whatever app it is couldn't be grabbed from steam (error on their side, meaning app likely doesn't exist as a proper app)
             cachedData[appid] = {updatingCache: false};
         }
