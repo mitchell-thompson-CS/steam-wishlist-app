@@ -4,7 +4,7 @@
     flex-direction: row;
     overflow-x: auto;
     gap: 10px;
-    padding-bottom: 10px;
+    padding: 0 5px 10px 5px;
     align-items: center;
 }
 
