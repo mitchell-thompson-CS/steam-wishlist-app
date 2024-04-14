@@ -231,7 +231,6 @@ const GameSidebar = () => {
                         <div className="game-quick-info"> {/* review section */}
                             <h3>Positive Reviews:</h3>
                             <span className="reviews-game">
-                                {console.log(gameData[id])}
                                 {gameData[id] && gameData[id].reviews && gameData[id].cache ?
                                     <p className="review-percent-game" style={{
                                         color: getReviewColor(gameData[id].reviews.review_percentage)
