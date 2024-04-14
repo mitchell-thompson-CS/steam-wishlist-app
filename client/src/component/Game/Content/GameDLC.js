@@ -60,7 +60,7 @@ const GameDLC = () => {
                 <div className="game-content-section-body" id="dlc-body">
                     {[...gameData[id].dlc].map((x, i) => {
                         return gameData[x] ?
-                            <Link to={"/game/" + x} key={i} className='dlc-entry' title={gameData[x].name}>
+                            <Link to={"/game/" + x} key={x} className='dlc-entry' title={gameData[x].name}>
                                 {gameData[x].header_image !== "" ?
                                     <img className='dlc-blank-img' src={gameData[x].header_image} alt="Loading..." /> :
                                     <img className='dlc-blank-img' src={blankHeader} alt="Loading..." />}
@@ -87,7 +87,9 @@ const GameDLC = () => {
                                 </div>
                             </Link>
                             :
-                            <img className="loading-dlc dlc-entry" src={loadingImage} alt="loading..." key={i} />
+                            <div className='dlc-entry loading-entry' key={x}>
+                                <img className="loading-dlc" src={loadingImage} alt="loading..." />
+                            </div>
                     })}
                 </div>
             </div>
