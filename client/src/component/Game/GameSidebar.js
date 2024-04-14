@@ -132,7 +132,14 @@ const GameSidebar = () => {
                 <div className="game-info-body">
                     <h1>{gameData[id] ? gameData[id].name : "Game Title"}</h1>
                     <div className="game-info-section"> {/* game description section */}
-                        <p id="game-info-description">{gameData[id] ? gameData[id].short_description : "Game Description"}</p>
+                        <p id="game-info-description">
+                            {gameData[id] && gameData[id].cache && gameData[id].short_description ?
+                                gameData[id].short_description :
+                                gameData[id] && gameData[id].cache ?
+                                    "Game Description" :
+                                    <img src={loadingImage} alt="loading..." className="loading-game-field" />
+                            }
+                        </p>
                     </div> {/* end of game-info-section */}
                     <div className="game-info-section">
                         <div className="game-quick-info no-top-padding"> {/* release date, dev, and pub section */}
@@ -146,10 +153,12 @@ const GameSidebar = () => {
                                 }
 
 
-                                {gameData[id] && gameData[id].release_date !== undefined &&
-                                    gameData[id].release_date.date !== undefined
+                                {gameData[id] && gameData[id].release_date &&
+                                    gameData[id].release_date.date
                                     ? gameData[id].release_date.date
-                                    : "No Release Date"
+                                    : gameData[id] && gameData[id].cache ?
+                                        "No Release Date" :
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>
@@ -157,10 +166,12 @@ const GameSidebar = () => {
                         <div className="game-quick-info no-top-padding"> {/* developer section */}
                             <h4>Developer:</h4>
                             <span>
-                                {gameData[id] && gameData[id].developers !== undefined
+                                {gameData[id] && gameData[id].developers && gameData[id].cache
                                     ? gameData[id].developers.map((dev, index) => {
                                         return <p key={index}>{dev}</p>
-                                    }) : "No Developer"
+                                    }) : gameData[id] && gameData[id].cache ?
+                                        "No Developer" :
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>
@@ -168,10 +179,12 @@ const GameSidebar = () => {
                         <div className="game-quick-info no-top-padding"> {/* publisher section */}
                             <h4>Publisher:</h4>
                             <span>
-                                {gameData[id] && gameData[id].publishers !== undefined
+                                {gameData[id] && gameData[id].publishers && gameData[id].cache
                                     ? gameData[id].publishers.map((dev, index) => {
                                         return <p key={index}>{dev}</p>
-                                    }) : "No Publisher"
+                                    }) : gameData[id] && gameData[id].cache ?
+                                        "No Publisher" :
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>
@@ -181,9 +194,14 @@ const GameSidebar = () => {
                         <div id="game-genres">
                             <h3>Genres:</h3>
                             <span>
-                                {gameData[id] && gameData[id].genres !== undefined ? gameData[id].genres.map((genre, index) => {
-                                    return <span key={index}><p>{genre.description}</p></span>
-                                }) : "No Genres"}
+                                {gameData[id] && gameData[id].genres && gameData[id].cache ?
+                                    gameData[id].genres.map((genre, index) => {
+                                        return <span key={index}><p>{genre.description}</p></span>
+                                    }) :
+                                    <span>
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
+                                    </span>
+                                }
                             </span>
                         </div>
                         <div id="game-genres-more">
@@ -213,10 +231,8 @@ const GameSidebar = () => {
                         <div className="game-quick-info"> {/* review section */}
                             <h3>Positive Reviews:</h3>
                             <span className="reviews-game">
-                                {gameData[id] !== undefined && gameData[id].reviews &&
-                                    gameData[id].reviews.total_positive !== null &&
-                                    gameData[id].reviews.total_reviews !== null
-                                    ?
+                                {console.log(gameData[id])}
+                                {gameData[id] && gameData[id].reviews && gameData[id].cache ?
                                     <p className="review-percent-game" style={{
                                         color: getReviewColor(gameData[id].reviews.review_percentage)
                                     }}>
@@ -225,7 +241,7 @@ const GameSidebar = () => {
                                             : "No Reviews"
                                         }
                                     </p>
-                                    : null
+                                    : <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>
@@ -241,11 +257,13 @@ const GameSidebar = () => {
                                             : null}
                                         <p className="priceFinal-game" id={gameData[id].price_overview.initial_formatted !== "" && gameData[id].price_overview.initial_formatted !== undefined ?
                                             "sale-price" : ""}>
-                                                {gameData[id].price_overview.is_free ? "Free" :
-                                                                    (gameData[id].price_overview.final_formatted !== undefined ? gameData[id].price_overview.final_formatted : "Not Listed")}
+                                            {gameData[id].price_overview.is_free ? "Free" :
+                                                (gameData[id].price_overview.final_formatted !== undefined ? gameData[id].price_overview.final_formatted : "Not Listed")}
                                         </p>
                                     </>
-                                    : gameData[id] !== undefined ? <p>Not Listed</p> : null
+                                    : gameData[id] && gameData[id].cache ?
+                                        <p>Not Listed</p> :
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>
@@ -258,10 +276,12 @@ const GameSidebar = () => {
                                     <>
                                         <p className="priceFinal-game">{"$" + gameData[id].price_overview.lowestprice}</p>
                                     </>
-                                    : <p className="noLowest lowestPrice">
-                                        {gameData[id].price_overview && gameData[id].price_overview.is_free ? "Free" :
-                                            (!gameData[id].price_overview || gameData[id].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
-                                    </p>
+                                    : gameData[id] && gameData[id].cache ?
+                                        <p className="noLowest lowestPrice">
+                                            {gameData[id].price_overview && gameData[id].price_overview.is_free ? "Free" :
+                                                (!gameData[id].price_overview || gameData[id].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
+                                        </p> :
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>
@@ -273,10 +293,11 @@ const GameSidebar = () => {
                                     <>
                                         {gameData[id].playingnow.player_count}
                                     </>
-                                    :
-                                    <>
-                                        <p id="no-players">No players</p>
-                                    </>
+                                    : gameData[id] && gameData[id].cache ?
+                                        <>
+                                            <p id="no-players">No players</p>
+                                        </> :
+                                        <img src={loadingImage} alt="loading..." className="loading-game-field" />
                                 }
                             </span>
                             <div className="clear"></div>

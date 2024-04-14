@@ -80,7 +80,7 @@ const GameDLC = () => {
                                                 </p>
                                             </>
                                             : gameData[x].cache === false ?
-                                                <img src={loadingImage} alt="loading" className='loading-dlc' />
+                                                <img src={loadingImage} alt="loading" className='loading-dlc-price' />
                                                 : <p className='priceFinal-game'>Not Listed</p>
                                         }
                                     </div>

@@ -64,6 +64,7 @@
     overflow: hidden;
     float: left;
     max-width: 80%;
+    display: flex;
 }
 
 #game-tags *, #game-genres *{
@@ -147,6 +148,11 @@
 
 #add-to-wishlist {
     float: right;
+}
+
+.loading-game-field {
+    width: 25px !important;
+    height: 25px !important;
 }
 
 .clear {

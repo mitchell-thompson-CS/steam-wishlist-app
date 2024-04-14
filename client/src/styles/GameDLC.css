@@ -69,3 +69,8 @@
     flex: none;
     display: flex;
 }
+
+.loading-dlc-price {
+    width: 30px;
+    height: 30px;
+}
