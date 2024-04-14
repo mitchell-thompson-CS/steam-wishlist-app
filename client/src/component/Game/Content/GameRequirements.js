@@ -6,10 +6,11 @@ const GameRequirements = () => {
     const gameData = useSelector(state => state.gameReducer.games);
     let { id } = useParams();
     const [selectedPlatform, setSelectedPlatform] = useState('windows');
+    const [anyPlatforms, setAnyPlatforms] = useState(false);
 
     // set the requirements for the selected platform
     useEffect(() => {
-        if (gameData && gameData[id] && gameData[id].platforms) {
+        if (anyPlatforms) {
             let platforms = gameData[id].platforms;
             if (selectedPlatform === 'windows' && platforms.windows === true) {
                 let pc_requirements = gameData[id].pc_requirements;
@@ -80,7 +81,7 @@ const GameRequirements = () => {
                 }
             }
         }
-    }, [gameData, id, selectedPlatform]);
+    }, [gameData, id, selectedPlatform, anyPlatforms]);
 
     // disable buttons for platforms that are not supported
     useEffect(() => {
@@ -131,12 +132,25 @@ const GameRequirements = () => {
         }
     }, [selectedPlatform, gameData, id]);
 
+    useEffect(() => {
+        if (gameData[id] && gameData[id].cache && gameData[id].platforms && anyPlatforms === false) {
+            for (let p of Object.values(gameData[id].platforms)) {
+                if (p === true) {
+                    setAnyPlatforms(true);
+                    break;
+                }
+            }
+        }
+    }, [gameData, id, anyPlatforms])
+
     function setPlatformElementDisabled(element) {
         try {
-            element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-            element.style.cursor = 'not-allowed';
-            element.style.hover = 'not-allowed';
-            element.style.boxShadow = 'none';
+            if (element) {
+                element.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                element.style.cursor = 'not-allowed';
+                element.style.hover = 'not-allowed';
+                element.style.boxShadow = 'none';
+            }
         } catch (e) {
             console.log(e);
         }
@@ -144,8 +158,10 @@ const GameRequirements = () => {
 
     function selectPlatformElement(element) {
         try {
-            element.style.backgroundColor = 'grey';
-            element.style.boxShadow = '0 0 10px 5px rgba(0, 0, 0, 0.2)';
+            if (element) {
+                element.style.backgroundColor = 'grey';
+                element.style.boxShadow = '0 0 10px 5px rgba(0, 0, 0, 0.2)';
+            }
         } catch (e) {
             console.log(e);
         }
@@ -153,8 +169,10 @@ const GameRequirements = () => {
 
     function deselectPlatformElement(element) {
         try {
-            element.style.backgroundColor = '';
-            element.style.boxShadow = '';
+            if (element) {
+                element.style.backgroundColor = '';
+                element.style.boxShadow = '';
+            }
         } catch (e) {
             console.log(e);
         }
@@ -172,33 +190,35 @@ const GameRequirements = () => {
     }
 
     return (
-        <div className="game-content-section">
-            <div className="game-content-section-header">
-                <h2>Game Requirements</h2>
-            </div>
-            <div className="game-content-section-body">
-                <div id="game-requirements-selector">
-                    <div className="platform-selector" id='windows-req' onClick={selectReqPlatform}>
-                        <h3>Windows</h3>
-                    </div>
-                    <div className="platform-selector" id='mac-req' onClick={selectReqPlatform}>
-                        <h3>Mac</h3>
-                    </div>
-                    <div className="platform-selector" id='linux-req' onClick={selectReqPlatform}>
-                        <h3>Linux</h3>
-                    </div>
-                    <div className="clear"></div>
+        gameData[id] && gameData[id].cache && anyPlatforms ?
+            <div className="game-content-section">
+                <div className="game-content-section-header">
+                    <h2>Game Requirements</h2>
                 </div>
+                <div className="game-content-section-body">
+                    <div id="game-requirements-selector">
+                        <div className="platform-selector" id='windows-req' onClick={selectReqPlatform}>
+                            <h3>Windows</h3>
+                        </div>
+                        <div className="platform-selector" id='mac-req' onClick={selectReqPlatform}>
+                            <h3>Mac</h3>
+                        </div>
+                        <div className="platform-selector" id='linux-req' onClick={selectReqPlatform}>
+                            <h3>Linux</h3>
+                        </div>
+                        <div className="clear"></div>
+                    </div>
 
-                <div id="game-requirements">
-                    <div id="minimum-requirements">
+                    <div id="game-requirements">
+                        <div id="minimum-requirements">
+                        </div>
+                        <div id="recommended-requirements">
+                        </div>
+                        <div className="clear"></div>
                     </div>
-                    <div id="recommended-requirements">
-                    </div>
-                    <div className="clear"></div>
                 </div>
-            </div>
-        </div>
+            </div> :
+            null
     )
 }
 
