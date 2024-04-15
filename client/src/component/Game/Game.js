@@ -11,6 +11,8 @@ import { addGame } from "../../actions/gameAction";
 import AddGameToWishlistPopup from "../Popups/AddGameToWishlistPopup";
 import axios from "axios";
 
+import loadingImage from '../../resources/rolling-loading.apng';
+
 const Game = () => {
     let { id } = useParams();
     const gameData = useSelector(state => state.gameReducer.games);
@@ -22,13 +24,13 @@ const Game = () => {
         async function getData() {
             try {
                 let data = await axios.get('/api/game/' + id);
-                if(data.status === 200) {
+                if (data.status === 200) {
                     data = data.data;
-                    if((gameData[id] === undefined || !gameData[id].cache) && JSON.stringify(gameData[id]) !== JSON.stringify(data)){
+                    if ((gameData[id] === undefined || !gameData[id].cache) && JSON.stringify(gameData[id]) !== JSON.stringify(data)) {
                         dispatch(addGame(id, data));
                     }
                 }
-            } catch(e) {
+            } catch (e) {
                 console.log("Error getting game information:", e);
             }
 
@@ -43,7 +45,7 @@ const Game = () => {
             getData().then(() => {
                 dispatch(setLoading(false));
             })
-        } else if(!gettingGame && !gameData[id].cache) {
+        } else if (!gettingGame && !gameData[id].cache) {
             setGettingGame(true);
             getData();
         }
@@ -54,7 +56,13 @@ const Game = () => {
             <AddGameToWishlistPopup trigger={addingGame} />
             <div className="game">
                 <GameSidebar />
-                <GameContent />
+                {gameData[id] && gameData[id].cache ?
+                    <GameContent /> :
+                    <div id="game-content" className="loading-game-content">
+                        <img src={loadingImage} alt="loading..." />
+                    </div>
+
+                }
                 <div className="clear"></div>
             </div>
             <Footer />
