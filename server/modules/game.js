@@ -259,7 +259,7 @@ async function getGamesData(appids) {
  * @returns
  */
 function verifyAppID(appid) {
-    if (!Number(appid)) {
+    if (!Number(appid) || Number(appid) < 0) {
         return false;
     }
 
