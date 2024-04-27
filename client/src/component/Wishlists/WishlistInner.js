@@ -119,6 +119,7 @@ const WishlistInner = () => {
         interval.current = setInterval(() => {
             curPing = !curPing;
             setIntervalPing(curPing);
+            setGettingGameData(false);
         }, delay);
     }
 
@@ -126,7 +127,8 @@ const WishlistInner = () => {
      * 
      */
     const fetchGameData = useCallback(async function (data) {
-        if (data && data.games && gameData !== undefined) {
+        if (data && data.games && gameData !== undefined && !gettingGameData) {
+            setGettingGameData(true);
             let arr = [];
             // checks which entries don't exist yet, or don't have correct cache data from server
             for (const [key, value] of Object.entries(data.games)) {
@@ -159,12 +161,13 @@ const WishlistInner = () => {
             }
 
             setLoadingGames(false);
+
         }
-    }, [dispatch, gameData]);
+    }, [dispatch, gameData, gettingGameData]);
 
     useEffect(() => {
         fetchGameData(wishlistItem);
-    }, [wishlistItem, gettingGameData, dispatch, fetchGameData, intervalPing]);
+    }, [wishlistItem, fetchGameData, intervalPing]);
 
     // enables the search popup with the current wishlists id
     function enableSearchPopup() {
@@ -466,7 +469,9 @@ const WishlistInner = () => {
                                                         (gameData[key].price_overview.final_formatted !== undefined ? gameData[key].price_overview.final_formatted : "Not Listed")}
                                                 </p>
                                             </>
-                                            : <p className="priceFinal">Free</p>
+                                            : gameData[key].cache ?
+                                                <p className="priceFinal">Free</p> :
+                                                <img src={loadingImage} alt="loading..." className="innerLoading" />
                                         }
                                     </span>
                                 </div>
@@ -478,10 +483,14 @@ const WishlistInner = () => {
                                         <p className="lowestPrice">
                                             {"$" + gameData[key].price_overview.lowestprice}
                                         </p> :
-                                        <p className="noLowest lowestPrice">
-                                            {gameData[key].price_overview && gameData[key].price_overview.is_free ? "Free" :
-                                                (!gameData[key].price_overview || gameData[key].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
-                                        </p>
+                                        gameData[key].cache ?
+                                            <p className="noLowest lowestPrice">
+                                                {gameData[key].price_overview && gameData[key].price_overview.is_free ? "Free" :
+                                                    (!gameData[key].price_overview || gameData[key].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
+                                            </p> :
+                                            <span className="price">
+                                                <img src={loadingImage} alt="loading..." className="innerLoading" />
+                                            </span>
                                     }
                                 </div>
 
@@ -494,9 +503,11 @@ const WishlistInner = () => {
                                                 {gameData[key].playingnow.player_count}
                                             </>
                                             :
-                                            <>
-                                                <p className="noPlayers">No players</p>
-                                            </>
+                                            gameData[key].cache ?
+                                                <>
+                                                    <p className="noPlayers">No players</p>
+                                                </> :
+                                                <img src={loadingImage} alt="loading..." className="innerLoading" />
                                         }
                                     </span>
                                 </div>
