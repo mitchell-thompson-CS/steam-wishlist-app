@@ -133,7 +133,7 @@ const GameSidebar = () => {
                     <h1>{gameData[id] ? gameData[id].name : "Game Title"}</h1>
                     <div className="game-info-section"> {/* game description section */}
                         <p id="game-info-description">
-                            {gameData[id] && gameData[id].cache && gameData[id].short_description ?
+                            {gameData[id] && gameData[id].short_description ?
                                 gameData[id].short_description :
                                 gameData[id] && gameData[id].cache ?
                                     "Game Description" :
@@ -166,7 +166,7 @@ const GameSidebar = () => {
                         <div className="game-quick-info no-top-padding"> {/* developer section */}
                             <h4>Developer:</h4>
                             <span>
-                                {gameData[id] && gameData[id].developers && gameData[id].cache
+                                {gameData[id] && gameData[id].developers
                                     ? gameData[id].developers.map((dev, index) => {
                                         return <p key={index}>{dev}</p>
                                     }) : gameData[id] && gameData[id].cache ?
@@ -179,7 +179,7 @@ const GameSidebar = () => {
                         <div className="game-quick-info no-top-padding"> {/* publisher section */}
                             <h4>Publisher:</h4>
                             <span>
-                                {gameData[id] && gameData[id].publishers && gameData[id].cache
+                                {gameData[id] && gameData[id].publishers
                                     ? gameData[id].publishers.map((dev, index) => {
                                         return <p key={index}>{dev}</p>
                                     }) : gameData[id] && gameData[id].cache ?
@@ -194,7 +194,7 @@ const GameSidebar = () => {
                         <div id="game-genres">
                             <h3>Genres:</h3>
                             <span>
-                                {gameData[id] && gameData[id].genres && gameData[id].cache ?
+                                {gameData[id] && gameData[id].genres ?
                                     gameData[id].genres.map((genre, index) => {
                                         return <span key={index}><p>{genre.description}</p></span>
                                     }) :
@@ -233,7 +233,7 @@ const GameSidebar = () => {
                         <div className="game-quick-info"> {/* review section */}
                             <h3>Positive Reviews:</h3>
                             <span className="reviews-game">
-                                {gameData[id] && gameData[id].reviews && gameData[id].cache ?
+                                {gameData[id] && gameData[id].reviews ?
                                     <p className="review-percent-game" style={{
                                         color: getReviewColor(gameData[id].reviews.review_percentage)
                                     }}>
@@ -290,7 +290,7 @@ const GameSidebar = () => {
                         <div className="game-quick-info"> {/* player count section */}
                             <h3>Playing Now:</h3>
                             <span className="playing-now-game">
-                                {gameData[id] !== undefined && gameData[id].playingnow && gameData[id].playingnow.player_count > 0 ?
+                                {gameData[id] !== undefined && gameData[id].playingnow && gameData[id].playingnow.player_count > 0  && gameData[id].cache ?
                                     <>
                                         {gameData[id].playingnow.player_count}
                                     </>

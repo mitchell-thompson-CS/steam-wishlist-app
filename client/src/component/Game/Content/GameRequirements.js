@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { setLoading } from '../../../actions/eventAction';
+import loadingImage from '../../../resources/rolling-loading.apng';
 
 const GameRequirements = () => {
     const gameData = useSelector(state => state.gameReducer.games);
@@ -190,35 +192,39 @@ const GameRequirements = () => {
     }
 
     return (
-        gameData[id] && gameData[id].cache && anyPlatforms ?
             <div className="game-content-section">
                 <div className="game-content-section-header">
                     <h2>Game Requirements</h2>
                 </div>
-                <div className="game-content-section-body">
-                    <div id="game-requirements-selector">
-                        <div className="platform-selector" id='windows-req' onClick={selectReqPlatform}>
-                            <h3>Windows</h3>
+                {gameData[id] && (anyPlatforms || gameData[id].cache) ?
+                    <div className="game-content-section-body">
+                        <div id="game-requirements-selector">
+                            <div className="platform-selector" id='windows-req' onClick={selectReqPlatform}>
+                                <h3>Windows</h3>
+                            </div>
+                            <div className="platform-selector" id='mac-req' onClick={selectReqPlatform}>
+                                <h3>Mac</h3>
+                            </div>
+                            <div className="platform-selector" id='linux-req' onClick={selectReqPlatform}>
+                                <h3>Linux</h3>
+                            </div>
+                            <div className="clear"></div>
                         </div>
-                        <div className="platform-selector" id='mac-req' onClick={selectReqPlatform}>
-                            <h3>Mac</h3>
-                        </div>
-                        <div className="platform-selector" id='linux-req' onClick={selectReqPlatform}>
-                            <h3>Linux</h3>
-                        </div>
-                        <div className="clear"></div>
-                    </div>
 
-                    <div id="game-requirements">
-                        <div id="minimum-requirements">
+                        <div id="game-requirements">
+                            <div id="minimum-requirements">
+                            </div>
+                            <div id="recommended-requirements">
+                            </div>
+                            <div className="clear"></div>
                         </div>
-                        <div id="recommended-requirements">
-                        </div>
-                        <div className="clear"></div>
                     </div>
-                </div>
-            </div> :
-            null
+                    : 
+                    <div className='centerLoading'>
+                        <img src={loadingImage} alt="loading..." /> 
+                    </div>
+                }
+            </div>
     )
 }
 

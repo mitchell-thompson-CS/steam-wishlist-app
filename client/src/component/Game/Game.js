@@ -38,6 +38,7 @@ const Game = () => {
                 setGettingGame(false);
             }, 3000);
         }
+
         if (!gettingGame && !gameData[id]) {
             // only want to have loading when there is actually no information there
             dispatch(setLoading(true));
@@ -56,13 +57,8 @@ const Game = () => {
             <AddGameToWishlistPopup trigger={addingGame} />
             <div className="game">
                 <GameSidebar />
-                {gameData[id] && gameData[id].cache ?
-                    <GameContent /> :
-                    <div id="game-content" className="loading-game-content">
-                        <img src={loadingImage} alt="loading..." />
-                    </div>
+                <GameContent />
 
-                }
                 <div className="clear"></div>
             </div>
             <Footer />

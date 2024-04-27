@@ -52,13 +52,13 @@ const GameDLC = () => {
     }, [gameData, id, gettingDLCInfo, dispatch]);
 
     return (
-        gameData[id] && Array.isArray(gameData[id].dlc) && gameData[id].dlc.length > 0 ?
+        (gameData[id] && Array.isArray(gameData[id].dlc) && gameData[id].dlc.length > 0) || (!gameData[id] || !gameData[id].dlc) ?
             <div className="game-content-section">
                 <div className="game-content-section-header">
                     <h2>Game DLC</h2>
                 </div>
                 <div className="game-content-section-body" id="dlc-body">
-                    {[...gameData[id].dlc].map((x, i) => {
+                    {gameData[id] && Array.isArray(gameData[id].dlc) && gameData[id].dlc.length > 0 ? [...gameData[id].dlc].map((x, i) => {
                         return gameData[x] ?
                             <Link to={"/game/" + x} key={x} className='dlc-entry' title={gameData[x].name}>
                                 {gameData[x].header_image !== "" ?
@@ -90,10 +90,15 @@ const GameDLC = () => {
                             <div className='dlc-entry loading-entry' key={x}>
                                 <img className="loading-dlc" src={loadingImage} alt="loading..." />
                             </div>
-                    })}
+                    })
+                        :
+                        <div className='centerLoading'>
+                            <img src={loadingImage} alt="loading..." />
+                        </div>
+                    }
                 </div>
-            </div>
-            : null
+            </div> :
+            null
     )
 }
 

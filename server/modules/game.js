@@ -365,7 +365,7 @@ async function handleGameData(appid, appinfo) {
     let gameData = {
         'type': appinfo.common.type,
         'name': appinfo.common.name,
-        'dlc': appinfo.extended && appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : [],
+        'dlc': appinfo.extended && appinfo.extended.listofdlc ? appinfo.extended.listofdlc.split(/[,]+/) : cacheState === true ? [] : undefined,
         'short_description': cachedData[appid] ? cachedData[appid].short_description : undefined,
         'header_image': appinfo.common && appinfo.common.header_image && appinfo.common.header_image.english ?
             HEADER_BASE_URL + appid + '/' + appinfo.common.header_image.english : "",

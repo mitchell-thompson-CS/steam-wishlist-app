@@ -8,3 +8,8 @@
     align-items: center;
     justify-content: center;
 }
+
+.centerLoading {
+    width: 100%;
+    text-align: center;
+}
