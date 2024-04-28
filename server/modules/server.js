@@ -8,6 +8,7 @@ const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWish
 const { getGamePage, searchGamePage, getGamesPage } = require("./game.js");
 const { lowRateLimit, mediumRateLimit, highRateLimit } = require("./rateLimit.js");
 const { getFeatured, getTopSellers } = require("./home.js");
+const path = require('path')
 
 const app = express()
 
@@ -31,11 +32,8 @@ app.use(express.json());
 // maintains login state from session
 app.use(passport.session());
 
-// index path renders index.ejs with user data
-app.get('/', async function (req, res) {
-    // TODO: send to react frontend
-    res.sendStatus(200);
-});
+// frontend
+app.use(express.static(path.resolve(__dirname, '../../client/build')));
 
 // auth paths
 app.get('/api/auth/steam', mediumRateLimit, savePrevPageToSession, passport.authenticate('steam', { failureRedirect: '/', keepSessionInfo: true }));
@@ -77,5 +75,10 @@ app.get('/api/games/:game_ids', mediumRateLimit, getGamesPage);
 app.get('/api/home/featured', mediumRateLimit, getFeatured);
 
 app.get('/api/home/top-sellers', mediumRateLimit, getTopSellers);
+
+// All other GET requests not handled before will return our React app
+app.get('/*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
+  });
 
 exports.app = app;
