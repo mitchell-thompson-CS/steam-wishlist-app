@@ -4,6 +4,7 @@ const axios = require("axios");
 const { exportedForTesting, getWishlists, createWishlist, deleteWishlist } = require('../../modules/wishlists');
 const { login } = require('../../modules/auth');
 const { renameWishlist, getWishlistInner, addGameToWishlists, removeGameFromWishlists, addEditorToWishlist, deleteEditorFromWishlist } = require('../../modules/wishlistInner');
+const { steamClient } = require('../../modules/game');
 
 let res;
 let req;
@@ -74,6 +75,7 @@ beforeEach(async () => {
 afterAll(async () => {
     await clearFirestore();
     await firebaseAdmin.delete();
+    steamClient.logOff();
 });
 
 

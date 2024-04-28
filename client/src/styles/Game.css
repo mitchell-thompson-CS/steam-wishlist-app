@@ -2,3 +2,14 @@
     padding: 25px;
     flex-grow: 1;
 }
+
+.loading-game-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.centerLoading {
+    width: 100%;
+    text-align: center;
+}

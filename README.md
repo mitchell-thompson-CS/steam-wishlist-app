@@ -4,11 +4,15 @@ This project aims to allow users an easy way to create and manage multiple wishl
 ## Purpose
 The main purpose of this project, as mentioned above, is to extend the functionality of the wishlist function built into Steam. This app allows categorization through multiple wishlists and easy management of them, allowing games to be easily added and removed.
 
-## Credits
-Program created by Mitchell Thompson and Jacob White.
+# Building the Program
+
+To build the program, enter the `server` directory and run `npm run build-run` which will build the client and then run it alongside the server. If you wish to just build the client, you can run `npm run build` inside of the `client` directory.
+
+# Running the Program For Development
+
+To run the program you will need to run the server and the client independently for testing. In the client directory you can run `npm start` and in the server directory you can run `npm start` or `npm run start-dev` for more logging information. Note: You will need to setup all the keys inside of the env for the program to run properly.
 
 # Setting up for tests
-Make sure to first go into the `server/` directory.
 
 ## Local firebase emulators
 Make sure the Firebase CLI is installed, using the command `firebase --version`
@@ -21,10 +25,13 @@ See this link [Install and Configure Local Emulators](https://firebase.google.co
 
 ## Typesense
 
-TBD if there is an easy way to do this. Typesense needs to be installed and its API key in the env file (currently Typesense only works with a local Typesense session).
+Typesense needs to be installed and its API key in the env file (currently Typesense only works with a local Typesense session).
 
 More information about setting up Typesense can be found [here](https://typesense.org/docs/guide/install-typesense.html)
 
 # Running Tests
 
 `npm test` inside the `server/` directory or `npm run test-dev` for more logging information.
+
+# Credits
+Program created by Mitchell Thompson and Jacob White.

@@ -32,6 +32,9 @@ const WishlistInner = () => {
 
     const [loadingGames, setLoadingGames] = useState(false);
 
+    let interval = useRef(null);
+    const [intervalPing, setIntervalPing] = useState(true);
+
     useEffect(() => {
         // fetches the wishlist data for the current wishlist
         async function fetchWishlistData() {
@@ -73,9 +76,8 @@ const WishlistInner = () => {
                 } else if (wishlistItems.shared && wishlistItems.shared[id] !== undefined) {
                     data = wishlistItems.shared[id];
                 }
-            }
-
-            if (gettingWishlistData.current) {
+            } else if (gettingWishlistData.current) {
+                // currently getting wishlist data, so can end here
                 return true;
             }
 
@@ -95,45 +97,77 @@ const WishlistInner = () => {
             }
         }
         // if the wishlistItem is not already set, we want to fetch the wishlist data
-        // fetchWishlistData();
         handleWishlistData();
     }, [id, wishlistItems, user, dispatch, navigate]);
 
+    // creates an interval on mount and clears it on dismount
     useEffect(() => {
-        // fetches the game data for each game in the wishlist
-        async function fetchGameData(data) {
-            if (!gettingGameData && data && data.games && gameData !== undefined) {
-                setGettingGameData(true);
-                let arr = [];
-                for (const [key, value] of Object.entries(data.games)) {
-                    if (gameData[key] === undefined) {
-                        arr.push(key);
-                    }
+        createInterval();
+
+        return () => {
+            clearInterval(interval.current);
+            interval.current = 0;
+        }
+    }, []);
+
+    /** Creates interval that flips between true and false
+     * 
+     * @param {Number} delay
+     */
+    function createInterval(delay = 3000) {
+        let curPing = true;
+        interval.current = setInterval(() => {
+            curPing = !curPing;
+            setIntervalPing(curPing);
+            setGettingGameData(false);
+        }, delay);
+    }
+
+    /** Fetches data for each game in wishlist
+     * 
+     */
+    const fetchGameData = useCallback(async function (data) {
+        if (data && data.games && gameData !== undefined && !gettingGameData) {
+            setGettingGameData(true);
+            let arr = [];
+            // checks which entries don't exist yet, or don't have correct cache data from server
+            for (const [key, value] of Object.entries(data.games)) {
+                if (gameData[key] === undefined || !gameData[key].cache) {
+                    arr.push(key);
                 }
-                try {
-                    if (arr.length === 0) {
-                        setGettingGameData(false);
-                        return;
-                    }
-                    setLoadingGames(true);
-                    let res = await axios.get('/api/games/' + JSON.stringify(arr));
-                    if (res.status === 200) {
-                        for (const [key, value] of Object.entries(res.data)) {
-                            if (gameData[key] === undefined) {
-                                dispatch(addGame(key, value));
-                            }
+            }
+            try {
+                if (arr.length === 0) {
+                    setGettingGameData(false);
+                    clearInterval(interval.current);
+                    interval.current = 0;
+                    return;
+                } else if (interval.current === 0) {
+                    // no interval is running, but we found data that doesn't have proper information yet, so create interval to check for it
+                    createInterval();
+                }
+                setLoadingGames(true);
+                let res = await axios.get('/api/games/' + JSON.stringify(arr));
+                if (res.status === 200) {
+                    for (const [key, value] of Object.entries(res.data)) {
+                        // check that there is a reason to update
+                        if ((gameData[key] === undefined || !gameData[key].cache) && JSON.stringify(gameData[key]) !== JSON.stringify(value)) {
+                            dispatch(addGame(key, value));
                         }
                     }
-                } catch (e) {
-                    dispatch(setEvent(false, "Error fetching game data"));
                 }
-
-                setLoadingGames(false);
-                setGettingGameData(false);
+            } catch (e) {
+                dispatch(setEvent(false, "Error fetching game data"));
             }
+
+            setLoadingGames(false);
+
         }
+    }, [dispatch, gameData, gettingGameData]);
+
+    useEffect(() => {
         fetchGameData(wishlistItem);
-    }, [wishlistItem, gettingGameData, dispatch, gameData]);
+    }, [wishlistItem, fetchGameData, intervalPing]);
 
     // enables the search popup with the current wishlists id
     function enableSearchPopup() {
@@ -275,7 +309,10 @@ const WishlistInner = () => {
     }
 
     function getReviewPercent(key) {
-        let num = (Math.round(((gameData[key].reviews.total_positive / gameData[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+        let num = NaN;
+        if (gameData[key].reviews) {
+            num = gameData[key].reviews.review_percentage;
+        }
         return (
             <p className="reviewPercent" style={{
                 color: getReviewColor(num)
@@ -427,9 +464,14 @@ const WishlistInner = () => {
                                                     <p className="priceInitial">{gameData[key].price_overview.initial_formatted}</p>
                                                     : null
                                                 }
-                                                <p className={"priceFinal " + (gameData[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{gameData[key].price_overview.final_formatted}</p>
+                                                <p className={"priceFinal " + (gameData[key].price_overview.initial_formatted !== "" && gameData[key].price_overview.initial_formatted !== undefined ? "sale-price" : "")}>
+                                                    {gameData[key].price_overview.is_free ? "Free" :
+                                                        (gameData[key].price_overview.final_formatted !== undefined ? gameData[key].price_overview.final_formatted : "Not Listed")}
+                                                </p>
                                             </>
-                                            : <p className="priceFinal">Free</p>
+                                            : gameData[key].cache ?
+                                                <p className="priceFinal">Free</p> :
+                                                <img src={loadingImage} alt="loading..." className="innerLoading" />
                                         }
                                     </span>
                                 </div>
@@ -441,36 +483,39 @@ const WishlistInner = () => {
                                         <p className="lowestPrice">
                                             {"$" + gameData[key].price_overview.lowestprice}
                                         </p> :
-                                        <p className="noLowest lowestPrice">No Lowest</p>
+                                        gameData[key].cache ?
+                                            <p className="noLowest lowestPrice">
+                                                {gameData[key].price_overview && gameData[key].price_overview.is_free ? "Free" :
+                                                    (!gameData[key].price_overview || gameData[key].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
+                                            </p> :
+                                            <span className="price">
+                                                <img src={loadingImage} alt="loading..." className="innerLoading" />
+                                            </span>
                                     }
                                 </div>
 
                                 {/* playing the game now */}
                                 <div className="gamePlayingNow">
                                     <p className="playingNowTitle">Playing Now</p>
-                                    <p className="playingNow">
+                                    <span className="playingNow">
                                         {gameData[key] !== undefined && gameData[key].playingnow && gameData[key].playingnow.player_count > 0 ?
                                             <>
                                                 {gameData[key].playingnow.player_count}
                                             </>
                                             :
-                                            <>
-                                                <p className="noPlayers">No players</p>
-                                            </>
+                                            gameData[key].cache ?
+                                                <>
+                                                    <p className="noPlayers">No players</p>
+                                                </> :
+                                                <img src={loadingImage} alt="loading..." className="innerLoading" />
                                         }
-                                    </p>
+                                    </span>
                                 </div>
 
                                 {/* game review percentage */}
                                 <div className="gamePercent">
                                     <p className="reviewPercentTitle">Rating</p>
                                     {getReviewPercent(key)}
-                                    <p className="reviewTotal">
-                                        {gameData[key].reviews.total_reviews !== 0
-                                            ? <>{gameData[key].reviews.total_reviews} Reviews</>
-                                            : null
-                                        }
-                                    </p>
                                 </div>
                             </a>
                         </li>

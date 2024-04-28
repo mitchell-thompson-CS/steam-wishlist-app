@@ -45,7 +45,7 @@ class Logging {
    */
   static async log(function_name, message, level=LogLevels.INFO) {
     if ((write_to_console || level !== LogLevels.INFO || process.env.NODE_ENV === "test-dev") && process.env.NODE_ENV !== "test") {
-      console.log("(" + LogLevelsStrings[level] + ")(" + function_name + ") " + message);
+      console.log("(" + LogLevelsStrings[level] + ")(" + function_name + ")(" + (new Date()).toLocaleString() + ") " + message);
     }
   }
 }

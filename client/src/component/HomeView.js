@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import '../styles/HomeView.css';
@@ -15,6 +15,9 @@ const HomeView = () => {
     const [topGames, setTopGames] = useState(null);
     const [trendingIsExpanded, setTrendingIsExpanded] = useState(false);
     const [topIsExpanded, setTopIsExpanded] = useState(false);
+
+    let interval = useRef(null);
+    const [intervalPing, setIntervalPing] = useState(true);
 
     useEffect(() => {
         async function fetchFeaturedGames() {
@@ -57,7 +60,53 @@ const HomeView = () => {
         }
 
         fetchFeaturedGames();
+        // const interval = setInterval(() => {
+        //     let anyFalse = false;
+        //     if(featuredGames !== null && typeof featuredGames === 'object'){
+        //         for (let key of Object.keys(featuredGames)) {
+        //             console.log(key + ", " + featuredGames[key].cache);
+        //             if (!featuredGames[key].cache) {
+        //                 anyFalse = true;
+        //             }
+        //         }
+        //     }
+
+        //     if (topGames !== null) {
+        //         topGames.forEach(element => {
+        //             if (!element.cache) {
+        //                 anyFalse = true;
+        //             }
+        //         });
+        //     }
+
+        //     if (!anyFalse) {
+        //         clearInterval(interval);
+        //     }
+        // }, 3000);
+
     }, [dispatch, gettingGameData, featuredGames, topGames]);
+
+    // creates an interval on mount and clears it on dismount
+    useEffect(() => {
+        createInterval();
+
+        return () => {
+            clearInterval(interval.current);
+            interval.current = 0;
+        }
+    }, []);
+
+    /** Creates interval that flips between true and false
+     * 
+     * @param {Number} delay
+     */
+    function createInterval(delay = 3000) {
+        let curPing = true;
+        interval.current = setInterval(() => {
+            curPing = !curPing;
+            setIntervalPing(curPing);
+        }, delay);
+    }
 
     const toggleExpandTrending = () => {
         setTrendingIsExpanded(!trendingIsExpanded);
@@ -86,9 +135,9 @@ const HomeView = () => {
     function getReviewPercent(key) {
         let num;
         if (!featuredGames[key]) {
-            num = (Math.round(((topGames[key].reviews.total_positive / topGames[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+            num = topGames[key].reviews.review_percentage;
         } else {
-            num = (Math.round(((featuredGames[key].reviews.total_positive / featuredGames[key].reviews.total_reviews) * 100) * 100) / 100).toFixed(2);
+            num = featuredGames[key].reviews.review_percentage;
         }
         return (
             <p className="reviewPercent" style={{
@@ -163,15 +212,18 @@ const HomeView = () => {
                                             <div className="gamePrice">
                                                 <p className="priceTitle">Price</p>
                                                 <span className="price">
-                                                    {featuredGames[key].price_overview && featuredGames[key].price_overview.final_formatted ?
+                                                    {featuredGames[key].price_overview ?
                                                         <>
-                                                            {featuredGames[key].price_overview.initial_formatted !== "" ?
+                                                            {featuredGames[key].price_overview.initial_formatted !== "" &&  featuredGames[key].price_overview.initial_formatted !== undefined ?
                                                                 <p className="priceInitial">{featuredGames[key].price_overview.initial_formatted}</p>
                                                                 : null
                                                             }
-                                                            <p className={"priceFinal " + (featuredGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{featuredGames[key].price_overview.final_formatted}</p>
+                                                            <p className={"priceFinal " + (featuredGames[key].price_overview.initial_formatted !== "" && featuredGames[key].price_overview.initial_formatted !== undefined ? "sale-price" : "")}>
+                                                                {featuredGames[key].price_overview.is_free ? "Free" :
+                                                                    (featuredGames[key].price_overview.final_formatted !== undefined ? featuredGames[key].price_overview.final_formatted : "Not Listed")}
+                                                            </p>
                                                         </>
-                                                        : <p className="priceFinal">Free</p>
+                                                        : <p className="priceFinal">Not Listed</p>
                                                     }
                                                 </span>
                                             </div>
@@ -183,21 +235,24 @@ const HomeView = () => {
                                                     <p className="lowestPrice">
                                                         {"$" + featuredGames[key].price_overview.lowestprice}
                                                     </p> :
-                                                    <p className="noLowest lowestPrice">No Lowest</p>
+                                                    <p className="noLowest lowestPrice">
+                                                        {featuredGames[key].price_overview && featuredGames[key].price_overview.is_free ? "Free" : 
+                                                        (!featuredGames[key].price_overview || featuredGames[key].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
+                                                    </p>
                                                 }
                                             </div>
 
                                             {/* playing the game now */}
                                             <div className="gamePlayingNow">
                                                 <p className="playingNowTitle">Playing Now</p>
-                                                <p className="playingNow">
+                                                <p className={"playingNow " + (featuredGames[key] !== undefined && featuredGames[key].playingnow && featuredGames[key].playingnow.player_count > 0 ? "" : " noPlayers")}>
                                                     {featuredGames[key] !== undefined && featuredGames[key].playingnow && featuredGames[key].playingnow.player_count > 0 ?
                                                         <>
                                                             {featuredGames[key].playingnow.player_count}
                                                         </>
                                                         :
                                                         <>
-                                                            <p className="noPlayers">No players</p>
+                                                            No players
                                                         </>
                                                     }
                                                 </p>
@@ -207,12 +262,6 @@ const HomeView = () => {
                                             <div className="gamePercent">
                                                 <p className="reviewPercentTitle">Rating</p>
                                                 {getReviewPercent(key)}
-                                                <p className="reviewTotal">
-                                                    {featuredGames[key].reviews.total_reviews !== 0
-                                                        ? <>{featuredGames[key].reviews.total_reviews} Reviews</>
-                                                        : null
-                                                    }
-                                                </p>
                                             </div>
                                         </a>
                                     </li>
@@ -246,13 +295,16 @@ const HomeView = () => {
                                             <div className="gamePrice">
                                                 <p className="priceTitle">Price</p>
                                                 <span className="price">
-                                                    {topGames[key].price_overview && topGames[key].price_overview.final_formatted ?
+                                                    {topGames[key].price_overview ?
                                                         <>
-                                                            {topGames[key].price_overview.initial_formatted !== "" ?
+                                                            {topGames[key].price_overview.initial_formatted !== ""  &&  topGames[key].price_overview.initial_formatted !== undefined ?
                                                                 <p className="priceInitial">{topGames[key].price_overview.initial_formatted}</p>
                                                                 : null
                                                             }
-                                                            <p className={"priceFinal " + (topGames[key].price_overview.initial_formatted !== "" ? "sale-price" : "")}>{topGames[key].price_overview.final_formatted}</p>
+                                                            <p className={"priceFinal " + (topGames[key].price_overview.initial_formatted !== "" && topGames[key].price_overview.initial_formatted !== undefined ? "sale-price" : "")}>
+                                                                {topGames[key].price_overview.is_free ? "Free" :
+                                                                    (topGames[key].price_overview.final_formatted !== undefined ? topGames[key].price_overview.final_formatted : "Not Listed")}
+                                                            </p>
                                                         </>
                                                         : <p className="priceFinal">Free</p>
                                                     }
@@ -266,21 +318,24 @@ const HomeView = () => {
                                                     <p className="lowestPrice">
                                                         {"$" + topGames[key].price_overview.lowestprice}
                                                     </p> :
-                                                    <p className="noLowest lowestPrice">No Lowest</p>
+                                                    <p className="noLowest lowestPrice">
+                                                        {topGames[key].price_overview && topGames[key].price_overview.is_free ? "Free" : 
+                                                        (!topGames[key].price_overview || topGames[key].price_overview.final_formatted === undefined ? "Not Listed" : "No Lowest")}
+                                                    </p>
                                                 }
                                             </div>
 
                                             {/* playing the game now */}
                                             <div className="gamePlayingNow">
                                                 <p className="playingNowTitle">Playing Now</p>
-                                                <p className="playingNow">
+                                                <p className={"playingNow " + (topGames[key] !== undefined && topGames[key].playingnow && topGames[key].playingnow.player_count > 0 ? "" : " noPlayers")}>
                                                     {topGames[key] !== undefined && topGames[key].playingnow && topGames[key].playingnow.player_count > 0 ?
                                                         <>
                                                             {topGames[key].playingnow.player_count}
                                                         </>
                                                         :
                                                         <>
-                                                            <p className="noPlayers">No players</p>
+                                                            No players
                                                         </>
                                                     }
                                                 </p>
@@ -290,12 +345,6 @@ const HomeView = () => {
                                             <div className="gamePercent">
                                                 <p className="reviewPercentTitle">Rating</p>
                                                 {getReviewPercent(key)}
-                                                <p className="reviewTotal">
-                                                    {topGames[key].reviews.total_reviews !== 0
-                                                        ? <>{topGames[key].reviews.total_reviews} Reviews</>
-                                                        : null
-                                                    }
-                                                </p>
                                             </div>
                                         </a>
                                     </li>

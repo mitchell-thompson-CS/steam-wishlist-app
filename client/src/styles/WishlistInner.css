@@ -3,6 +3,10 @@
     position: relative;
 }
 
+.innerLoading {
+    width: 50px;
+}
+
 #wishlistInner-header {
     width: 100%;
     display: flex;
@@ -353,7 +357,7 @@
 }
 
 .reviewPercent {
-    margin: auto auto 0px auto;
+    margin: auto;
 }
 
 .reviewTotal {

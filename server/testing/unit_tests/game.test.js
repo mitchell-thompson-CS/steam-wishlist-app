@@ -1,4 +1,4 @@
-const { getGamePage, getGameData, searchGamePage, getGamesPage } = require("../../modules/game");
+const { getGamePage, getGameData, searchGamePage, getGamesPage, steamClient } = require("../../modules/game");
 const { startTypesense, exportedForTesting, searchTypesenseCollection } = require("../../modules/typesense");
 const { typesenseClient } = require("../typesenseClient");
 
@@ -11,6 +11,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
     await exportedForTesting.clearTypesenseCollection("games_test");
+    steamClient.logOff();
 });
 
 beforeEach(() => {
