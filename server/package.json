@@ -9,7 +9,7 @@
     "test-dev-log": "NODE_ENV=test-dev jest --watch --runInBand --detectOpenHandles --verbose",
     "start": "node index.js",
     "start-dev": "node index.js -v",
-    "build-run": "cd ../client && npm install && npm run build && cd ../server && npm start" 
+    "build-run": "cd ../client && npm install && npm run build && cd ../server && npm install && npm start" 
   },
   "author": "",
   "license": "ISC",
